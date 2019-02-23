@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E8CE2287-B20C-450A-9497-37B32FF06D27}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Invasiones</RootNamespace>
+    <AssemblyName>Invasiones</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ApplicationIcon>icono_invasiones.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="fuente\Audio\Sonido.cs" />
+    <Compile Include="fuente\Debug\Log.cs" />
+    <Compile Include="fuente\Dibujo\Fuente.cs" />
+    <Compile Include="fuente\Dibujo\Superficie.cs" />
+    <Compile Include="fuente\Dibujo\Video.cs" />
+    <Compile Include="fuente\Estados\EstadoAyuda.cs" />
+    <Compile Include="fuente\Estados\EstadoJuego.cs" />
+    <Compile Include="fuente\Estados\EstadoLogo.cs" />
+    <Compile Include="fuente\Estados\EstadoMenuPpal.cs" />
+    <Compile Include="fuente\Estados\EstadoOpciones.cs" />
+    <Compile Include="fuente\Estados\EstadoSalir.cs" />
+    <Compile Include="fuente\Eventos\Mouse.cs" />
+    <Compile Include="fuente\Eventos\Teclado.cs" />
+    <Compile Include="fuente\GameFrame.cs" />
+    <Compile Include="fuente\GUI\Tips.cs" />
+    <Compile Include="fuente\Sprites\AnimObjeto.cs" />
+    <Compile Include="fuente\GUI\Boton.cs" />
+    <Compile Include="fuente\GUI\CajaGUI.cs" />
+    <Compile Include="fuente\GUI\CuadroDeEntrada.cs" />
+    <Compile Include="fuente\GUI\Hud.cs" />
+    <Compile Include="fuente\GUI\Menu.cs" />
+    <Compile Include="fuente\GUI\MenuDeConfirmacion.cs" />
+    <Compile Include="fuente\Map\Camara.cs" />
+    <Compile Include="fuente\Map\Mapa.cs" />
+    <Compile Include="fuente\Map\PathFinder\PathFinder.cs" />
+    <Compile Include="fuente\Map\Tile.cs" />
+    <Compile Include="fuente\Map\Tileset.cs" />
+    <Compile Include="fuente\Nivel\Episodio\Episodio.cs" />
+    <Compile Include="fuente\Nivel\Episodio\Episodio.EstadoCargando.cs" />
+    <Compile Include="fuente\Nivel\Episodio\Episodio.EstadoJugando.cs" />
+    <Compile Include="fuente\Nivel\Episodio\Episodio.EstadoMostrarIntroduccion.cs" />
+    <Compile Include="fuente\Nivel\IA.cs" />
+    <Compile Include="fuente\Nivel\Jugadores\BandoArgentino.cs" />
+    <Compile Include="fuente\Nivel\Jugadores\BandoEnemigo.cs" />
+    <Compile Include="fuente\Nivel\Jugadores\Jugador.cs" />
+    <Compile Include="fuente\Nivel\Nivel.cs" />
+    <Compile Include="fuente\Nivel\Objetivo.cs" />
+    <Compile Include="fuente\Nivel\Objeto.cs" />
+    <Compile Include="fuente\Nivel\Obstaculo.cs" />
+    <Compile Include="fuente\Nivel\Orden.cs" />
+    <Compile Include="fuente\Nivel\Unidades\Grupo.cs" />
+    <Compile Include="fuente\Nivel\Unidades\Unidad\Unidad.cs" />
+    <Compile Include="fuente\Nivel\Unidades\Unidad\Unidad.EstadoMoviendo.cs" />
+    <Compile Include="fuente\Nivel\Unidades\Unidad\Unidad.EstadoSanando.cs" />
+    <Compile Include="fuente\Nivel\Unidades\Unidad\Unidad.Propiedades.cs" />
+    <Compile Include="fuente\Nivel\Unidades\Unidad\Unidades.Ordenes.cs" />
+    <Compile Include="fuente\Programa.cs" />
+    <Compile Include="fuente\Recursos\AdministradorDeRecursos.cs" />
+    <Compile Include="fuente\Recursos\Definiciones.cs" />
+    <Compile Include="fuente\Recursos\Res.cs" />
+    <Compile Include="fuente\Recursos\Texto.cs" />
+    <Compile Include="fuente\Recursos\Utilidades.cs" />
+    <Compile Include="fuente\SM\Estado.cs" />
+    <Compile Include="fuente\SM\MaquinaDeEstados.cs" />
+    <Compile Include="fuente\Sprites\Animaciones.cs" />
+    <Compile Include="fuente\Sprites\Sprite.cs" />
+    <Compile Include="fuente\Strings\Texto.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="data\nivel\nivel_0.xml" />
+    <Content Include="data\nivel\orden_nv0_102_274.xml" />
+    <Content Include="data\res.xml" />
+    <Content Include="data\strings.xml" />
+    <Content Include="icono_invasiones.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\patricio.csv" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

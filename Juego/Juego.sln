@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Invasiones", "Invasiones\Invasiones.csproj", "{E8CE2287-B20C-450A-9497-37B32FF06D27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlIdExporter", "XmlIdExporter\XmlIdExporter.csproj", "{A5A166C3-EADF-43F8-A7B9-390E5D279625}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E8CE2287-B20C-450A-9497-37B32FF06D27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8CE2287-B20C-450A-9497-37B32FF06D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8CE2287-B20C-450A-9497-37B32FF06D27}.Debug|x86.ActiveCfg = Debug|x86
+		{E8CE2287-B20C-450A-9497-37B32FF06D27}.Debug|x86.Build.0 = Debug|x86
+		{E8CE2287-B20C-450A-9497-37B32FF06D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8CE2287-B20C-450A-9497-37B32FF06D27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8CE2287-B20C-450A-9497-37B32FF06D27}.Release|x86.ActiveCfg = Release|x86
+		{E8CE2287-B20C-450A-9497-37B32FF06D27}.Release|x86.Build.0 = Release|x86
+		{A5A166C3-EADF-43F8-A7B9-390E5D279625}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5A166C3-EADF-43F8-A7B9-390E5D279625}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5A166C3-EADF-43F8-A7B9-390E5D279625}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A5A166C3-EADF-43F8-A7B9-390E5D279625}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5A166C3-EADF-43F8-A7B9-390E5D279625}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5A166C3-EADF-43F8-A7B9-390E5D279625}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

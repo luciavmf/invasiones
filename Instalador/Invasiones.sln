@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Instalador", "Instalador\Instalador.vdproj", "{F7D8AB7E-170F-4A3A-8E80-53C8BD78E629}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		Release|Default = Release|Default
+		Description = Juego de estrategia en tiempo real, sobre las invasiones inglesas de los años  1806 y 1807
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F7D8AB7E-170F-4A3A-8E80-53C8BD78E629}.Debug|Default.ActiveCfg = Debug
+		{F7D8AB7E-170F-4A3A-8E80-53C8BD78E629}.Debug|Default.Build.0 = Debug
+		{F7D8AB7E-170F-4A3A-8E80-53C8BD78E629}.Release|Default.ActiveCfg = Release
+		{F7D8AB7E-170F-4A3A-8E80-53C8BD78E629}.Release|Default.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
