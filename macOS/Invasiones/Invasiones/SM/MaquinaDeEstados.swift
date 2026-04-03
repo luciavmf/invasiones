@@ -1,7 +1,7 @@
 // SM/MaquinaDeEstados.swift
 // Puerto de MaquinaDeEstados.cs — máquina de estados genérica del juego.
 
-import SpriteKit
+import Foundation
 
 class MaquinaDeEstados {
 
@@ -70,7 +70,7 @@ class MaquinaDeEstados {
     }
 
     /// Dibuja el estado actual.
-    func dibujar(_ escena: SKScene) {
-        m_estadoActual?.dibujar(escena)
+    func dibujar(_ g: Video) {
+        m_estadoActual?.dibujar(g)
     }
 }

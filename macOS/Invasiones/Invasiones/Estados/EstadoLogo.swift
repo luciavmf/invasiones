@@ -1,26 +1,50 @@
 // Estados/EstadoLogo.swift
-// Placeholder — puerto de EstadoLogo.cs (pantalla de logo/splash).
-// TODO: implementar lógica de splash cuando se porte Dibujo/Superficie.
+// Puerto de EstadoLogo.cs — pantalla de logo con fade-in antes de pasar al menú.
 
-import SpriteKit
+import Foundation
 
 class EstadoLogo: Estado {
 
-    override func iniciar() {
-        Log.Instancia.debug("EstadoLogo: iniciar")
-        // TODO: cargar imagen de logo y reproducir por N frames
+    // MARK: - Constantes
+    private let LOGO_INICIO_CNT = 20
+    private let LOGO_TIEMPO_CNT = 70
+
+    // MARK: - Declaraciones
+    private var m_logo:          Superficie?
+    private var m_transparencia: Int = 10
+
+    // MARK: - Constructor
+    override init(_ sm: MaquinaDeEstados) {
+        super.init(sm)
+        m_cuenta = 0
     }
+
+    // MARK: - Métodos
+
+    override func iniciar() {}
 
     override func actualizar() {
-        // TODO: cuenta regresiva; por ahora va directo al menú principal
-        maquinaDeEstados.setearElProximoEstado(.MENU_PRINCIPAL)
+        if m_cuenta == 0 {
+            m_logo = AdministradorDeRecursos.Instancia.obtenerImagenAlpha(Res.IMG_LOGO)
+            m_transparencia = 10
+        } else if m_cuenta > LOGO_INICIO_CNT + LOGO_TIEMPO_CNT {
+            maquinaDeEstados.setearElProximoEstado(.MENU_PRINCIPAL)
+        }
+        m_cuenta += 1
     }
 
-    override func dibujar(_ escena: SKScene) {
-        // TODO: dibujar logo
+    override func dibujar(_ g: Video) {
+        g.llenarRectangulo(Definiciones.COLOR_NEGRO)
+
+        if m_cuenta > LOGO_INICIO_CNT && m_cuenta < LOGO_TIEMPO_CNT {
+            if m_transparencia < 255 - 10 {
+                m_transparencia += 10
+            }
+            g.dibujar(m_logo, 0, 0, m_transparencia, Superficie.H_CENTRO | Superficie.V_CENTRO)
+        }
     }
 
     override func salir() {
-        Log.Instancia.debug("EstadoLogo: salir")
+        m_logo = nil
     }
 }

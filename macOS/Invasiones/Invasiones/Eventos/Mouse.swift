@@ -1,8 +1,8 @@
 // Eventos/Mouse.swift
 // Puerto de Mouse.cs — singleton que rastrea posición, botones y arrastre del mouse.
-// SDL reemplazado por NSEvent; el cursor se gestiona como SKSpriteNode en la escena.
+// SDL reemplazado por NSEvent; el cursor personalizado se dibuja como Superficie via Video.
 
-import SpriteKit
+import AppKit
 
 class Mouse {
 
@@ -28,8 +28,8 @@ class Mouse {
     private var m_posicionInicioArrastre: CGPoint = .zero
     private(set) var m_rectanguloArrastrado: CGRect = .zero
 
-    /// Nodo de sprite del cursor personalizado (se asigna desde el nivel/estado).
-    var m_imagenCursor: SKSpriteNode?
+    /// Superficie del cursor personalizado (se asigna desde el estado/nivel).
+    private var m_cursorSup: Superficie?
 
     /// Lista de botones actualmente presionados (índices BOTON_IZQ/DER/CNT).
     private(set) var BotonesApretados: [Int] = []
@@ -96,8 +96,8 @@ class Mouse {
         NSCursor.unhide()
     }
 
-    func setearCursor(_ nodo: SKSpriteNode) {
-        m_imagenCursor = nodo
+    func setearCursor(_ sup: Superficie?) {
+        m_cursorSup = sup
     }
 
     func posicionarCursor(_ x: CGFloat, _ y: CGFloat) {
@@ -105,10 +105,9 @@ class Mouse {
         m_y = max(0, min(y, CGFloat(Programa.ALTO_DE_LA_PANTALLA)))
     }
 
-    /// Actualiza la posición del nodo cursor en la escena. Llamar desde GameScene tras actualizar().
-    func dibujarCursor(en escena: SKScene) {
-        guard !m_cursorOculto, let nodo = m_imagenCursor else { return }
-        // En SpriteKit Y crece hacia arriba; convertimos desde coordenadas de pantalla.
-        nodo.position = CGPoint(x: m_x, y: CGFloat(Programa.ALTO_DE_LA_PANTALLA) - m_y)
+    /// Dibuja el cursor personalizado en la posición actual usando el contexto Video.
+    func dibujarCursor(en g: Video) {
+        guard !m_cursorOculto, let sup = m_cursorSup else { return }
+        g.dibujar(sup, Int(m_x), Int(m_y), 255, 0)
     }
 }

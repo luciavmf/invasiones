@@ -23,13 +23,10 @@ class GameFrame {
 
     // MARK: - Declaraciones
     private(set) var maquinaDeEstados: MaquinaDeEstados!
+    private var video: Video?
 
-    /// FPS actual (actualizado por GameScene).
     static var FPS: Double = 0
     static var UPS: Double = 0
-
-    // MARK: - Referencia débil a la escena (para que estados puedan acceder al grafo de nodos)
-    weak var escena: SKScene?
 
     // MARK: - Constructor
     init() {}
@@ -37,7 +34,7 @@ class GameFrame {
     // MARK: - Inicio del juego
     /// Llamado una vez desde GameScene.didMove(to:).
     func iniciarJuego(en escena: SKScene) {
-        self.escena = escena
+        video = Video(escena: escena)
 
         Mouse.Instancia.posicionarCursor(
             CGFloat(Programa.ANCHO_DE_LA_PANTALLA) / 2,
@@ -73,9 +70,10 @@ class GameFrame {
     }
 
     func dibujar() {
-        guard let escena = escena else { return }
-        maquinaDeEstados.dibujar(escena)
-        Mouse.Instancia.dibujarCursor(en: escena)
+        guard let v = video else { return }
+        v.limpiar()
+        maquinaDeEstados.dibujar(v)
+        Mouse.Instancia.dibujarCursor(en: v)
     }
 
     // MARK: - Salida

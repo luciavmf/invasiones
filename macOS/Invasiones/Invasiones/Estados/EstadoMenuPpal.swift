@@ -1,25 +1,94 @@
 // Estados/EstadoMenuPpal.swift
-// Placeholder — puerto de EstadoMenuPpal.cs (menú principal).
-// TODO: implementar menú completo cuando se porten GUI/Menu y Dibujo/Superficie.
+// Puerto de EstadoMenuPpal.cs — menú principal con animación de entrada.
 
-import SpriteKit
+import Foundation
 
 class EstadoMenuPpal: Estado {
 
+    // MARK: - Constantes
+    private let CUENTA_HASTA_MOSTRAR_MENU = 20
+    private let INCREMENTO_MENU_Y         = 5
+
+    // MARK: - Items del menú
+    private enum ITEM: Int {
+        case NUEVO_JUEGO = 0
+        case AYUDA       = 1
+        case SALIR       = 2
+    }
+
+    // MARK: - Declaraciones
+    private var m_itemSeleccionado:      Int = -1
+    private var m_menu:                  Menu?
+    private var m_menuPosicionDeseadaY:  Int = 0
+    private var m_posicionY:             Int = 0
+    private var m_primeraVezConstruido:  Bool = true
+
+    // MARK: - Constructor
+    override init(_ sm: MaquinaDeEstados) {
+        super.init(sm)
+        m_primeraVezConstruido = true
+    }
+
+    // MARK: - Métodos
+
     override func iniciar() {
-        Log.Instancia.debug("EstadoMenuPpal: iniciar")
-        // TODO: construir opciones del menú (Nuevo Juego, Opciones, Ayuda, Salir)
+        m_fondo = AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_SPLASH)
+
+        Mouse.Instancia.setearCursor(AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_CURSOR))
+        Mouse.Instancia.mostrarCursor()
+
+        let menu = Menu(imagen: nil,
+                        cantItem: 3,
+                        x: 0,
+                        y: Video.Alto - Definiciones.MENU_PRINCIPAL_Y_OFFSET,
+                        ancla: Superficie.H_CENTRO)
+
+        menu.agregarItem(ITEM.NUEVO_JUEGO.rawValue, Res.STR_MENU_NUEVO_JUEGO, Menu.ITEM_VISIBLE)
+        menu.agregarItem(ITEM.AYUDA.rawValue,       Res.STR_MENU_AYUDA,       Menu.ITEM_VISIBLE)
+        menu.agregarItem(ITEM.SALIR.rawValue,       Res.STR_MENU_SALIR,       Menu.ITEM_VISIBLE)
+
+        if m_primeraVezConstruido {
+            m_primeraVezConstruido   = false
+            m_menuPosicionDeseadaY   = Video.Alto - menu.alto - Definiciones.MENU_PRINCIPAL_Y_OFFSET
+            m_posicionY              = Video.Alto + menu.alto + Definiciones.MENU_PRINCIPAL_Y_OFFSET
+            menu.setearPosicion(0, Video.Alto + 15, Superficie.H_CENTRO)
+        }
+
+        menu.setearFuente(AdministradorDeRecursos.Instancia.fuentes[Definiciones.FUENTE_MENU])
+        m_menu = menu
     }
 
     override func actualizar() {
-        // TODO: procesar selección de menú con Mouse/Teclado
+        guard let menu = m_menu else { return }
+
+        m_cuenta += 1
+        if m_cuenta > CUENTA_HASTA_MOSTRAR_MENU {
+            if m_posicionY > m_menuPosicionDeseadaY {
+                m_posicionY -= INCREMENTO_MENU_Y
+            }
+            menu.setearPosicion(0, m_posicionY, Superficie.H_CENTRO)
+        }
+
+        m_itemSeleccionado = menu.actualizar()
+
+        switch m_itemSeleccionado {
+        case ITEM.NUEVO_JUEGO.rawValue:
+            maquinaDeEstados.setearElProximoEstado(.JUEGO)
+        case ITEM.AYUDA.rawValue:
+            maquinaDeEstados.setearElProximoEstado(.AYUDA)
+        case ITEM.SALIR.rawValue:
+            maquinaDeEstados.setearElProximoEstado(.SALIR)
+        default:
+            break
+        }
     }
 
-    override func dibujar(_ escena: SKScene) {
-        // TODO: dibujar fondo y opciones de menú
+    override func dibujar(_ g: Video) {
+        g.dibujar(m_fondo, 0, 0, 0)
+        m_menu?.dibujar(g)
     }
 
     override func salir() {
-        Log.Instancia.debug("EstadoMenuPpal: salir")
+        m_menu = nil
     }
 }
