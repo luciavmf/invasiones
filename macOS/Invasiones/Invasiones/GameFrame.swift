@@ -46,6 +46,8 @@ class GameFrame {
         Mouse.Instancia.ocultarCursor()
 
         Texto.cargar()
+        AdministradorDeRecursos.Instancia.cargarPathsRecursos()
+        AdministradorDeRecursos.Instancia.cargarFuentes()
 
         maquinaDeEstados = MaquinaDeEstados()
         maquinaDeEstados.agregarEstado(.LOGO,           EstadoLogo(maquinaDeEstados))

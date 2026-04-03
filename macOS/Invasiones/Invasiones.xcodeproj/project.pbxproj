@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		848B94012F7FF6AA00EAF596 /* data in Resources */ = {isa = PBXBuildFile; fileRef = 848B94002F7FF6AA00EAF596 /* data */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		848B93D62F7FF6AA00EAF596 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		848B93BF2F7FF6A800EAF596 /* Invasiones.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Invasiones.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		848B93D52F7FF6AA00EAF596 /* InvasionesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InvasionesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		848B93DF2F7FF6AA00EAF596 /* InvasionesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InvasionesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		848B94002F7FF6AA00EAF596 /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -76,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				848B93C12F7FF6A800EAF596 /* Invasiones */,
+				848B94002F7FF6AA00EAF596 /* data */,
 				848B93D82F7FF6AA00EAF596 /* InvasionesTests */,
 				848B93E22F7FF6AA00EAF596 /* InvasionesUITests */,
 				848B93C02F7FF6A800EAF596 /* Products */,
@@ -212,6 +218,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				848B94012F7FF6AA00EAF596 /* data in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<strings>
+  <SDL_INIT_FALLO>No se pudo inicializar SDL correctamente</SDL_INIT_FALLO>
+  <WINDOW_CAPTION>Invasiones</WINDOW_CAPTION>
+  <FATAL_ERROR_CAPTION>Error fatal</FATAL_ERROR_CAPTION>
+	
+  <PRESIONE_PARA_CONTINUAR>presiona una tecla para continuar</PRESIONE_PARA_CONTINUAR>
+	<CARGANDO>Cargando...</CARGANDO>
+	<SIGUIENTE>Siguiente</SIGUIENTE>
+	<ATRAS>Atras</ATRAS>
+	<GANASTE>Ganaste!</GANASTE>
+	<PERDISTE>Juego Terminado...</PERDISTE>
+  <CONTINUARJUEGO>Deseas jugar nuevamente?</CONTINUARJUEGO>
+  <OBJETIVOS>Objetivo:</OBJETIVOS>
+  <ACEPTAR>Aceptar</ACEPTAR>
+  <CONTINUAR>Continuar</CONTINUAR>
+  
+	<!-- Opciones de todod los menus-->
+  <MENU_PRINCIPAL>Menú Principal</MENU_PRINCIPAL>
+	<MENU_CONTINUAR>Continuar</MENU_CONTINUAR>
+	<MENU_NUEVO_JUEGO>Jugar</MENU_NUEVO_JUEGO>
+	<MENU_CARGAR_PARTIDA>Cargar Partida</MENU_CARGAR_PARTIDA>
+  <MENU_OPCIONES>Opciones</MENU_OPCIONES>
+	<MENU_CREDITOS>Créditos</MENU_CREDITOS>
+	<MENU_AYUDA>Ayuda</MENU_AYUDA>
+	<MENU_SALIR>Salir</MENU_SALIR>
+	<MENU_GUARDAR>Guardar</MENU_GUARDAR>
+	<MENU_REINICIAR>Reiniciar</MENU_REINICIAR>
+
+	<!--Leyendas en algunos de los botones.-->
+	<BOTON_MENU>Volver</BOTON_MENU>
+	<BOTON_MENU_DEL_JUEGO>Menú</BOTON_MENU_DEL_JUEGO>
+
+	<!--Titulos varios-->
+	<JUEGO_PAUSADO>Juego Pausado</JUEGO_PAUSADO>
+
+	<!-- Atributos de las unidades-->
+	<UNIDAD>Unidad</UNIDAD>
+	<PUNTOS_DE_RESISTENCIA>Pts. Resist.</PUNTOS_DE_RESISTENCIA>
+	<ALCANCE>Alcance</ALCANCE>
+	<PUNTOS_DE_ATAQUE>Pts. Ataque.</PUNTOS_DE_ATAQUE>
+	<VISIBILIDAD>Visibilidad</VISIBILIDAD>
+	<PUNTERIA>Punteria</PUNTERIA>
+	<VELOCIDAD>Velocidad</VELOCIDAD>
+	
+	<!--Confirmaciones-->
+	<CONFIRMACION_SALIR>¿Estas seguro de que deseas salir?</CONFIRMACION_SALIR>
+	<SI>Si</SI>
+	<NO>No</NO>
+
+	<INGRESE_NOMBRE>Ingresá tu nombre:</INGRESE_NOMBRE>
+	<LISTO>Listo</LISTO>
+	
+	<!--Creditos-->
+	<CREDITOS_PROGRAMACION>Programación</CREDITOS_PROGRAMACION>
+	<CREDITOS_PROGRAMADOR_1>Lucía Valeria Medina Fretes</CREDITOS_PROGRAMADOR_1>
+	<CREDITOS_DISEÑO_DE_NIVEL>Diseño de Nivel</CREDITOS_DISEÑO_DE_NIVEL>
+	<CREDITOS_DISEÑADOR_DE_NIVEL_1>Matías Querel</CREDITOS_DISEÑADOR_DE_NIVEL_1>
+
+ 
+	<!--Objetivos a cumplir-->
+	<OBJETIVO_BATALLA_1_1>Capturar la bandera para comprobar la llegada de los ingleses y notifica al puesto indicado.</OBJETIVO_BATALLA_1_1>
+	<OBJETIVO_BATALLA_2_1>Robar los explosivos del polvorín ingles y llevarlos hasta el puente.</OBJETIVO_BATALLA_2_1>
+  <OBJETIVO_BATALLA_3_1>Recuperar el mando del fuerte.</OBJETIVO_BATALLA_3_1>
+  <OBJETIVO_BATALLA_4_1>Eliminar a todos los ingleses parapetados en la plaza.</OBJETIVO_BATALLA_4_1>
+
+	<!-- Introduccione a las batallas-->
+	<PRIMER_BATALLA>"La llegada de las tropas inglesas"</PRIMER_BATALLA>
+	<PRIMER_BATALLA_2>En abril de 1806, zarparon de Ciudad del Cabo barcos ingleses al mando\ndel Coronel Popham con el objetivo de conquistar la ciudad de Buenos Aires,\nel centro comercial más importante de toda Sudamérica.\n\nSe inicia entonces la larga travesía, que el 20 de Mayo de 1806, daría\nla primera alarma a las autoridades del Virreinato.</PRIMER_BATALLA_2>
+  <PRIMER_BATALLA_OBJETIVO_3>Capturá la bandera que trajeron los ingleses.\nLuego, notificá la llegada al puesto de avanzada\nque se te indicará una vez capturada la bandera.</PRIMER_BATALLA_OBJETIVO_3>
+	
+	<SEGUNDA_BATALLA>"El cruce del Riachuelo"</SEGUNDA_BATALLA>
+  <SEGUNDA_BATALLA_2>Luego de pasar la defensa propuesta por el virrey Cisneros, \n los soldadods ingleses comenzaron su marcha con\nel objetivo de conquistar el fuerte de Buenos Aires: un punto estratégico del\nVirreinato del Río de La Plata. Sin embargo, en el largo camino que\nlos separa de su meta se encontraron con la segunda Dificultad: "El\nRiachuelo". A la altura del actual puente La Noria, el ejército \ningles encuentra este obstaculo y debe sortearlo\n para la conquista de Buenos Aires se haga realidad.</SEGUNDA_BATALLA_2>
+	<SEGUNDA_BATALLA_OBJETIVO_3>Incendiá el puente para evitar el cruce de los ingleses.\nPara eso, robá explosivos del Polvorín Inglés y\nllevalos hasta el puente para incendiarlo.</SEGUNDA_BATALLA_OBJETIVO_3>
+	
+	<TERCER_BATALLA>"La toma del Fuerte"</TERCER_BATALLA>
+	<TERCER_BATALLA_2>Aún así, Beresford logra cruzar el Riachuelo. Ya nada podrá impedir el avance británico\nsobre el centro de la ciudad capital del Virreinato.\nTotalmente abatidos, y ante la repentina retirada de Sobremonte, los funcionarios\nespañoles aguardan la llegada de Beresford para rendir la plaza.\n\nCon el Fuerte ya en poder del general Beresford, la bandera británica no tardará\nen flamear... Así lo hará por 46 largas jornadas...\n El pueblo, indignado al ver como la ciudad había sido tomada por un simple\npuñado de soldados, no tardaría en organizar su propia defensa.</TERCER_BATALLA_2>
+	<TERCER_BATALLA_OBJETIVO_3>Llega desde el puente hasta el fuerte, \n y recuperalo.</TERCER_BATALLA_OBJETIVO_3>
+	
+	<CUARTA_BATALLA>"El combate en plaza Miserere"</CUARTA_BATALLA>
+	<CUARTA_BATALLA_2>El pueblo, indignado al ver como la ciudad había sido tomada por un simple\npuñado de soldados, no tardaría en organizar su propia defensa.\n\nAsí, vecinos de la ciudad, criollos y españoles por igual, se enfrentarían\na los ingleses...\n\nLa resistencia del pueblo, sólo podría ser enfrentada mediante la llegada\nde los refuerzos que Beresford y Popham se apresurarían a solicitar al\ngobierno de Londres. Sin embargo, Santiago de Liniers, quien abandona\nsu posición en Ensenada, tomaría por sorpresa a las\ntropas inglesas.</CUARTA_BATALLA_2>
+	<CUARTA_BATALLA_OBJETIVO_3>Destruye al ejército ingles que se encuentra en la plaza.</CUARTA_BATALLA_OBJETIVO_3>
+
+	<CONSECUENCIAS>"Final"</CONSECUENCIAS>
+	<CONSECUENCIAS_1>Beresford firmaría la capitulación el 20 de agosto, en la que se acordaba el intercambio de prisioneros entre ambos bandos. Retomada la ciudad, la Real Audiencia de Buenos Aires asumió el gobierno civil y decidió entregarle la Capitanía General a Liniers...</CONSECUENCIAS_1>
+	<CONSECUENCIAS_2>Asimismo, la corona española le agregó el título "La muy fiel y reconquistadora" a la ciudad de Montevideo y en el escudo de dicha ciudad se agregarían banderas inglesas caídas, indicando la derrota de los británicos frente a Montevideo...</CONSECUENCIAS_2>
+	<CONSECUENCIAS_3>Popham fue juzgado por una corte marcial británica por haber abandonado su misión en Cabo de Buena Esperanza... pero sólo sería  amonestado. La ciudad de Londres le otorgaría luego una espada de honor por sus esfuerzos por abrir nuevos mercados; la sentencia nunca llegaría a afectarlo...</CONSECUENCIAS_3>
+	
+	<!-- Textos de la ayuda-->
+	<MENU_AYUDA_TEXTO_SELECCIONAR_01>Seleccionar Unidades</MENU_AYUDA_TEXTO_SELECCIONAR_01>
+	<MENU_AYUDA_TEXTO_SELECCIONAR_02>Sosteniendo el botón primario del mouse, seleccioná el área\n donde se encuentra la o las unidades. \n Recordá que solo podes seleccionar un maximo \n de 6 unidades.\n Si perdes de vista a tus unidades dentro del mapa,\n presiona la tecla U para seleccionar la siguiente unidad.</MENU_AYUDA_TEXTO_SELECCIONAR_02>
+	<MENU_AYUDA_TEXTO_MOVER_01>Mover Unidades</MENU_AYUDA_TEXTO_MOVER_01>
+	<MENU_AYUDA_TEXTO_MOVER_02>Seleccioná una o más unidades y luego hacé click\ncon el botón secundario del mouse en el lugar del mapa que quieras que vaya.</MENU_AYUDA_TEXTO_MOVER_02>
+	<MENU_AYUDA_TEXTO_ATACAR_01>Atacar Unidades</MENU_AYUDA_TEXTO_ATACAR_01>
+	<MENU_AYUDA_TEXTO_ATACAR_02>Teniendo seleccionada una unidad o un grupo de unidades, hacé click con el botón derecho\ndel mouse sobre la unidad que deseas atacar. Siempre que puedas atacar a una unidad,\nel cursor del mouse cambiará a una espada.\nCada vez que tu ejército visualice a una unidad enemiga la atacará\nautomáticamente.</MENU_AYUDA_TEXTO_ATACAR_02>
+  <MENU_AYUDA_TEXTO_OBJETIVO_01>Indicador de Objetivo:</MENU_AYUDA_TEXTO_OBJETIVO_01>
+  <MENU_AYUDA_TEXTO_OBJETIVO_02>La flecha verde en la pantalla te muestra la dirección\n en la que se encuentra el objectivo.</MENU_AYUDA_TEXTO_OBJETIVO_02>
+  <MENU_AYUDA_TEXTO_SCROLL_01>Mover la Camara</MENU_AYUDA_TEXTO_SCROLL_01>
+  <MENU_AYUDA_TEXTO_SCROLL_02>Podés mover la camara para investigar el terreno o \n seguir a tus tropas si acercas el puntero del mouse \n a los limites de la pantalla.</MENU_AYUDA_TEXTO_SCROLL_02>
+  <MENU_AYUDA_TEXTO_HUD_01>Inteface:</MENU_AYUDA_TEXTO_HUD_01>
+  <MENU_AYUDA_TEXTO_HUD_02>Hay informacion indispensable en la interfaz que puede ayudarte: \n Cantidad de Unidades Argentinas (A). \n Cantidad de Unidades Inglesas (B). \n Estado de la unidad seleccionada (C).</MENU_AYUDA_TEXTO_HUD_02>
+  <MENU_AYUDA_TEXTO_SANAR_01>Sanar Unidad</MENU_AYUDA_TEXTO_SANAR_01>
+	<MENU_AYUDA_TEXTO_SANAR_02>Seleccioná una unidad herida y hacé click con el botón derecho del mouse\nsobre una enfermería. Las enfermerías estan indicadas con una cruz roja.</MENU_AYUDA_TEXTO_SANAR_02>
+  <MENU_AYUDA_TEXTO_TIPS_01>Tips:</MENU_AYUDA_TEXTO_TIPS_01>
+  <MENU_AYUDA_TEXTO_TIPS_02>No te olvides de chequear los tips de tanto en tanto. Hay mucha informacion util en ellos!</MENU_AYUDA_TEXTO_TIPS_02>
+  <MENU_AYUDA_TEXTO_GANAR_01>Ganar Batalla</MENU_AYUDA_TEXTO_GANAR_01>
+	<MENU_AYUDA_TEXTO_GANAR_02>Para ganar las batallas deberás cumplir los objetivos \n que aparecerán en pantalla.</MENU_AYUDA_TEXTO_GANAR_02>
+ 
+  <!-- Textos de los tips-->
+  <TIP_00>Tip!</TIP_00>
+  <TIP_01>Si perdiste energía, dirigite a las casas  marcadas \n con una cruz roja para recuperarte.</TIP_01>
+  <TIP_02>Hay varias casas donde podés recuperar tu salud. \n Buscalas a lo largo del mapa.</TIP_02>
+  <TIP_03>Rodeá a los ingleses e intentá atacarlos por sorpresa.</TIP_03>
+  <TIP_04>Atacá en grupos de manera coordinada, \n tendrás más oportunidades de ganar.</TIP_04>
+  <TIP_05>Si no puedes derrotarlos,  \n huí y replanteá tu estrategia.</TIP_05>
+  <TIP_06>Nunca ataques a tu enemigo si te superan en numero,\n  replegate y agrupá a tus hombres.</TIP_06>
+  <TIP_07>Evitá batallas innecesarias.\n Si podés, consigue los objetivos sin matar a ningún inglés.</TIP_07>
+  <TIP_08>Para no ser atacado, mantenete lejos del área\n  de visión del bando enemigo.</TIP_08>
+  <TIP_09>"Defiendete cuando no puedas derrotar al enemigo,\n  y ataca al enemigo cuando puedas vencerle"</TIP_09>
+  <TIP_10>"El campo de batalla puede parecer confusión y caos,\n  pero el bando propio debe permanecer ordenado.\n Así será a prueba de derrotas"</TIP_10>
+  <TIP_11>"Muevete cuando sea ventajoso y crea cambios en\n  la situación dispersando y concentrando tus fuerzas"</TIP_11>
+  <TIP_12>"Lo mas importante en una operación militar\n  es la victoria y no la persistencia"</TIP_12>
+  <TIP_13>"Es mejor conservar a un enemigo intacto que destruirlo"</TIP_13>
+  <TIP_14>"La defensa es para tiempos de escasez,\n  el ataque es para tiempos de abundancia"</TIP_14>
+  <TIP_15>"Los buenos estrategas vencen solo cuando es facil vencer...\n  No lo olvides."</TIP_15>
+  <TIP_16>"Si puede atacar a unos pocos soldados con muchos,\n  diezmarás el número de tus adversarios"</TIP_16>
+  <TIP_17>Coloca el cursor sobre los bordes de la pantalla \n para navegar sobre el mapa</TIP_17>
+  <TIP_18>Investiga un poco el mapa antes de mover a tus tropas.</TIP_18>
+  <TIP_19>No te olvides que podes encontrar \n a tus tropas usando la tecla U.</TIP_19>
+  <TIP_20>Solo podes manejar grupos de 6 unidades como maximo, \n asi que planea bien tus ataques por grupo. </TIP_20>
+  <TIP_21>La flecha verde en pantalla indica la direccion\n del objetivo actual. No lo olvides.</TIP_21>
+  <TIP_22>No pierdas tiempo atacando innecesariamente.\n Concentrate en los objetivos de la mision.</TIP_22>
+  <TIP_23>Si te pierdes en el mapa, recuerda que puedes\n volver a encontrar a tus tropas con la tecla U.</TIP_23>
+</strings>
