@@ -1,91 +1,85 @@
-//
-//  GameScene.swift
-//  Invasiones
-//
-//  Created by Lucia Medina Fretes on 03.04.26.
-//
+// GameScene.swift
+// Punto de entrada SpriteKit. Equivalente al loop de GameFrame.Run() en C#.
+// Delega toda la lógica en GameFrame; sólo gestiona eventos de NSEvent y el tick de SpriteKit.
 
 import SpriteKit
-import GameplayKit
 
 class GameScene: SKScene {
-    
-    private var label : SKLabelNode?
-    private var spinnyNode : SKShapeNode?
-    
+
+    // MARK: - Declaraciones
+    private var gameFrame = GameFrame()
+    private var ultimaTeclaApretada: Int = -1
+
+    // MARK: - Ciclo de vida de la escena
     override func didMove(to view: SKView) {
-        
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
-        }
-        
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
-        
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 2.5
-            
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
-        }
+        // Tamaño fijo de la pantalla original
+        size = CGSize(width: Programa.ANCHO_DE_LA_PANTALLA, height: Programa.ALTO_DE_LA_PANTALLA)
+        scaleMode = .aspectFit
+
+        gameFrame.iniciarJuego(en: self)
     }
-    
-    
-    func touchDown(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.green
-            self.addChild(n)
-        }
-    }
-    
-    func touchMoved(toPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.blue
-            self.addChild(n)
-        }
-    }
-    
-    func touchUp(atPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.red
-            self.addChild(n)
-        }
-    }
-    
-    override func mouseDown(with event: NSEvent) {
-        self.touchDown(atPoint: event.location(in: self))
-    }
-    
-    override func mouseDragged(with event: NSEvent) {
-        self.touchMoved(toPoint: event.location(in: self))
-    }
-    
-    override func mouseUp(with event: NSEvent) {
-        self.touchUp(atPoint: event.location(in: self))
-    }
-    
-    override func keyDown(with event: NSEvent) {
-        switch event.keyCode {
-        case 0x31:
-            if let label = self.label {
-                label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
-            }
-        default:
-            print("keyDown: \(event.characters!) keyCode: \(event.keyCode)")
-        }
-    }
-    
-    
+
+    // MARK: - Loop (SpriteKit llama a update(_:) cada frame)
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        gameFrame.actualizar()
+        gameFrame.dibujar()
+    }
+
+    // MARK: - Eventos de mouse
+    override func mouseDown(with event: NSEvent) {
+        let pos = event.location(in: self)
+        Mouse.Instancia.X = pos.x
+        Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - pos.y
+        Mouse.Instancia.presionarBoton(Mouse.BOTON_IZQ)
+    }
+
+    override func rightMouseDown(with event: NSEvent) {
+        let pos = event.location(in: self)
+        Mouse.Instancia.X = pos.x
+        Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - pos.y
+        Mouse.Instancia.presionarBoton(Mouse.BOTON_DER)
+    }
+
+    override func otherMouseDown(with event: NSEvent) {
+        Mouse.Instancia.presionarBoton(Mouse.BOTON_CNT)
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        Mouse.Instancia.soltarBoton(Mouse.BOTON_IZQ)
+    }
+
+    override func rightMouseUp(with event: NSEvent) {
+        Mouse.Instancia.soltarBoton(Mouse.BOTON_DER)
+    }
+
+    override func otherMouseUp(with event: NSEvent) {
+        Mouse.Instancia.soltarBoton(Mouse.BOTON_CNT)
+    }
+
+    override func mouseMoved(with event: NSEvent) {
+        let pos = event.location(in: self)
+        Mouse.Instancia.X = pos.x
+        Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - pos.y
+    }
+
+    override func mouseDragged(with event: NSEvent) {
+        let pos = event.location(in: self)
+        Mouse.Instancia.X = pos.x
+        Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - pos.y
+    }
+
+    // MARK: - Eventos de teclado
+    override func keyDown(with event: NSEvent) {
+        guard !event.isARepeat else { return }
+        let keyCode = Int(event.keyCode)
+        if keyCode != ultimaTeclaApretada {
+            ultimaTeclaApretada = keyCode
+            Teclado.Instancia.presionarTecla(keyCode)
+        }
+    }
+
+    override func keyUp(with event: NSEvent) {
+        ultimaTeclaApretada = -1
+        Teclado.Instancia.soltarTecla(Int(event.keyCode))
     }
 }

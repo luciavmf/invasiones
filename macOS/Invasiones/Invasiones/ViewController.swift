@@ -17,19 +17,19 @@ class ViewController: NSViewController {
         super.viewDidLoad()
 
         if let view = self.skView {
-            // Load the SKScene from 'GameScene.sks'
-            if let scene = SKScene(fileNamed: "GameScene") {
-                // Set the scale mode to scale to fit the window
-                scene.scaleMode = .aspectFill
-                
-                // Present the scene
-                view.presentScene(scene)
-            }
-            
+            let scene = GameScene(
+                size: CGSize(width: Programa.ANCHO_DE_LA_PANTALLA,
+                             height: Programa.ALTO_DE_LA_PANTALLA)
+            )
+            scene.scaleMode = .aspectFit
+            view.presentScene(scene)
+
             view.ignoresSiblingOrder = true
-            
+
+#if DEBUG
             view.showsFPS = true
             view.showsNodeCount = true
+#endif
         }
     }
 }
