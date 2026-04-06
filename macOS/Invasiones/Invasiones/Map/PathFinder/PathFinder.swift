@@ -13,130 +13,130 @@ class PathFinder {
 
     // MARK: - Internal node
 
-    private class Nodo: Equatable {
-        var padre: Nodo?
-        var costoG: Int = 0
-        var costoH: Int = 0
-        var costoF: Int = 0
+    private class Node: Equatable {
+        var parent: Node?
+        var costG: Int = 0
+        var costH: Int = 0
+        var costF: Int = 0
         var i: Int
         var j: Int
 
         init(_ i: Int = 0, _ j: Int = 0) { self.i = i; self.j = j }
 
-        static func == (a: Nodo, b: Nodo) -> Bool { a.i == b.i && a.j == b.j }
+        static func == (a: Node, b: Node) -> Bool { a.i == b.i && a.j == b.j }
     }
 
     // MARK: - Constants
-    private let COSTO_DIAGONAL:  Int = 14
-    private let COSTO_DERECHO:   Int = 10
-    private let COSTO_IMPOSIBLE: Int = 99999
-    private let TIMEOUT_SEG:     Double = 4.5  // equivalente a 45 décimas de segundo
+    private let COST_DIAGONAL:  Int = 14
+    private let COST_STRAIGHT:  Int = 10
+    private let COST_IMPOSSIBLE: Int = 99999
+    private let TIMEOUT_SECS:   Double = 4.5
 
     // MARK: - Singleton
-    private static var m_instancia: PathFinder?
+    private static var m_instance: PathFinder?
 
-    static var Instancia: PathFinder {
-        if m_instancia == nil { m_instancia = PathFinder() }
-        return m_instancia!
+    static var instance: PathFinder {
+        if m_instance == nil { m_instance = PathFinder() }
+        return m_instance!
     }
 
     // MARK: - Declarations
-    private var m_mapaTilesFisicos: [[Int16]] = []
-    private weak var m_mapa: Mapa?
+    private var m_physicalTiles: [[Int16]] = []
+    private weak var m_map: Map?
 
     private init() {}
 
     // MARK: - Methods
 
-    func cargarMapa(_ mapa: Mapa) -> Bool {
-        guard !mapa.capaTilesFisicos.isEmpty else { return false }
-        m_mapaTilesFisicos = mapa.capaTilesFisicos
-        m_mapa = mapa
+    func loadMap(_ map: Map) -> Bool {
+        guard !map.physicalTilesLayer.isEmpty else { return false }
+        m_physicalTiles = map.physicalTilesLayer
+        m_map = map
         return true
     }
 
     /// Returns the shortest path (stack of (i,j) points) or nil if none exists.
-    func encontrarCaminoMasCorto(_ inicioI: Int, _ inicioJ: Int,
-                                  _ objetivoI: Int, _ objetivoJ: Int) -> [(i: Int, j: Int)]? {
-        guard let mapa = m_mapa, !m_mapaTilesFisicos.isEmpty else {
-            Log.Instancia.advertir("PathFinder: mapa no cargado.")
+    func findShortestPath(_ startI: Int, _ startJ: Int,
+                          _ targetI: Int, _ targetJ: Int) -> [(i: Int, j: Int)]? {
+        guard let map = m_map, !m_physicalTiles.isEmpty else {
+            Log.shared.warn("PathFinder: map not loaded.")
             return nil
         }
-        guard mapa.esPosicionCaminable(objetivoI, objetivoJ) else {
-            Log.Instancia.debug("PathFinder: posición objetivo no caminable.")
+        guard map.isWalkable(targetI, targetJ) else {
+            Log.shared.debug("PathFinder: target position not walkable.")
             return nil
         }
 
-        let inicio   = Nodo(inicioI, inicioJ)
-        let objetivo = Nodo(objetivoI, objetivoJ)
+        let start  = Node(startI, startJ)
+        let target = Node(targetI, targetJ)
 
-        var abiertos:  [Nodo] = [inicio]
-        var cerrados:  [Nodo] = []
+        var open:   [Node] = [start]
+        var closed: [Node] = []
         let startTime = Date()
 
-        while !abiertos.isEmpty {
-            if Date().timeIntervalSince(startTime) > TIMEOUT_SEG {
-                Log.Instancia.debug("PathFinder: timeout.")
+        while !open.isEmpty {
+            if Date().timeIntervalSince(startTime) > TIMEOUT_SECS {
+                Log.shared.debug("PathFinder: timeout.")
                 return nil
             }
 
-            guard let mejorIdx = abiertos.indices.min(by: { abiertos[$0].costoF < abiertos[$1].costoF }),
-                  abiertos[mejorIdx].costoF < COSTO_IMPOSIBLE else { return nil }
+            guard let bestIdx = open.indices.min(by: { open[$0].costF < open[$1].costF }),
+                  open[bestIdx].costF < COST_IMPOSSIBLE else { return nil }
 
-            let mejor = abiertos.remove(at: mejorIdx)
+            let best = open.remove(at: bestIdx)
 
-            if mejor == objetivo {
-                cerrados.append(mejor)
-                return reconstruirCamino(desde: mejor, cerrados: cerrados)
+            if best == target {
+                closed.append(best)
+                return reconstructPath(from: best, closed: closed)
             }
 
-            agregarHijos(mejor, a: &abiertos, cerrados: cerrados, objetivo: objetivo, mapa: mapa)
-            cerrados.append(mejor)
+            addChildren(best, open: &open, closed: closed, target: target, map: map)
+            closed.append(best)
         }
         return nil
     }
 
     // MARK: - Private helpers
 
-    private func agregarHijos(_ padre: Nodo, a abiertos: inout [Nodo],
-                               cerrados: [Nodo], objetivo: Nodo, mapa: Mapa) {
-        let arr = abrirNodo(padre, padre.i - 1, padre.j,     COSTO_DERECHO,  &abiertos, cerrados, objetivo, mapa)
-        let der = abrirNodo(padre, padre.i,     padre.j + 1, COSTO_DERECHO,  &abiertos, cerrados, objetivo, mapa)
-        let abj = abrirNodo(padre, padre.i + 1, padre.j,     COSTO_DERECHO,  &abiertos, cerrados, objetivo, mapa)
-        let izq = abrirNodo(padre, padre.i,     padre.j - 1, COSTO_DERECHO,  &abiertos, cerrados, objetivo, mapa)
-        if arr && der { abrirNodo(padre, padre.i - 1, padre.j + 1, COSTO_DIAGONAL, &abiertos, cerrados, objetivo, mapa) }
-        if der && abj { abrirNodo(padre, padre.i + 1, padre.j + 1, COSTO_DIAGONAL, &abiertos, cerrados, objetivo, mapa) }
-        if abj && izq { abrirNodo(padre, padre.i + 1, padre.j - 1, COSTO_DIAGONAL, &abiertos, cerrados, objetivo, mapa) }
-        if izq && arr { abrirNodo(padre, padre.i - 1, padre.j - 1, COSTO_DIAGONAL, &abiertos, cerrados, objetivo, mapa) }
+    private func addChildren(_ parent: Node, open: inout [Node],
+                              closed: [Node], target: Node, map: Map) {
+        let up    = openNode(parent, parent.i - 1, parent.j,     COST_STRAIGHT,  &open, closed, target, map)
+        let right = openNode(parent, parent.i,     parent.j + 1, COST_STRAIGHT,  &open, closed, target, map)
+        let down  = openNode(parent, parent.i + 1, parent.j,     COST_STRAIGHT,  &open, closed, target, map)
+        let left  = openNode(parent, parent.i,     parent.j - 1, COST_STRAIGHT,  &open, closed, target, map)
+        if up    && right { openNode(parent, parent.i - 1, parent.j + 1, COST_DIAGONAL, &open, closed, target, map) }
+        if right && down  { openNode(parent, parent.i + 1, parent.j + 1, COST_DIAGONAL, &open, closed, target, map) }
+        if down  && left  { openNode(parent, parent.i + 1, parent.j - 1, COST_DIAGONAL, &open, closed, target, map) }
+        if left  && up    { openNode(parent, parent.i - 1, parent.j - 1, COST_DIAGONAL, &open, closed, target, map) }
     }
 
     @discardableResult
-    private func abrirNodo(_ padre: Nodo, _ i: Int, _ j: Int, _ costo: Int,
-                            _ abiertos: inout [Nodo], _ cerrados: [Nodo],
-                            _ objetivo: Nodo, _ mapa: Mapa) -> Bool {
-        guard mapa.esPosicionCaminable(i, j) else { return false }
+    private func openNode(_ parent: Node, _ i: Int, _ j: Int, _ cost: Int,
+                           _ open: inout [Node], _ closed: [Node],
+                           _ target: Node, _ map: Map) -> Bool {
+        guard map.isWalkable(i, j) else { return false }
 
-        let hijo = Nodo(i, j)
-        guard !cerrados.contains(hijo) else { return true }
+        let child = Node(i, j)
+        guard !closed.contains(child) else { return true }
 
-        hijo.costoG = costo + padre.costoG
-        hijo.costoH = (abs(i - objetivo.i) + abs(j - objetivo.j)) * COSTO_DERECHO
-        hijo.costoF = hijo.costoG + hijo.costoH
-        hijo.padre  = padre
+        child.costG = cost + parent.costG
+        child.costH = (abs(i - target.i) + abs(j - target.j)) * COST_STRAIGHT
+        child.costF = child.costG + child.costH
+        child.parent = parent
 
-        if !abiertos.contains(hijo) {
-            abiertos.append(hijo)
+        if !open.contains(child) {
+            open.append(child)
         }
         return true
     }
 
-    private func reconstruirCamino(desde nodo: Nodo, cerrados: [Nodo]) -> [(i: Int, j: Int)] {
-        var camino: [(i: Int, j: Int)] = []
-        var actual: Nodo? = nodo
-        while let n = actual {
-            camino.append((n.i, n.j))
-            actual = n.padre
+    private func reconstructPath(from node: Node, closed: [Node]) -> [(i: Int, j: Int)] {
+        var path: [(i: Int, j: Int)] = []
+        var current: Node? = node
+        while let n = current {
+            path.append((n.i, n.j))
+            current = n.parent
         }
-        return camino // first element = destination, last = origin
+        return path // first element = destination, last = origin
     }
 }

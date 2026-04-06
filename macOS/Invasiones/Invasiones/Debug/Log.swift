@@ -13,30 +13,30 @@ import Foundation
 class Log {
 
     // MARK: - Singleton
-    private static var s_instancia: Log?
+    private static var instance: Log?
 
-    static var Instancia: Log {
-        if s_instancia == nil {
-            s_instancia = Log()
+    static var shared: Log {
+        if instance == nil {
+            instance = Log()
         }
-        return s_instancia!
+        return instance!
     }
 
     // MARK: - Declarations
-    private static var s_habilitado = true
+    private static var enabled = true
 
 #if DEBUG
-    private let m_nombreDeArchivo = "output.log"
-    private var m_archivoEscritor: FileHandle?
+    private let fileName = "output.log"
+    private var fileWriter: FileHandle?
 #endif
 
     // MARK: - Initializer (private — singleton)
     private init() {
 #if DEBUG
-        let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(m_nombreDeArchivo)
+        let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
         FileManager.default.createFile(atPath: url.path, contents: nil)
-        m_archivoEscritor = try? FileHandle(forWritingTo: url)
-        m_archivoEscritor?.seekToEndOfFile()
+        fileWriter = try? FileHandle(forWritingTo: url)
+        fileWriter?.seekToEndOfFile()
 #endif
     }
 
@@ -46,28 +46,42 @@ class Log {
 
     func dispose() {
 #if DEBUG
-        m_archivoEscritor?.closeFile()
-        m_archivoEscritor = nil
+        fileWriter?.closeFile()
+        fileWriter = nil
 #endif
-        Log.s_instancia = nil
+        Log.instance = nil
     }
 
     // MARK: - Methods
-    private func loguear(_ nivel: String, _ mensaje: String) {
-        guard Log.s_habilitado else { return }
+    private func log(_ level: String, _ message: String) {
+        guard Log.enabled else { return }
 #if DEBUG
         let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .short, timeStyle: .medium)
-        let linea = "[\(timestamp)] \(nivel) - \(mensaje)"
-        print(linea)
-        if let data = (linea + "\n").data(using: .utf8) {
-            m_archivoEscritor?.write(data)
+        let line = "[\(timestamp)] \(level) - \(message)"
+        print(line)
+        if let data = (line + "\n").data(using: .utf8) {
+            fileWriter?.write(data)
         }
 #endif
     }
 
-    func debug(_ mensaje: String)    { loguear("DEBUG", mensaje) }
-    func informar(_ mensaje: String) { loguear("INFO",  mensaje) }
-    func advertir(_ mensaje: String) { loguear("WARN",  mensaje) }
-    func error(_ mensaje: String)    { loguear("ERROR", mensaje) }
-    func error(_ error: Error)       { self.error(error.localizedDescription) }
+    func debug(_ message: String) {
+        log("DEBUG", message)
+    }
+
+    func info(_ message: String) {
+        log("INFO",  message)
+    }
+
+    func warn(_ message: String) {
+        log("WARN",  message)
+    }
+
+    func error(_ message: String) {
+        log("ERROR", message)
+    }
+
+    func error(_ error: Error) {
+        self.error(error.localizedDescription)
+    }
 }

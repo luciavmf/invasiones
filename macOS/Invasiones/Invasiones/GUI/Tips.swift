@@ -9,96 +9,96 @@
 
 import Foundation
 
-class Tips: CajaGUI {
+class Tips: GUIBox {
 
     // MARK: - Constants
     private static let INITIAL_TIP_TIME = 250
-    private static let MAX_TITILA       = 40
-    private static let MIN_TITILA       = 20
+    private static let MAX_BLINK       = 40
+    private static let MIN_BLINK       = 20
 
     // MARK: - Declarations
-    private var m_botonTip:               Boton
-    private var m_correspondeMostrarTip:  Bool = false
-    private var m_cuentaTip:              Int  = 0
-    private var m_cuentaTitila:           Int  = 0
+    private var m_tipButton:               Button
+    private var m_shouldShowTip:  Bool = false
+    private var m_tipCount:              Int  = 0
+    private var m_blinkCount:           Int  = 0
 
     // MARK: - Initializer
     override init() {
-        m_botonTip = Boton(leyenda: Res.STR_TIP_00, fuente: nil)
+        m_tipButton = Button(label: Res.STR_TIP_00, font: nil)
         super.init()
 
-        m_botonTip.setearPosicion(
-            Video.Ancho - m_botonTip.ancho - 20,
-            Video.Alto  - 90 - m_botonTip.alto,
+        m_tipButton.setPosition(
+            Video.width - m_tipButton.width - 20,
+            Video.height  - 90 - m_tipButton.height,
             0)
 
-        m_ancho = Definiciones.TIPS_ANCHO
-        m_alto  = Definiciones.TIPS_ALTO
+        m_width = Definitions.TIPS_WIDTH
+        m_height  = Definitions.TIPS_HEIGHT
 
-        generarTipRandom()
+        generateRandomTip()
 
-        m_cuentaTip              = Tips.INITIAL_TIP_TIME
-        m_correspondeMostrarTip  = false
+        m_tipCount              = Tips.INITIAL_TIP_TIME
+        m_shouldShowTip  = false
     }
 
-    // MARK: - CajaGUI
+    // MARK: - GUIBox
 
-    override func setearPosicion(_ x: Int, _ y: Int, _ ancla: Int) {
+    override func setPosition(_ x: Int, _ y: Int, _ anchor: Int) {
         m_x = x
         m_y = y
-        if (ancla & Superficie.H_CENTRO) != 0 { m_x += (Video.Ancho >> 1) - (m_ancho >> 1) }
-        if (ancla & Superficie.V_CENTRO) != 0 { m_y += (Video.Alto  >> 1) - (m_alto  >> 1) }
+        if (anchor & Surface.centerHorizontal) != 0 { m_x += (Video.width >> 1) - (m_width >> 1) }
+        if (anchor & Surface.centerVertical) != 0 { m_y += (Video.height  >> 1) - (m_height  >> 1) }
     }
 
     @discardableResult
-    override func actualizar() -> Int {
-        m_cuentaTitila += 1
+    override func update() -> Int {
+        m_blinkCount += 1
 
-        if m_correspondeMostrarTip {
-            if m_cuentaTip <= 0 {
-                m_correspondeMostrarTip = false
+        if m_shouldShowTip {
+            if m_tipCount <= 0 {
+                m_shouldShowTip = false
             }
-            if m_cuentaTitila > Tips.MAX_TITILA {
-                m_cuentaTitila = 0
+            if m_blinkCount > Tips.MAX_BLINK {
+                m_blinkCount = 0
             }
         } else {
             if Int.random(in: 0..<300) == 99 {
-                m_correspondeMostrarTip = true
-                m_cuentaTitila          = 0
-                m_cuentaTip             = Tips.INITIAL_TIP_TIME
-                generarTipRandom()
+                m_shouldShowTip = true
+                m_blinkCount          = 0
+                m_tipCount             = Tips.INITIAL_TIP_TIME
+                generateRandomTip()
             }
         }
 
-        m_botonTip.actualizar()
+        m_tipButton.update()
         return -1  // SELECCION.NINGUNO
     }
 
-    override func dibujar(_ g: Video) {
-        guard m_correspondeMostrarTip else { return }
+    override func draw(_ g: Video) {
+        guard m_shouldShowTip else { return }
 
-        if m_botonTip.debajoDelPuntero {
-            g.setearColor(Definiciones.GUI_COLOR_MENUS)
-            g.llenarRectangulo(m_x, m_y, m_ancho, m_alto, Definiciones.TIPS_ALPHA)
-            g.setearFuente(
-                AdministradorDeRecursos.Instancia.fuentes[Definiciones.FUENTE_RECORDATORIO_OBJETIVOS],
-                Definiciones.GUI_COLOR_TEXTO)
-            g.escribir(m_leyenda,
-                       m_x - (Video.Ancho >> 1) + (m_ancho >> 1),
-                       m_y + m_alto / 5,
-                       Superficie.H_CENTRO)
-            m_botonTip.dibujar(g)
+        if m_tipButton.isUnderCursor {
+            g.setColor(Definitions.GUI_COLOR_MENUS)
+            g.fillRect(m_x, m_y, m_width, m_height, Definitions.TIPS_ALPHA)
+            g.setFont(
+                ResourceManager.shared.fonts[Definitions.FONT_OBJECTIVES_REMINDER],
+                Definitions.GUI_COLOR_TEXT)
+            g.write(m_label,
+                       m_x - (Video.width >> 1) + (m_width >> 1),
+                       m_y + m_height / 5,
+                       Surface.centerHorizontal)
+            m_tipButton.draw(g)
         } else {
-            m_cuentaTip -= 1
-            if m_cuentaTitila > Tips.MIN_TITILA && m_cuentaTitila < Tips.MAX_TITILA {
-                m_botonTip.dibujar(g)
+            m_tipCount -= 1
+            if m_blinkCount > Tips.MIN_BLINK && m_blinkCount < Tips.MAX_BLINK {
+                m_tipButton.draw(g)
             }
         }
     }
 
     // MARK: - Private
 
-    private func generarTipRandom() {
-        m_leyenda = Int.random(in: Res.STR_TIP_01..<Res.STR_TIP_23)
+    private func generateRandomTip() {
+        m_label = Int.random(in: Res.STR_TIP_01..<Res.STR_TIP_23)
     }
 }

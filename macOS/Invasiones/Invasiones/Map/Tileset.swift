@@ -12,12 +12,12 @@ import Foundation
 class Tileset {
 
     // MARK: - Declarations
-    var primerGid:    Int16 = 0
-    private var m_nombre:    String = ""
+    var firstGid:    Int16 = 0
+    private var name:    String = ""
     private(set) var id:     Int16  = 0
-    private(set) var anchoDelTile: Int16 = 0
-    private(set) var altoDelTile:  Int16 = 0
-    private(set) var imagen: Superficie?
+    private(set) var tileWidth: Int16 = 0
+    private(set) var tileHeight:  Int16 = 0
+    private(set) var image: Surface?
     var tiles:  [Tile?] = []
 
     // MARK: - Initializer
@@ -27,9 +27,9 @@ class Tileset {
 
     /// Loads the tileset from the given TSX path.
     @discardableResult
-    func cargar(_ tilesetPath: String) -> Bool {
+    func load(_ tilesetPath: String) -> Bool {
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: tilesetPath)) else {
-            Log.Instancia.error("Tileset: no se puede abrir \(tilesetPath)")
+            Log.shared.error("Tileset: no se puede abrir \(tilesetPath)")
             return false
         }
         let delegate = TilesetXMLDelegate(tileset: self, basePath: tilesetPath)
@@ -42,19 +42,19 @@ class Tileset {
     // MARK: - Helpers
 
     /// Returns the (x, y, w, h) rectangle within the tileset image for the given tile.
-    func obtenerRectanguloDelTile(_ tileId: Int) -> (x: Int, y: Int, w: Int, h: Int) {
-        guard let img = imagen, anchoDelTile > 0, altoDelTile > 0 else { return (0, 0, 0, 0) }
-        let cols = img.ancho / Int(anchoDelTile)
+    func getTileRect(_ tileId: Int) -> (x: Int, y: Int, w: Int, h: Int) {
+        guard let img = image, tileWidth > 0, tileHeight > 0 else { return (0, 0, 0, 0) }
+        let cols = img.width / Int(tileWidth)
         let col  = cols > 0 ? tileId % cols : 0
-        let fila = cols > 0 ? tileId / cols : 0
-        return (col * Int(anchoDelTile), fila * Int(altoDelTile),
-                Int(anchoDelTile), Int(altoDelTile))
+        let row = cols > 0 ? tileId / cols : 0
+        return (col * Int(tileWidth), row * Int(tileHeight),
+                Int(tileWidth), Int(tileHeight))
     }
 
     /// Sets the name and infers the numeric ID.
-    func setearNombre(_ nombre: String) {
-        m_nombre = nombre
-        switch nombre.lowercased() {
+    func setName(_ name: String) {
+        self.name = name
+        switch name.lowercased() {
         case "tierra":      id = Int16(Res.TLS_TIERRA)
         case "agua":        id = Int16(Res.TLS_AGUA)
         case "pasto":       id = Int16(Res.TLS_PASTO)
@@ -71,13 +71,13 @@ class Tileset {
         }
     }
 
-    func setearAnchoTile(_ v: Int16) { anchoDelTile = v }
-    func setearAltoTile(_ v: Int16)  { altoDelTile  = v }
+    func setTileWidth(_ v: Int16) { tileWidth = v }
+    func setTileHeight(_ v: Int16)  { tileHeight  = v }
 
-    func setearImagen(_ sup: Superficie?) {
-        imagen = sup
-        if let img = sup, anchoDelTile > 0, altoDelTile > 0 {
-            let count = (img.alto / Int(altoDelTile)) * (img.ancho / Int(anchoDelTile))
+    func setImage(_ sup: Surface?) {
+        image = sup
+        if let img = sup, tileWidth > 0, tileHeight > 0 {
+            let count = (img.height / Int(tileHeight)) * (img.width / Int(tileWidth))
             tiles = Array(repeating: nil, count: count)
         }
     }
@@ -103,20 +103,20 @@ private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
 
         switch name {
         case "tileset":
-            if let n = attributes["name"] { ts.setearNombre(n) }
-            if let w = attributes["tilewidth"]  { ts.setearAnchoTile(Int16(w) ?? 0) }
-            if let h = attributes["tileheight"] { ts.setearAltoTile(Int16(h)  ?? 0) }
+            if let n = attributes["name"] { ts.setName(n) }
+            if let w = attributes["tilewidth"]  { ts.setTileWidth(Int16(w) ?? 0) }
+            if let h = attributes["tileheight"] { ts.setTileHeight(Int16(h)  ?? 0) }
 
         case "image":
             if let src = attributes["source"] {
-                let fullPath = Utilidades.obtenerPath(
+                let fullPath = Utils.getPath(
                     (basePath as NSString).appendingPathComponent(src))
-                    ?? Utilidades.obtenerPath(
-                        (Programa.PATH_ESCENARIOS as NSString).appendingPathComponent(src))
+                    ?? Utils.getPath(
+                        (Program.SCENARIOS_PATH as NSString).appendingPathComponent(src))
                 if let path = fullPath {
-                    ts.setearImagen(AdministradorDeRecursos.Instancia.obtenerImagen(path))
+                    ts.setImage(ResourceManager.shared.getImage(path))
                 } else {
-                    Log.Instancia.error("Tileset: no se encuentra imagen \(src)")
+                    Log.shared.error("Tileset: no se encuentra image \(src)")
                 }
             }
 
@@ -143,7 +143,7 @@ private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
                 default: break
                 }
             } else if propName == "cantidad" {
-                ts.tiles[currentTileId]?.cantidad = Int(propValue) ?? 0
+                ts.tiles[currentTileId]?.count = Int(propValue) ?? 0
             }
 
         default: break

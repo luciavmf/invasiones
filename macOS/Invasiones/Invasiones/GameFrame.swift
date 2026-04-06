@@ -13,22 +13,22 @@ import SpriteKit
 
 class GameFrame {
 
-    // MARK: - State enum (equivalent to GameFrame.ESTADO in C#)
-    enum ESTADO {
-        case INVALIDO
-        case FIN
+    // MARK: - State enum (equivalent to GameFrame.STATE in C#)
+    enum STATE {
+        case INVALID
+        case END
         case LOGO
-        case JUEGO
-        case AYUDA
-        case MENU_PRINCIPAL
-        case INTRODUCCION_CONSECUENCIAS
-        case CREDITOS
-        case OPCIONES
-        case SALIR
+        case GAME
+        case HELP
+        case MAIN_MENU
+        case INTRO_CONSEQUENCES
+        case CREDITS
+        case OPTIONS
+        case QUIT
     }
 
     // MARK: - Declarations
-    private(set) var maquinaDeEstados: MaquinaDeEstados!
+    private(set) var stateMachine: StateMachine!
     private var video: Video?
 
     static var FPS: Double = 0
@@ -39,63 +39,62 @@ class GameFrame {
 
     // MARK: - Game start
     /// Called once from GameScene.didMove(to:).
-    func iniciarJuego(en escena: SKScene) {
+    func startGame(en escena: SKScene) {
         video = Video(escena: escena)
 
-        Mouse.Instancia.posicionarCursor(
-            CGFloat(Programa.ANCHO_DE_LA_PANTALLA) / 2,
-            CGFloat(Programa.ALTO_DE_LA_PANTALLA) / 2
+        Mouse.shared.positionCursor(
+            CGFloat(Program.SCREEN_WIDTH) / 2,
+            CGFloat(Program.SCREEN_HEIGHT) / 2
         )
-        Mouse.Instancia.ocultarCursor()
+        Mouse.shared.hideCursor()
 
-        Texto.cargar()
-        AdministradorDeRecursos.Instancia.cargarPathsRecursos()
-        AdministradorDeRecursos.Instancia.leerInfoSprites()
-        AdministradorDeRecursos.Instancia.leerInfoAnimaciones()
-        AdministradorDeRecursos.Instancia.cargarFuentes()
+        GameText.loadStrings()
+        ResourceManager.shared.loadResourcePaths()
+        ResourceManager.shared.readSpriteInfo()
+        ResourceManager.shared.readAnimationInfo()
+        ResourceManager.shared.loadFonts()
 
-        Sonido.Instancia.inicializar()
-        Sonido.Instancia.cargarTodosLosSonidos()
+        Sound.shared.loadAllSounds()
 
-        maquinaDeEstados = MaquinaDeEstados()
-        maquinaDeEstados.agregarEstado(.LOGO,           EstadoLogo(maquinaDeEstados))
-        maquinaDeEstados.agregarEstado(.MENU_PRINCIPAL, EstadoMenuPpal(maquinaDeEstados))
-        maquinaDeEstados.agregarEstado(.JUEGO,          EstadoJuego(maquinaDeEstados))
-        maquinaDeEstados.agregarEstado(.FIN,            nil)
-        maquinaDeEstados.agregarEstado(.AYUDA,          EstadoAyuda(maquinaDeEstados))
-        maquinaDeEstados.agregarEstado(.OPCIONES,       EstadoOpciones(maquinaDeEstados))
-        maquinaDeEstados.agregarEstado(.SALIR,          EstadoSalir(maquinaDeEstados))
+        stateMachine = StateMachine()
+        stateMachine.addState(.LOGO,           LogoState(stateMachine))
+        stateMachine.addState(.MAIN_MENU, MainMenuState(stateMachine))
+        stateMachine.addState(.GAME,          GameState(stateMachine))
+        stateMachine.addState(.END,            nil)
+        stateMachine.addState(.HELP,          HelpState(stateMachine))
+        stateMachine.addState(.OPTIONS,       OptionsState(stateMachine))
+        stateMachine.addState(.QUIT,          ExitState(stateMachine))
 
-        maquinaDeEstados.setearEstado(.LOGO)
-        maquinaDeEstados.actualizar() // triggers iniciar() on the first state
+        stateMachine.setState(.LOGO)
+        stateMachine.update() // triggers start() on the first state
     }
 
     // MARK: - Loop (called by GameScene.update every frame)
-    func actualizar() {
-        guard maquinaDeEstados.estadoActual != .FIN else {
-            salirDeLaAplicacion()
+    func update() {
+        guard stateMachine.currentState != .END else {
+            quitApp()
             return
         }
-        Mouse.Instancia.actualizar()
-        maquinaDeEstados.actualizar()
+        Mouse.shared.update()
+        stateMachine.update()
     }
 
-    func dibujar() {
+    func draw() {
         guard let v = video else { return }
-        v.limpiar()
-        maquinaDeEstados.dibujar(v)
-        Mouse.Instancia.dibujarCursor(en: v)
+        v.clear()
+        stateMachine.draw(v)
+        Mouse.shared.drawCursor(en: v)
     }
 
     // MARK: - Exit
-    private func salirDeLaAplicacion() {
-        liberarTodosLosRecursos()
+    private func quitApp() {
+        releaseAllResources()
         NSApplication.shared.terminate(nil)
     }
 
-    private func liberarTodosLosRecursos() {
-        maquinaDeEstados?.dispose()
-        maquinaDeEstados = nil
-        Log.Instancia.dispose()
+    private func releaseAllResources() {
+        stateMachine?.dispose()
+        stateMachine = nil
+        Log.shared.dispose()
     }
 }

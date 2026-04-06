@@ -14,24 +14,24 @@ class GameScene: SKScene {
 
     // MARK: - Declarations
     private var gameFrame = GameFrame()
-    private var ultimaTeclaApretada: Int = -1
+    private var m_lastKeyPressed: Int = -1
 
     // MARK: - Scene lifecycle
     override func didMove(to view: SKView) {
         // Fixed size matching the original screen resolution
-        size = CGSize(width: Programa.ANCHO_DE_LA_PANTALLA, height: Programa.ALTO_DE_LA_PANTALLA)
+        size = CGSize(width: Program.SCREEN_WIDTH, height: Program.SCREEN_HEIGHT)
         scaleMode = .aspectFit
         // Origin at the bottom-left corner — all Video code assumes (0,0) = bottom-left.
         anchorPoint = CGPoint(x: 0, y: 0)
         backgroundColor = .black
 
         // The original ran at 20 FPS with SDL_Delay; SpriteKit also accepts mouseMoved.
-        view.preferredFramesPerSecond = Programa.FPS_POR_DEFECTO
+        view.preferredFramesPerSecond = Program.DEFAULT_FPS
         view.window?.acceptsMouseMovedEvents = true
         // Make the SKView the first responder to receive mouseMoved without a prior click.
         view.window?.makeFirstResponder(view)
 
-        gameFrame.iniciarJuego(en: self)
+        gameFrame.startGame(en: self)
     }
 
     // MARK: - Loop (SpriteKit calls update(_:) every frame)
@@ -43,69 +43,69 @@ class GameScene: SKScene {
             let winPos    = win.convertPoint(fromScreen: screenPos)
             let viewPos   = v.convert(winPos, from: nil)
             let scenePos  = convertPoint(fromView: viewPos)
-            Mouse.Instancia.X = scenePos.x
-            Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - scenePos.y
+            Mouse.shared.X = scenePos.x
+            Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - scenePos.y
         }
-        gameFrame.actualizar()
-        gameFrame.dibujar()
+        gameFrame.update()
+        gameFrame.draw()
     }
 
     // MARK: - Mouse events
     override func mouseDown(with event: NSEvent) {
         let pos = event.location(in: self)
-        Mouse.Instancia.X = pos.x
-        Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - pos.y
-        Mouse.Instancia.presionarBoton(Mouse.BOTON_IZQ)
+        Mouse.shared.X = pos.x
+        Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - pos.y
+        Mouse.shared.pressButton(Mouse.BUTTON_LEFT)
     }
 
     override func rightMouseDown(with event: NSEvent) {
         let pos = event.location(in: self)
-        Mouse.Instancia.X = pos.x
-        Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - pos.y
-        Mouse.Instancia.presionarBoton(Mouse.BOTON_DER)
+        Mouse.shared.X = pos.x
+        Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - pos.y
+        Mouse.shared.pressButton(Mouse.BUTTON_RIGHT)
     }
 
     override func otherMouseDown(with event: NSEvent) {
-        Mouse.Instancia.presionarBoton(Mouse.BOTON_CNT)
+        Mouse.shared.pressButton(Mouse.BUTTON_MIDDLE)
     }
 
     override func mouseUp(with event: NSEvent) {
-        Mouse.Instancia.soltarBoton(Mouse.BOTON_IZQ)
+        Mouse.shared.releaseButton(Mouse.BUTTON_LEFT)
     }
 
     override func rightMouseUp(with event: NSEvent) {
-        Mouse.Instancia.soltarBoton(Mouse.BOTON_DER)
+        Mouse.shared.releaseButton(Mouse.BUTTON_RIGHT)
     }
 
     override func otherMouseUp(with event: NSEvent) {
-        Mouse.Instancia.soltarBoton(Mouse.BOTON_CNT)
+        Mouse.shared.releaseButton(Mouse.BUTTON_MIDDLE)
     }
 
     override func mouseMoved(with event: NSEvent) {
         let pos = event.location(in: self)
-        Mouse.Instancia.X = pos.x
-        Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - pos.y
+        Mouse.shared.X = pos.x
+        Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - pos.y
         view?.window?.acceptsMouseMovedEvents = true
     }
 
     override func mouseDragged(with event: NSEvent) {
         let pos = event.location(in: self)
-        Mouse.Instancia.X = pos.x
-        Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - pos.y
+        Mouse.shared.X = pos.x
+        Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - pos.y
     }
 
     // MARK: - Keyboard events
     override func keyDown(with event: NSEvent) {
         guard !event.isARepeat else { return }
         let keyCode = Int(event.keyCode)
-        if keyCode != ultimaTeclaApretada {
-            ultimaTeclaApretada = keyCode
-            Teclado.Instancia.presionarTecla(keyCode)
+        if keyCode != m_lastKeyPressed {
+            m_lastKeyPressed = keyCode
+            Keyboard.shared.pressKey(keyCode)
         }
     }
 
     override func keyUp(with event: NSEvent) {
-        ultimaTeclaApretada = -1
-        Teclado.Instancia.soltarTecla(Int(event.keyCode))
+        m_lastKeyPressed = -1
+        Keyboard.shared.releaseKey(Int(event.keyCode))
     }
 }

@@ -14,24 +14,24 @@ import SpriteKit
 class Video {
 
     // MARK: - Screen constants (equivalent to the static fields of Video in C#)
-    static let Ancho: Int = Programa.ANCHO_DE_LA_PANTALLA
-    static let Alto:  Int = Programa.ALTO_DE_LA_PANTALLA
+    static let width: Int = Program.SCREEN_WIDTH
+    static let height:  Int = Program.SCREEN_HEIGHT
 
     // MARK: - Nodo canvas
     private let canvasNode: SKNode
 
     // MARK: - Drawing state
-    private var colorActual:       SKColor = .black
-    private var fuenteActual:      Fuente?
-    private var colorFuenteActual: SKColor = .white
+    private var currentColor:       SKColor = .black
+    private var m_currentFont:      GameFont?
+    private var m_fontColor: SKColor = .white
     private var zPos:              CGFloat = 0
 
     // Clip rect in C# coordinates (top-left origin). Only the state is persisted;
     // actual visual clipping is handled by the map renderer itself.
     private var clipX: Int = 0
     private var clipY: Int = 0
-    private var clipW: Int = Programa.ANCHO_DE_LA_PANTALLA
-    private var clipH: Int = Programa.ALTO_DE_LA_PANTALLA
+    private var clipW: Int = Program.SCREEN_WIDTH
+    private var clipH: Int = Program.SCREEN_HEIGHT
 
     // MARK: - Initializer
     init(escena: SKScene) {
@@ -42,7 +42,7 @@ class Video {
     // MARK: - Frame management
 
     /// Removes all nodes from the previous frame and resets the Z order.
-    func limpiar() {
+    func clear() {
         canvasNode.removeAllChildren()
         zPos = 0
     }
@@ -50,35 +50,35 @@ class Video {
     // MARK: - Draw surfaces
 
     /// Draws a surface (or its active clip) at C# coordinates (x, y) with an anchor.
-    func dibujar(_ superficie: Superficie?, _ x: Int, _ y: Int, _ ancla: Int) {
-        let alpha = Int((superficie?.alphaActual ?? 1.0) * 255.0)
-        dibujar(superficie, x, y, alpha, ancla)
+    func draw(_ surface: Surface?, _ x: Int, _ y: Int, _ anchor: Int) {
+        let alpha = Int((surface?.currentAlpha ?? 1.0) * 255.0)
+        draw(surface, x, y, alpha, anchor)
     }
 
     /// Draws a surface with an explicit transparency value (alpha 0-255).
-    func dibujar(_ superficie: Superficie?, _ x: Int, _ y: Int, _ alpha: Int, _ ancla: Int) {
-        guard let sup = superficie,
-              let tex = sup.texturaActual ?? sup.textura else { return }
+    func draw(_ surface: Surface?, _ x: Int, _ y: Int, _ alpha: Int, _ anchor: Int) {
+        guard let sup = surface,
+              let tex = sup.currentTexture ?? sup.texture else { return }
 
         var px = x, py = y
         let fw = Int(tex.size().width)
         let fh = Int(tex.size().height)
 
-        if (ancla & Superficie.H_CENTRO) != 0 { px += Video.Ancho / 2 - fw / 2 }
-        if (ancla & Superficie.V_CENTRO) != 0 { py += Video.Alto  / 2 - fh / 2 }
+        if (anchor & Surface.centerHorizontal) != 0 { px += Video.width / 2 - fw / 2 }
+        if (anchor & Surface.centerVertical) != 0 { py += Video.height  / 2 - fh / 2 }
 
         let node = SKSpriteNode(texture: tex)
         node.anchorPoint = CGPoint(x: 0, y: 1)          // top-left anchor
-        node.position    = CGPoint(x: px, y: Video.Alto - py)
+        node.position    = CGPoint(x: px, y: Video.height - py)
         node.alpha       = CGFloat(max(0, min(alpha, 255))) / 255.0
         node.zPosition   = zPos; zPos += 1
         canvasNode.addChild(node)
     }
 
     /// Draws a sub-region of a surface at a destination position (tile blit).
-    func dibujar(_ superficie: Superficie?, _ srcX: Int, _ srcY: Int, _ srcW: Int, _ srcH: Int,
+    func draw(_ superficie: Surface?, _ srcX: Int, _ srcY: Int, _ srcW: Int, _ srcH: Int,
                  _ destX: Int, _ destY: Int) {
-        guard let sup = superficie, let tex = sup.textura else { return }
+        guard let sup = superficie, let tex = sup.texture else { return }
         let texW = tex.size().width
         let texH = tex.size().height
         guard texW > 0, texH > 0, srcW > 0, srcH > 0 else { return }
@@ -93,42 +93,42 @@ class Video {
 
         let node = SKSpriteNode(texture: subTex)
         node.anchorPoint = CGPoint(x: 0, y: 1)
-        node.position    = CGPoint(x: destX, y: Video.Alto - destY)
-        node.alpha       = sup.alphaActual
+        node.position    = CGPoint(x: destX, y: Video.height - destY)
+        node.alpha       = sup.currentAlpha
         node.zPosition   = zPos; zPos += 1
         canvasNode.addChild(node)
     }
 
     // MARK: - Clip
 
-    func obtenerClip() -> (x: Int, y: Int, w: Int, h: Int) { (clipX, clipY, clipW, clipH) }
+    func getClip() -> (x: Int, y: Int, w: Int, h: Int) { (clipX, clipY, clipW, clipH) }
 
-    func setearClip(_ x: Int, _ y: Int, _ w: Int, _ h: Int) {
+    func setClip(_ x: Int, _ y: Int, _ w: Int, _ h: Int) {
         clipX = x; clipY = y; clipW = w; clipH = h
     }
 
     // MARK: - Write text
 
-    /// Writes the string identified by its ID (index in Texto.Strings) with an anchor.
-    func escribir(_ stringId: Int, _ x: Int, _ y: Int, _ ancla: Int) {
-        let strings = Texto.Strings
+    /// Writes the string identified by its ID (index in GameText.Strings) with an anchor.
+    func write(_ stringId: Int, _ x: Int, _ y: Int, _ anchor: Int) {
+        let strings = GameText.Strings
         guard stringId >= 0, stringId < strings.count else { return }
-        escribirTexto(strings[stringId], x, y, ancla)
+        writeText(strings[stringId], x, y, anchor)
     }
 
     /// Writes a string literal (for debug output and dynamic text).
-    func escribir(_ texto: String, _ x: Int, _ y: Int, _ ancla: Int) {
-        escribirTexto(texto, x, y, ancla)
+    func write(_ text: String, _ x: Int, _ y: Int, _ anchor: Int) {
+        writeText(text, x, y, anchor)
     }
 
-    private func escribirTexto(_ text: String, _ x: Int, _ y: Int, _ ancla: Int) {
+    private func writeText(_ text: String, _ x: Int, _ y: Int, _ anchor: Int) {
         var px = x, py = y
-        if (ancla & Superficie.H_CENTRO) != 0 { px += Video.Ancho / 2 }
-        if (ancla & Superficie.V_CENTRO) != 0 { py += Video.Alto  / 2 }
+        if (anchor & Surface.centerHorizontal) != 0 { px += Video.width / 2 }
+        if (anchor & Surface.centerVertical) != 0 { py += Video.height  / 2 }
 
         let label = SKLabelNode()
         let nsFont: NSFont
-        if let font = fuenteActual?.nsFont {
+        if let font = m_currentFont?.nsFont {
             label.fontName = font.fontName
             label.fontSize = font.pointSize
             nsFont = font
@@ -140,15 +140,15 @@ class Video {
         paraStyle.alignment = .center
         let attrs: [NSAttributedString.Key: Any] = [
             .font:            nsFont,
-            .foregroundColor: colorFuenteActual,
+            .foregroundColor: m_fontColor,
             .paragraphStyle:  paraStyle
         ]
         label.attributedText          = NSAttributedString(string: text, attributes: attrs)
         label.horizontalAlignmentMode = .center
-        label.verticalAlignmentMode   = (ancla & Superficie.V_CENTRO) != 0 ? .center : .top
+        label.verticalAlignmentMode   = (anchor & Surface.centerVertical) != 0 ? .center : .top
         label.numberOfLines           = 0      // allows line breaks with \n
-        label.preferredMaxLayoutWidth = CGFloat(Video.Ancho - 80)  // enables word-wrap and avoids clipping
-        label.position  = CGPoint(x: px, y: Video.Alto - py)
+        label.preferredMaxLayoutWidth = CGFloat(Video.width - 80)  // enables word-wrap and avoids clipping
+        label.position  = CGPoint(x: px, y: Video.height - py)
         label.zPosition = zPos; zPos += 1
         canvasNode.addChild(label)
     }
@@ -156,45 +156,45 @@ class Video {
     // MARK: - Fill primitives
 
     /// Fills a rectangle with the current colour, optional alpha and anchor.
-    func llenarRectangulo(_ x: Int, _ y: Int, _ w: Int, _ h: Int,
-                          _ alpha: Int = 255, _ ancla: Int = 0) {
+    func fillRect(_ x: Int, _ y: Int, _ w: Int, _ h: Int,
+                          _ alpha: Int = 255, _ anchor: Int = 0) {
         var px = x, py = y
-        if (ancla & Superficie.H_CENTRO) != 0 { px += Video.Ancho / 2 - w / 2 }
-        if (ancla & Superficie.V_CENTRO) != 0 { py += Video.Alto  / 2 - h / 2 }
-        let node = SKSpriteNode(color: colorActual,
+        if (anchor & Surface.centerHorizontal) != 0 { px += Video.width / 2 - w / 2 }
+        if (anchor & Surface.centerVertical) != 0 { py += Video.height  / 2 - h / 2 }
+        let node = SKSpriteNode(color: currentColor,
                                 size: CGSize(width: w, height: h))
         node.anchorPoint = CGPoint(x: 0, y: 1)
-        node.position    = CGPoint(x: px, y: Video.Alto - py)
+        node.position    = CGPoint(x: px, y: Video.height - py)
         node.alpha       = CGFloat(max(0, min(alpha, 255))) / 255.0
         node.zPosition   = zPos; zPos += 1
         canvasNode.addChild(node)
     }
 
     /// Fills the entire screen with a solid colour (overload without coordinates).
-    func llenarRectangulo(_ color: Int) {
-        setearColor(color)
-        llenarRectangulo(0, 0, Video.Ancho, Video.Alto)
+    func fillRect(_ color: Int) {
+        setColor(color)
+        fillRect(0, 0, Video.width, Video.height)
     }
 
     // MARK: - Drawing state
 
-    func setearColor(_ color: Int) {
-        colorActual = skColor(color)
+    func setColor(_ color: Int) {
+        currentColor = skColor(color)
     }
 
-    func setearFuente(_ fuente: Fuente?, _ color: Int) {
-        fuenteActual      = fuente
-        colorFuenteActual = skColor(color)
+    func setFont(_ font: GameFont?, _ color: Int) {
+        m_currentFont = font
+        m_fontColor = skColor(color)
     }
 
     /// Draws the outline of a rectangle (no fill) with the current colour.
-    func dibujarRectangulo(_ x: Int, _ y: Int, _ w: Int, _ h: Int, _ ancla: Int) {
+    func drawRect(_ x: Int, _ y: Int, _ w: Int, _ h: Int, _ anchor: Int) {
         var px = x, py = y
-        if (ancla & Superficie.H_CENTRO) != 0 { px += Video.Ancho / 2 - w / 2 }
-        if (ancla & Superficie.V_CENTRO) != 0 { py += Video.Alto  / 2 - h / 2 }
+        if (anchor & Surface.centerHorizontal) != 0 { px += Video.width / 2 - w / 2 }
+        if (anchor & Surface.centerVertical) != 0 { py += Video.height  / 2 - h / 2 }
 
-        let shape = SKShapeNode(rect: CGRect(x: px, y: Video.Alto - py - h, width: w, height: h))
-        shape.strokeColor = colorActual
+        let shape = SKShapeNode(rect: CGRect(x: px, y: Video.height - py - h, width: w, height: h))
+        shape.strokeColor = currentColor
         shape.fillColor   = .clear
         shape.lineWidth   = 1
         shape.zPosition   = zPos; zPos += 1
@@ -202,7 +202,7 @@ class Video {
     }
 
     /// No-op: SpriteKit manages double-buffering automatically.
-    func refrescar() {}
+    func refresh() {}
 
     // MARK: - Helpers
 
