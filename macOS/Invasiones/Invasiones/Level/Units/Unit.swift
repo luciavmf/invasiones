@@ -9,39 +9,61 @@
 
 import Foundation
 
+/// Represents a single unit (soldier) in the game.
+/// Manages its own state machine (idle, moving, patrolling, attacking, pursuing, healing, dying),
+/// pathfinding, formation offsets, collision evasion, and sprite animation.
 class Unit: MapObject {
 
     // MARK: - Constants
+    /// Maximum tile radius a unit can see other units.
     static let MAX_VISIBILITY = 15
+    /// Tile radius within which collision checks are performed.
     static let COLLISION_CHECK_DISTANCE = 4
 
-    private let PATROL_RANDOM_MAX = 16
+    /// Minimum number of tiles away a patrol destination can be from the base position.
     private let PATROL_RANDOM_MIN = 8
+    /// Maximum number of tiles away a patrol destination can be from the base position.
+    private let PATROL_RANDOM_MAX = 16
+    /// Minimum tile distance to the objective for a MOVE order to be considered fulfilled.
     private let CANTIDAD_MINIMA_TILES_ORD_MOVER = 3
+    /// Width of the selection/health bar drawn above the unit when selected.
     private let SELECCION_ANCHO = 20
+    /// Vertical offset of the selection bar relative to the unit's screen y coordinate.
     private let SELECCION_Y = -3
+    /// Number of ticks the unit's corpse remains visible on screen before disappearing.
     private let CUENTA_FRAME_MUERTO = 150
 
     // MARK: - Enums
+    /// States in which a unit can exist.
     enum STATE {
         case IDLE, MOVING, DYING, ATACANDO, PURSUING_UNIT, DEAD, PATROLLING, HEALING
     }
 
+    /// Sub-states used within the MOVING state.
     enum SUBESTADO {
         case INCREMENTAR_PASO, ESQUIVAR_UNIDAD, ALCANZAR_PASO, TERMINO_DE_DAR_PASO
     }
 
     // MARK: - Attributes
+    /// The unit type index (e.g. UNIDAD_PATRICIO or UNIDAD_INGLES).
     private var type: Int = 0
     private var substate: SUBESTADO = .INCREMENTAR_PASO
+    /// The faction this unit belongs to.
     var faction: Episode.BANDO = .ENEMY
+    /// The unit currently being evaded after a collision.
     private(set) var unitToEvade: Unit?
+    /// Current health points.
     private(set) var health: Int = 100
+    /// Maximum health points (loaded from CSV).
     private(set) var resistancePoints: Int = 100
+    /// Damage dealt per attack (always applied in full — accuracy roll was never implemented).
     private(set) var attackPoints: Int = 10
+    /// Tile radius within which enemy units are detected.
     private(set) var visibility: Int = 10
+    /// Accuracy stat loaded from CSV (not used in attack logic).
     private(set) var aim: Int = 5
     private var attackRange: Int = 5
+    /// Number of frames between consecutive attacks.
     private(set) var attackInterval: Int = 30
     private var currentSpeed: (x: Int, y: Int) = (2, 2)
     private var defaultSpeedVec: (x: Int, y: Int) = (2, 2)
@@ -49,23 +71,33 @@ class Unit: MapObject {
     private var stateValue: STATE = .IDLE
     private var nextStateValue: STATE = .IDLE
     private var direction: Int = 0  // 0=N, 1=NE, 2=E, 3=SE, 4=S, 5=SO, 6=O, 7=NO
+    /// The remaining path to follow, stored as a stack (popLast = next step).
     private(set) var pathToFollow: [(i: Int, j: Int)]? = nil
+    /// The tile the unit is currently moving toward.
     private(set) var nextTile: (x: Int, y: Int) = (0, 0)
     private var nextStep: (x: Int, y: Int) = (0, 0)
+    /// Whether the unit is currently selected by the player.
     var isSelected: Bool = false
     private var mode: Int = 0
     private var sprite: Sprite?
     private var count: Int = 0
     private var targetPos: (x: Int, y: Int) = (-1, -1)
+    /// The unit's display name (loaded from the CSV file).
     private(set) var name: String = ""
+    /// The avatar image shown in the HUD when this unit is selected.
     private(set) var avatar: Surface?
     private var command: Command?
+    /// The objective-level command used to determine whether the unit has fulfilled its mission.
     private var objectiveCommand: Command?
+    /// Set to `true` when the unit has fulfilled its assigned order this frame.
     private(set) var completedOrder: Bool = false
+    /// The base tile position used as the centre of the patrol area.
     private var patrolPosition: (x: Int, y: Int) = (0, 0)
     private var desiredPosition: (x: Int, y: Int) = (0, 0)  // offset en formación
     private var firstSprite: Int = 0
+    /// Number of ticks between each health recovery tick.
     private var ticksPerRecovery: Int = 50
+    /// Health points restored per recovery tick.
     private var recoveryPoints: Int = 20
     private var recoveryTicks: Int = 0
     private var isCommander: Bool = false
@@ -79,10 +111,13 @@ class Unit: MapObject {
     // MARK: - Public properties
 
     var currentState: STATE { stateValue }
-
+    /// The attack range of the unit in tiles.
     var range: Int { attackRange }
+    /// The current movement speed vector.
     var speed: (x: Int, y: Int) { currentSpeed }
+    /// The base movement speed loaded from the unit CSV.
     var defaultSpeed: Int { defaultSpeedVec.x }
+    /// The offset within the formation used for flocking/grouping calculations.
     var formationOffset: (x: Int, y: Int) {
         get { desiredPosition }
         set { desiredPosition = newValue }
@@ -180,6 +215,7 @@ class Unit: MapObject {
 
     // MARK: - Public orders
 
+    /// Orders the unit to move to tile (x, y), computing a path via A*.
     func move(_ x: Int, _ y: Int) {
         command = Command(.MOVE, x, y)
         setState(.MOVING)
@@ -200,6 +236,7 @@ class Unit: MapObject {
         substate = .INCREMENTAR_PASO
     }
 
+    /// Puts the unit into patrol mode, wandering randomly around its starting tile.
     func patrol() {
         setState(.PATROLLING)
         nextStateValue = .PATROLLING
@@ -208,34 +245,40 @@ class Unit: MapObject {
             physicalTilePos.x, physicalTilePos.y)
     }
 
+    /// Orders the unit to pursue and attack the given enemy unit.
     func attack(_ enemy: Unit) {
         self.enemy = enemy
         targetPos = (-1, -1)
         setState(.PURSUING_UNIT)
     }
 
+    /// Halts the unit immediately, clearing its path and returning it to idle.
     func stop() {
         setState(.IDLE)
         pathToFollow = nil
     }
 
+    /// Sets the objective-level command used to determine whether the unit has fulfilled its mission.
     func setObjectiveCommand(_ ord: Command?) {
         completedOrder = false
         objectiveCommand = ord
     }
 
+    /// Puts the unit into the healing state so it regenerates health over time.
     func recoverHealth() {
         setState(.HEALING)
     }
 
     // MARK: - Collision and evasion
 
+    /// Returns `true` if this unit and `other` occupy overlapping tiles.
     func hasCollision(_ other: Unit) -> Bool {
         let dx = abs(physicalTilePos.x - other.physicalTilePos.x)
         let dy = abs(physicalTilePos.y - other.physicalTilePos.y)
         return dx < 2 && dy < 2
     }
 
+    /// Triggers the evasion sub-state so the unit recalculates its path around `other`.
     func evadeUnit(_ other: Unit, _ visible: [Unit]?) {
         unitToEvade = other
         substate = .ESQUIVAR_UNIDAD
@@ -243,24 +286,29 @@ class Unit: MapObject {
 
     // MARK: - Queries
 
+    /// Returns `true` if the unit is dead or in the dying animation.
     func isDead() -> Bool { stateValue == .DEAD || stateValue == .DYING }
 
+    /// Returns `true` if the unit is in any active movement state (moving, patrolling, or pursuing).
     func isMoving() -> Bool {
         return stateValue == .MOVING || stateValue == .PATROLLING || stateValue == .PURSUING_UNIT
     }
 
+    /// Returns `true` if the unit's screen position falls within the camera's visible area.
     func isOnScreen() -> Bool {
         guard let cam = MapObject.camera else { return false }
         return x >= cam.startX && x <= cam.startX + cam.width &&
                y >= cam.startY && y <= cam.startY + cam.height
     }
 
+    /// Calculates the Euclidean distance in tile units from this unit to tile (toI, toJ).
     func calculateDistance(_ toI: Int, _ toJ: Int) -> Double {
         let di = Double(physicalTilePos.x - toI)
         let dj = Double(physicalTilePos.y - toJ)
         return sqrt(di * di + dj * dj)
     }
 
+    /// Returns `true` if the unit is close enough to its objective tile to count the MOVE order as fulfilled.
     func completedMoveObjective() -> Bool {
         guard let ord = objectiveCommand else { return false }
         let dist = calculateDistance(ord.point.x, ord.point.y)
@@ -269,25 +317,37 @@ class Unit: MapObject {
 
     // MARK: - Group / formation
 
+    /// Returns `true` if the unit currently belongs to a group.
     var belongsToGroup: Bool { group != nil }
+    /// The group this unit belongs to, or `nil` if it is operating independently.
     var myGroup: Group? { group }
 
+    /// Registers this unit as a member of `group`.
     func joinGroup(_ group: Group) {
         self.group = group
     }
 
+    /// Removes this unit from its current group.
     func leaveGroup() {
         group = nil
     }
 
+    /// Marks this unit as the group commander (its path determines group movement).
     func markAsCommander() {
         isCommander = true
     }
 
+    /// Removes the commander designation from this unit.
     func unmarkCommander() {
         isCommander = false
     }
 
+    /// Calculates this unit's path by offsetting the commander's path by (offsetX, offsetY) tiles,
+    /// finding detours through A* for any non-walkable positions.
+    /// - Parameters:
+    ///   - commanderPath: The path the group commander is following.
+    ///   - offsetX: Formation tile offset along the i axis.
+    ///   - offsetY: Formation tile offset along the j axis.
     func calculatePathAtDistance(_ commanderPath: [(i: Int, j: Int)],
                                   _ offsetX: Int, _ offsetY: Int) {
         guard let map = MapObject.map else { return }
@@ -384,6 +444,7 @@ class Unit: MapObject {
         return idx
     }
 
+    /// Returns `true` if the mouse cursor is currently over this unit's sprite bounding box.
     func isUnderMouse() -> Bool {
         let mx = Int(Mouse.shared.X)
         let my = Int(Mouse.shared.Y)
@@ -393,6 +454,7 @@ class Unit: MapObject {
         return mx >= x - hw && mx <= x + hw && my >= y - fh && my <= y
     }
 
+    /// Orders the unit to move toward the infirmary at (x, y) and then heal.
     func heal(_ x: Int, _ y: Int) {
         command = Command(.HEAL, x, y)
 
@@ -424,6 +486,8 @@ class Unit: MapObject {
     }
 
     // MARK: - Selección por arrastre de mouse (rectangle)
+    /// Selects the unit if its sprite overlaps the drag-selection rectangle.
+    /// - Returns: `true` if the unit was selected.
     func selectIfInRect(_ x: Int, _ y: Int, _ w: Int, _ h: Int) -> Bool {
         let fw = sprite?.frameAncho ?? (frameWidth > 0 ? frameWidth : 20)
         let fh = sprite?.frameAlto  ?? (frameHeight  > 0 ? frameHeight  : 30)
@@ -732,6 +796,7 @@ class Unit: MapObject {
         return attackPoints
     }
 
+    /// Applies `danio` points of damage to this unit, triggering death if health reaches zero.
     func takeDamage(_ danio: Int) {
         health -= danio
         if health <= 0 {
@@ -740,6 +805,7 @@ class Unit: MapObject {
         }
     }
 
+    /// Transitions the unit into the dying state and plays the death sound.
     func morir() {
         Log.shared.debug("Me mori.")
         setState(.DYING)
@@ -788,7 +854,8 @@ class Unit: MapObject {
 
     // MARK: - Loadingr desde CSV
 
-    /// Reads the unit attributes from the CSV file at the path indexed by `id`.
+    /// Reads the unit stats (speed, health, attack, etc.) from the CSV data file for the given unit type id.
+    /// - Parameter id: The index into the resource manager's unit paths array.
     func readUnit(_ id: Int) {
         let paths = ResourceManager.shared.unitPaths
         guard id >= 0, id < paths.count, let path = paths[id],

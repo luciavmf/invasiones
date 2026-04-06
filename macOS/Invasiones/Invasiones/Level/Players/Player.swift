@@ -9,19 +9,27 @@
 
 import Foundation
 
+/// Abstract base class for both game factions (Argentine and Enemy).
+/// Manages a list of units, handles objective assignment, and implements shared
+/// combat logic including visibility checks, collision resolution, and unit updates.
 class Player {
 
     // MARK: - Enums
     enum STATE { case START, LOADING, GAME }
 
     // MARK: - Protected attributes
+    /// Whether the player has completed the current objective.
     var objectiveCompleted: Bool = false
+    /// The faction this player controls.
     var faction: Episode.BANDO = .ARGENTINE
+    /// Set to true when at least one unit completed its order in the current frame.
     var someoneCompletedOrder: Bool = false
+    /// Animated ring displayed at the current order target position.
     var ring: AnimObject?
 
     var hud: Hud
     var units: [Unit] = []
+    /// The shared object table indexed by physical tile position (updated each frame).
     var objectsToDraw: ObjectTable     // [physicalMapHeight][physicalMapWidth]
     var map: Map
     var groups: [Group]? = nil
@@ -35,6 +43,7 @@ class Player {
     var selectedGroup: Group?
     var objective: Objective?
     var command: Command?
+    /// The map object the player must collect (only valid for TAKE_OBJECT orders).
     var objectToTake: MapObject?
     var fireEffects: [AnimObject]? = nil
 
@@ -50,12 +59,15 @@ class Player {
 
     // MARK: - Abstract methods (deben ser sobreescritos)
     func update() { fatalError("update() must be overridden") }
+
     func loadUnits(_ levelIndex: Int) -> Bool { fatalError("loadUnits must be overridden") }
 
     // MARK: - Objective completion
+    /// - Returns: `true` if the player has fulfilled the current objective.
     func completedObjective() -> Bool { objectiveCompleted }
 
     // MARK: - Set objective
+    /// Assigns a new objective, distributes its first command to all units, and resets the completion flag.
     func setObjective(_ obj: Objective?) {
         objective = obj
         objectiveCompleted = false
@@ -76,6 +88,8 @@ class Player {
         units.forEach { $0.setObjectiveCommand(command) }
     }
 
+    /// Advances to the next command within the current objective.
+    /// Automatically processes and activates any TRIGGER commands before returning.
     func setNextCommand() {
         someoneCompletedOrder = false
         command = objective?.nextCommand()
@@ -115,6 +129,7 @@ class Player {
 
     // MARK: - Unit update (shared)
 
+    /// Updates all units: moves them, checks selections, resolves collisions, triggers attacks, and queues dead units.
     func updateUnits() {
         deadUnits = nil
         let checkSelection = selectedUnit == nil && selectedGroup == nil
@@ -169,6 +184,7 @@ class Player {
         }
     }
 
+    /// Removes all units marked dead this frame from the unit list and the object map.
     func removeDeadUnits() {
         guard let muertas = deadUnits else { return }
         for dead in muertas {
@@ -210,6 +226,9 @@ class Player {
         }
     }
 
+    /// Returns a list of units visible to `unit` and marks the corresponding tiles as visible on the map.
+    /// - Parameter unit: The unit to check visibility from.
+    /// - Returns: A list of visible units, or `nil` if none are found.
     func getVisibleUnitsAndTiles(_ unit: Unit) -> [Unit]? {
         var visible: [Unit]? = nil
         let iStart = max(0, unit.physicalTilePos.x - Unit.MAX_VISIBILITY)
@@ -269,6 +288,13 @@ class Player {
         }
     }
 
+    /// Places `count` units of the given type in a spiral pattern around tile (x, y).
+    /// - Parameters:
+    ///   - type: The unit type identifier.
+    ///   - count: The number of units to place.
+    ///   - x: Target tile column (physical grid).
+    ///   - y: Target tile row (physical grid).
+    /// - Returns: The list of placed units.
     func placeUnits(_ type: Int, _ count: Int, _ x: Int, _ y: Int) -> [Unit] {
         guard count > 0 else {
             Log.shared.error("No se puede crear un group de cantidad 0.")
@@ -317,6 +343,7 @@ class Player {
         return unit
     }
 
+    /// Deselects the currently selected unit and/or group and clears the HUD selection.
     func clearSelection() {
         selectedGroup?.isSelected = false
         selectedUnit?.isSelected = false

@@ -11,10 +11,15 @@
 
 import SpriteKit
 
+/// Wrapper over a SpriteKit texture, mirroring the SDL_Surface-based Superficie class.
+/// Used by all classes that draw images. Supports anchor-point-based positioning,
+/// sub-texture clipping, and per-surface alpha.
 class Surface {
 
     // MARK: - Anchor constants (equivalent to SDL flags)
+    /// Anchor flag: centre horizontally.
     static let centerHorizontal: Int = 1
+    /// Anchor flag: centre vertically.
     static let centerVertical: Int = 2
 
     // MARK: - Declarations
@@ -27,12 +32,14 @@ class Surface {
     /// Current alpha (0.0–1.0).
     var currentAlpha: CGFloat = 1.0
 
-    /// Size of the FULL texture (not the clip).
+    /// Width of the full texture in pixels (not the clip).
     var width: Int { Int(texture?.size().width ?? 0) }
+    /// Height of the full texture in pixels (not the clip).
     var height: Int { Int(texture?.size().height ?? 0) }
 
-    /// Size of the active clip (or the full texture if no clip is set).
+    /// Width of the active clip, or the full texture width if no clip is set.
     var clipWidth: Int { Int(currentTexture?.size().width ?? texture?.size().width ?? 0) }
+    /// Height of the active clip, or the full texture height if no clip is set.
     var clipHeight: Int { Int(currentTexture?.size().height ?? texture?.size().height ?? 0) }
 
     // MARK: - Initializers

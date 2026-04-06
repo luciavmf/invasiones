@@ -11,6 +11,9 @@
 
 import SpriteKit
 
+/// The drawing surface that represents the screen.
+/// Wraps SpriteKit and exposes an SDL-compatible draw API to the rest of the game.
+/// All objects are added to a canvas node each frame and cleared at the start of the next.
 class Video {
 
     // MARK: - Screen constants (equivalent to the static fields of Video in C#)

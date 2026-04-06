@@ -9,13 +9,22 @@
 
 import Foundation
 
+/// A static obstacle on the map (tree, building, rock, etc.) drawn from a tileset sprite sheet.
 class Obstacle: MapObject {
 
     // MARK: - Declarations
+    /// The frame index within the tileset image.
     private var index: Int = 0
+    /// Whether the obstacle is a building, which changes how it is drawn.
     private var isBuilding: Bool = false
 
     // MARK: - Initializer
+    /// Creates an obstacle from a tileset at tile position (i, j).
+    /// - Parameters:
+    ///   - idx: The frame index within the tileset.
+    ///   - i: The tile column (i coordinate).
+    ///   - j: The tile row (j coordinate).
+    ///   - tileset: The tileset that contains this obstacle's image.
     init(index idx: Int, i: Int, j: Int, tileset: Tileset) {
         super.init()
         index = idx

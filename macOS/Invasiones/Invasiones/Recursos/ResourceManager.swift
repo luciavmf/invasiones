@@ -10,7 +10,7 @@
 
 import SpriteKit
 
-class ResourceManager: NSObject, XMLParserDelegate {
+class ResourceManager {
 
     // MARK: - Singleton
     static let shared = ResourceManager()
@@ -40,7 +40,7 @@ class ResourceManager: NSObject, XMLParserDelegate {
     private(set) var unitTypes: [Unit?] = []
 
     // MARK: - Initializer (private)
-    private override init() {}
+    private init() {}
 
     func dispose() {
         fonts.forEach { $0?.dispose() }

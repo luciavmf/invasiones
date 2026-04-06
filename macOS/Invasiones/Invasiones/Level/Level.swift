@@ -9,25 +9,35 @@
 
 import Foundation
 
+/// Manages the battles and objectives for a level, loaded from nivel_N.xml.
 class Level {
 
     // MARK: - Constants
+    /// The maximum number of battles a level can contain.
     static let MAX_BATTLES = 5
 
     // MARK: - Private class
+    /// Contains the ordered stack of objectives for a single battle phase.
     private class Batalla {
         var objetivos: [Objective] = []  // LIFO: popLast
+        /// The total number of objectives this battle originally had.
         var objectiveCount: Int = 0
     }
 
     // MARK: - Declarations
+    /// All battles in the level.
     private var battles: [Batalla?]
+    /// The index of the battle currently being played.
     private(set) var currentBattleIndex: Int = 0
+    /// The total number of battles loaded for this level.
     private(set) var battleCount: Int = 0
+    /// The index of the current objective within the current battle.
     private(set) var currentObjectiveIndex: Int = 0
+    /// Running count of objectives completed so far (across all battles).
     private(set) var completedObjectiveCount: Int = -1
 
     // MARK: - Properties
+    /// The number of objectives in the current battle.
     var currentObjectiveCount: Int {
         guard currentBattleIndex < battles.count,
               let b = battles[currentBattleIndex] else { return 0 }
@@ -44,6 +54,8 @@ class Level {
 
     // MARK: - Loading
 
+    /// Reads the level definition from nivel_{levelIndex}.xml and populates the battles array.
+    /// - Parameter levelIndex: The level number to load.
     func load(_ levelIndex: Int) {
         let pathStr = Program.LEVEL_PATH + "/nivel_\(levelIndex).xml"
         guard let path = Utils.getPath(pathStr) else {

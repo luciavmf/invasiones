@@ -9,6 +9,8 @@
 
 import Foundation
 
+/// The AI-controlled enemy faction.
+/// Loads enemy units from the map, assigns scripted AI orders to groups, and sends ungrouped units to patrol.
 class EnemyTeam: Player {
 
     // MARK: - Initializer

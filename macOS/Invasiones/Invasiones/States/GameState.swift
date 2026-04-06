@@ -9,6 +9,8 @@
 
 import Foundation
 
+/// The game state where the battle takes place.
+/// Contains and drives an Episode, handles the pause menu and the exit-confirmation dialog.
 class GameState: State {
 
     // MARK: - Enums

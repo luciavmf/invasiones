@@ -9,13 +9,19 @@
 
 import Foundation
 
+/// Generic game state machine. Multiple instances can be created as needed.
 class StateMachine {
 
     // MARK: - Declarations
+    /// The current active state object.
     private var currentStateObj: State?
+    /// The key of the current state.
     private(set) var currentState: GameFrame.STATE = .INVALID
+    /// The previous state.
     private var prevState: State?
+    /// The next state, queued for transition.
     private var nextState: State?
+    /// The key of the next state.
     private var nextStateKey: GameFrame.STATE = .INVALID
 
     /// Dictionary of all registered states.
