@@ -11,30 +11,30 @@ import Foundation
 
 class ExitState: State {
 
-    private var m_confirmMenu: ConfirmationMenu?
+    private var confirmMenu: ConfirmationMenu?
 
     override func start() {
-        m_background = ResourceManager.shared.getImage(Res.IMG_SPLASH)
-        m_confirmMenu = ConfirmationMenu(Res.STR_CONFIRMACION_SALIR, Res.STR_NO, Res.STR_SI)
-        m_confirmMenu?.setPosition(0, 0, Surface.centerVertical | Surface.centerHorizontal)
+        background = ResourceManager.shared.getImage(Res.IMG_SPLASH)
+        confirmMenu = ConfirmationMenu(Res.STR_CONFIRMACION_SALIR, Res.STR_NO, Res.STR_SI)
+        confirmMenu?.setPosition(0, 0, Surface.centerVertical | Surface.centerHorizontal)
     }
 
     override func update() {
-        guard let result = m_confirmMenu?.update() else { return }
-        if result == ConfirmationMenu.SELECCION.DERECHO.rawValue {
+        guard let result = confirmMenu?.update() else { return }
+        if result == ConfirmationMenu.Selection.right.rawValue {
             stateMachine.setState(.END)
         }
-        if result == ConfirmationMenu.SELECCION.IZQUIERDO.rawValue {
+        if result == ConfirmationMenu.Selection.left.rawValue {
             stateMachine.setNextState(.MAIN_MENU)
         }
     }
 
     override func draw(_ g: Video) {
-        g.draw(m_background, 0, 0, 0)
-        m_confirmMenu?.draw(g)
+        g.draw(background, 0, 0, 0)
+        confirmMenu?.draw(g)
     }
 
     override func exit() {
-        m_confirmMenu = nil
+        confirmMenu = nil
     }
 }

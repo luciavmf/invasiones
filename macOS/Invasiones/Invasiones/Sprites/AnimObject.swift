@@ -19,15 +19,15 @@ class AnimObject: MapObject {
         animation = anim
         super.init()
 
-        m_physicalTilePos = (i, j)
+        physicalTilePos = (i, j)
         let p = tileToWorld(i, j)
-        m_worldPos = p
+        worldPos = p
 
         animation.load()
         updateScreenPos()
 
-        m_worldPos.x -= animation.offsets.x
-        m_worldPos.y -= animation.offsets.y
+        worldPos.x -= animation.offsets.x
+        worldPos.y -= animation.offsets.y
 
         animation.play()
         animation.loop = true
@@ -44,8 +44,8 @@ class AnimObject: MapObject {
 
     override func draw(_ g: Video) {
         guard let map = MapObject.map else { return }
-        if m_worldPos.x == -1 || m_worldPos.y == -1 { return }
-        animation.draw(g, m_x + map.tileWidth / 2, m_y + map.tileHeight / 2, 0)
+        if worldPos.x == -1 || worldPos.y == -1 { return }
+        animation.draw(g, x + map.tileWidth / 2, y + map.tileHeight / 2, 0)
     }
 
     // MARK: - Own methods
@@ -55,11 +55,11 @@ class AnimObject: MapObject {
     }
 
     func setPosition(_ i: Int, _ j: Int) {
-        m_physicalTilePos = (i, j)
+        physicalTilePos = (i, j)
         let p = tileToWorld(i, j)
-        m_worldPos = p
-        m_worldPos.x -= animation.offsets.x
-        m_worldPos.y -= animation.offsets.y
+        worldPos = p
+        worldPos.x -= animation.offsets.x
+        worldPos.y -= animation.offsets.y
         updateScreenPos()
     }
 }

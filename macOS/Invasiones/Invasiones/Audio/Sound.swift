@@ -14,12 +14,7 @@ import Foundation
 class Sound {
 
     // MARK: - Singleton
-    private static var instance: Sound?
-
-    static var shared: Sound {
-        if instance == nil { instance = Sound() }
-        return instance!
-    }
+    static let shared = Sound()
 
     // MARK: - Declarations
     private var sfxPlayers: [AVAudioPlayer?] = Array(repeating: nil, count: Res.SFX_COUNT)

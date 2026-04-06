@@ -12,17 +12,13 @@ import Foundation
 class GUIBox {
 
     // MARK: - Declarations
-    var m_y:       Int = 0
-    var m_x:       Int = 0
-    var m_font:  GameFont?
-    var m_width:   Int = 0
-    var m_height:    Int = 0
-    var m_image:  Surface?
-    var m_label: Int = 0
-
-    // MARK: - Properties
-    var height:  Int { m_height  }
-    var width: Int { m_width }
+    var posY: Int = 0
+    var posX: Int = 0
+    var font: GameFont?
+    var width: Int = 0
+    var height: Int = 0
+    var image: Surface?
+    var label: Int = 0
 
     // MARK: - Initializer
     init() {}

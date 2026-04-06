@@ -17,13 +17,13 @@ class State {
     var stateMachine: StateMachine
 
     /// Background image for this state (loaded in start(), drawn in draw()).
-    var m_background: Surface?
+    var background: Surface?
 
     /// Generic button reused by several states (e.g. "Menu", "Next").
-    var m_button: Button?
+    var button: Button?
 
     /// Used for countdowns.
-    var m_count: Int = 0
+    var count: Int = 0
 
     // MARK: - Initializer
     init(_ sm: StateMachine) {

@@ -13,24 +13,19 @@ import SpriteKit
 class ResourceManager: NSObject, XMLParserDelegate {
 
     // MARK: - Singleton
-    private static var instance: ResourceManager?
-
-    static var shared: ResourceManager {
-        if instance == nil { instance = ResourceManager() }
-        return instance!
-    }
+    static let shared = ResourceManager()
 
     // MARK: - Declarations
     /// Image cache indexed by id (Int) or name (String).
-    private var m_imageById:     [Int: Surface]    = [:]
-    private var m_imageByName: [String: Surface] = [:]
+    private var imageById: [Int: Surface] = [:]
+    private var imageByName: [String: Surface] = [:]
 
     /// Resolved (absolute) paths read from res.xml.
-    private(set) var fontPaths:    [String?] = []
-    private(set) var imagePaths:   [String?] = []
+    private(set) var fontPaths: [String?] = []
+    private(set) var imagePaths: [String?] = []
     private(set) var scenarioPaths: [String?] = []
-    private(set) var soundPaths:    [String?] = []
-    private(set) var unitPaths:   [String?] = []
+    private(set) var soundPaths: [String?] = []
+    private(set) var unitPaths: [String?] = []
 
     /// Loaded fonts (one per Definitions.FNT variant).
     private(set) var fonts: [GameFont?] = []
@@ -47,14 +42,11 @@ class ResourceManager: NSObject, XMLParserDelegate {
     // MARK: - Initializer (private)
     private override init() {}
 
-    deinit { dispose() }
-
     func dispose() {
         fonts.forEach { $0?.dispose() }
         fonts.removeAll()
-        m_imageById.removeAll()
-        m_imageByName.removeAll()
-        ResourceManager.instance = nil
+        imageById.removeAll()
+        imageByName.removeAll()
     }
 
     // MARK: - Load paths from res.xml
@@ -74,11 +66,11 @@ class ResourceManager: NSObject, XMLParserDelegate {
             return false
         }
 
-        fontPaths    = parser.fonts
-        imagePaths   = parser.images
+        fontPaths = parser.fonts
+        imagePaths = parser.images
         scenarioPaths = parser.scenarios
-        soundPaths    = parser.sounds
-        unitPaths   = parser.units
+        soundPaths = parser.sounds
+        unitPaths = parser.units
 
         let hasErrors = fontPaths.contains(where: { $0 == nil })
                       || imagePaths.contains(where: { $0 == nil })
@@ -92,7 +84,7 @@ class ResourceManager: NSObject, XMLParserDelegate {
 
     /// Gets (and caches) the image by relative or absolute file name.
     func getImage(_ name: String) -> Surface? {
-        if let cached = m_imageByName[name] { return cached }
+        if let cached = imageByName[name] { return cached }
         // If it's already an absolute path that exists, use it directly.
         let path: String
         if name.hasPrefix("/") && FileManager.default.fileExists(atPath: name) {
@@ -102,16 +94,16 @@ class ResourceManager: NSObject, XMLParserDelegate {
             path = resolved
         }
         let sup = Surface(path: path)
-        m_imageByName[name] = sup
+        imageByName[name] = sup
         return sup
     }
 
     /// Gets (and caches) the image by ID (index into imagePaths).
     func getImage(_ id: Int) -> Surface? {
-        if let cached = m_imageById[id] { return cached }
+        if let cached = imageById[id] { return cached }
         guard id < imagePaths.count, let path = imagePaths[id] else { return nil }
         let sup = Surface(path: path)
-        m_imageById[id] = sup
+        imageById[id] = sup
         return sup
     }
 
@@ -134,12 +126,12 @@ class ResourceManager: NSObject, XMLParserDelegate {
 
         fonts = Array(repeating: nil, count: Definitions.FNT.TOTAL.rawValue)
 
-        fonts[Definitions.FNT.SANS12.rawValue]   = GameFont(fontId: Res.FNT_SANS,   size: 12)
-        fonts[Definitions.FNT.SANS14.rawValue]   = GameFont(fontId: Res.FNT_SANS,   size: 14)
-        fonts[Definitions.FNT.SANS18.rawValue]   = GameFont(fontId: Res.FNT_SANS,   size: 18)
-        fonts[Definitions.FNT.SANS20.rawValue]   = GameFont(fontId: Res.FNT_SANS,   size: 20)
-        fonts[Definitions.FNT.SANS24.rawValue]   = GameFont(fontId: Res.FNT_SANS,   size: 24)
-        fonts[Definitions.FNT.SANS28.rawValue]   = GameFont(fontId: Res.FNT_SANS,   size: 28)
+        fonts[Definitions.FNT.SANS12.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 12)
+        fonts[Definitions.FNT.SANS14.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 14)
+        fonts[Definitions.FNT.SANS18.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 18)
+        fonts[Definitions.FNT.SANS20.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 20)
+        fonts[Definitions.FNT.SANS24.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 24)
+        fonts[Definitions.FNT.SANS28.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 28)
         fonts[Definitions.FNT.LBLACK12.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 12)
         fonts[Definitions.FNT.LBLACK14.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 14)
         fonts[Definitions.FNT.LBLACK18.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 18)
@@ -196,24 +188,24 @@ class ResourceManager: NSObject, XMLParserDelegate {
 /// Parses res.xml and extracts the resolved paths for each section.
 private class ResXMLParser: NSObject, XMLParserDelegate {
 
-    var fonts:     [String?] = Array(repeating: nil, count: Res.FNT_COUNT)
-    var images:    [String?] = Array(repeating: nil, count: Res.IMG_COUNT)
+    var fonts: [String?] = Array(repeating: nil, count: Res.FNT_COUNT)
+    var images: [String?] = Array(repeating: nil, count: Res.IMG_COUNT)
     var scenarios: [String?] = Array(repeating: nil, count: Res.TLS_COUNT + Res.MAP_COUNT)
-    var sounds:    [String?] = Array(repeating: nil, count: Res.SND_COUNT + Res.SFX_COUNT)
-    var units:     [String?] = Array(repeating: nil, count: Res.UNIDAD_COUNT)
+    var sounds: [String?] = Array(repeating: nil, count: Res.SND_COUNT + Res.SFX_COUNT)
+    var units: [String?] = Array(repeating: nil, count: Res.UNIDAD_COUNT)
 
     // Parser state
     private enum Section { case none, fonts, images, tilesets, maps, sfx, units, anims }
     private var section: Section = .none
     private var currentText = ""
-    private var m_inLeafElement = false
+    private var inLeafElement = false
 
     // Per-section counters
-    private var iFonts    = 0
-    private var iImages   = 0
+    private var iFonts = 0
+    private var iImages = 0
     private var iScenarios = 0
-    private var iSounds    = 0
-    private var iUnits   = 0
+    private var iSounds = 0
+    private var iUnits = 0
 
     // For units (file="..." attribute)
     private var fileAttr: String?
@@ -238,22 +230,22 @@ private class ResXMLParser: NSObject, XMLParserDelegate {
                 saveUnit()
             } else if section != .none && section != .anims {
                 currentText = ""
-                m_inLeafElement = true
+                inLeafElement = true
             }
         }
     }
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
-        if m_inLeafElement { currentText += string }
+        if inLeafElement { currentText += string }
     }
 
     func parser(_ parser: XMLParser, didEndElement name: String, namespaceURI: String?,
                 qualifiedName: String?) {
-        if m_inLeafElement {
+        if inLeafElement {
             let value = currentText.trimmingCharacters(in: .whitespacesAndNewlines)
             if !value.isEmpty { saveValue(value) }
             currentText = ""
-            m_inLeafElement = false
+            inLeafElement = false
         }
         switch name {
         case "fuentes":  section = .none
@@ -296,17 +288,17 @@ private class SpritesXMLParser: NSObject, XMLParserDelegate {
 
     var sprites: [Sprite?] = Array(repeating: nil, count: Res.SPR_COUNT)
 
-    private var inSprites   = false
-    private var spriteIdx   = 0
+    private var inSprites = false
+    private var spriteIdx = 0
     private var animations: [Animation] = []
 
     // Current attributes of the <image> element
-    private var imgPath    = ""
+    private var imgPath = ""
     private var frameAncho = 0
-    private var frameAlto  = 0
-    private var ticks      = 0
-    private var offsetX    = 0
-    private var offsetY    = 0
+    private var frameAlto = 0
+    private var ticks = 0
+    private var offsetX = 0
+    private var offsetY = 0
 
     func parser(_ parser: XMLParser, didStartElement name: String, namespaceURI: String?,
                 qualifiedName: String?, attributes: [String: String]) {
@@ -318,12 +310,12 @@ private class SpritesXMLParser: NSObject, XMLParserDelegate {
             animations = []
 
         case "image" where inSprites:
-            imgPath    = Utils.getPath(attributes["path"] ?? "") ?? ""
-            frameAncho = Int(attributes["framewidth"]  ?? "0") ?? 0
-            frameAlto  = Int(attributes["frameheight"] ?? "0") ?? 0
-            ticks      = Int(attributes["frameticks"]  ?? "0") ?? 0
-            offsetX    = Int(attributes["offsetX"]     ?? "0") ?? 0
-            offsetY    = Int(attributes["offsetY"]     ?? "0") ?? 0
+            imgPath = Utils.getPath(attributes["path"] ?? "") ?? ""
+            frameAncho = Int(attributes["framewidth"] ?? "0") ?? 0
+            frameAlto = Int(attributes["frameheight"] ?? "0") ?? 0
+            ticks = Int(attributes["frameticks"] ?? "0") ?? 0
+            offsetX = Int(attributes["offsetX"] ?? "0") ?? 0
+            offsetY = Int(attributes["offsetY"] ?? "0") ?? 0
             let anim = Animation(idx: 0, path: imgPath, ticks: ticks,
                                    anchoFrame: frameAncho, altoFrame: frameAlto,
                                    offsetX: offsetX, offsetY: offsetY)
@@ -364,13 +356,13 @@ private class AnimsXMLParser: NSObject, XMLParserDelegate {
                 qualifiedName: String?, attributes: [String: String]) {
         if name == "anims" { inAnims = true; animIdx = 0 }
 
-        if name == "animation", inAnims {
-            let imgPath    = Utils.getPath(attributes["imagepath"] ?? "") ?? ""
-            let frameAncho = Int(attributes["framewidth"]  ?? "0") ?? 0
-            let frameAlto  = Int(attributes["frameheight"] ?? "0") ?? 0
-            let ticks      = Int(attributes["frameticks"]  ?? "0") ?? 0
-            let offsetX    = Int(attributes["offsetX"]     ?? "0") ?? 0
-            let offsetY    = Int(attributes["offsetY"]     ?? "0") ?? 0
+        if name == "animacion", inAnims {
+            let imgPath = Utils.getPath(attributes["imagepath"] ?? "") ?? ""
+            let frameAncho = Int(attributes["framewidth"] ?? "0") ?? 0
+            let frameAlto = Int(attributes["frameheight"] ?? "0") ?? 0
+            let ticks = Int(attributes["frameticks"] ?? "0") ?? 0
+            let offsetX = Int(attributes["offsetX"] ?? "0") ?? 0
+            let offsetY = Int(attributes["offsetY"] ?? "0") ?? 0
 
             if animIdx < animations.count {
                 animations[animIdx] = Animation(idx: 0, path: imgPath, ticks: ticks,

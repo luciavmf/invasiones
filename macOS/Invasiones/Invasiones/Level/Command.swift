@@ -24,26 +24,26 @@ class Command {
 
     // MARK: - Declarations
     private(set) var id: TYPE
-    private(set) var point:     (x: Int, y: Int)
-    private(set) var image:    Surface?
+    private(set) var point: (x: Int, y: Int)
+    private(set) var image: Surface?
     private(set) var animation: AnimObject?
-    private(set) var width:     Int = 0
+    private(set) var width: Int = 0
 
     // MARK: - Initializeres
 
     init(_ type: TYPE, _ x: Int, _ y: Int) {
-        id    = type
+        id = type
         point = (x, y)
     }
 
     init(_ type: TYPE, _ x: Int, _ y: Int, _ widthParam: Int) {
-        id    = type
+        id = type
         point = (x, y)
         width = widthParam
     }
 
     init(_ type: TYPE, _ x: Int, _ y: Int, _ path: String) {
-        id    = type
+        id = type
         point = (x, y)
         if let p = Utils.getPath(path) {
             image = ResourceManager.shared.getImage(p)
@@ -54,8 +54,8 @@ class Command {
     }
 
     init(_ type: TYPE, _ x: Int, _ y: Int, _ anim: AnimObject?) {
-        id        = type
-        point     = (x, y)
+        id = type
+        point = (x, y)
         animation = anim
     }
 }

@@ -15,16 +15,16 @@ class Video {
 
     // MARK: - Screen constants (equivalent to the static fields of Video in C#)
     static let width: Int = Program.SCREEN_WIDTH
-    static let height:  Int = Program.SCREEN_HEIGHT
+    static let height: Int = Program.SCREEN_HEIGHT
 
     // MARK: - Nodo canvas
     private let canvasNode: SKNode
 
     // MARK: - Drawing state
-    private var currentColor:       SKColor = .black
-    private var m_currentFont:      GameFont?
-    private var m_fontColor: SKColor = .white
-    private var zPos:              CGFloat = 0
+    private var currentColor: SKColor = .black
+    private var currentFont: GameFont?
+    private var fontColor: SKColor = .white
+    private var zPos: CGFloat = 0
 
     // Clip rect in C# coordinates (top-left origin). Only the state is persisted;
     // actual visual clipping is handled by the map renderer itself.
@@ -83,10 +83,10 @@ class Video {
         let texH = tex.size().height
         guard texW > 0, texH > 0, srcW > 0, srcH > 0 else { return }
 
-        let nx  = CGFloat(srcX) / texW
-        let ny  = 1.0 - CGFloat(srcY + srcH) / texH
-        let nw  = CGFloat(srcW) / texW
-        let nh  = CGFloat(srcH) / texH
+        let nx = CGFloat(srcX) / texW
+        let ny = 1.0 - CGFloat(srcY + srcH) / texH
+        let nw = CGFloat(srcW) / texW
+        let nh = CGFloat(srcH) / texH
 
         let subTex = SKTexture(rect: CGRect(x: nx, y: ny, width: nw, height: nh), in: tex)
         subTex.filteringMode = .nearest
@@ -128,7 +128,7 @@ class Video {
 
         let label = SKLabelNode()
         let nsFont: NSFont
-        if let font = m_currentFont?.nsFont {
+        if let font = currentFont?.nsFont {
             label.fontName = font.fontName
             label.fontSize = font.pointSize
             nsFont = font
@@ -140,15 +140,15 @@ class Video {
         paraStyle.alignment = .center
         let attrs: [NSAttributedString.Key: Any] = [
             .font:            nsFont,
-            .foregroundColor: m_fontColor,
+            .foregroundColor: fontColor,
             .paragraphStyle:  paraStyle
         ]
-        label.attributedText          = NSAttributedString(string: text, attributes: attrs)
+        label.attributedText = NSAttributedString(string: text, attributes: attrs)
         label.horizontalAlignmentMode = .center
-        label.verticalAlignmentMode   = (anchor & Surface.centerVertical) != 0 ? .center : .top
-        label.numberOfLines           = 0      // allows line breaks with \n
+        label.verticalAlignmentMode = (anchor & Surface.centerVertical) != 0 ? .center : .top
+        label.numberOfLines = 0      // allows line breaks with \n
         label.preferredMaxLayoutWidth = CGFloat(Video.width - 80)  // enables word-wrap and avoids clipping
-        label.position  = CGPoint(x: px, y: Video.height - py)
+        label.position = CGPoint(x: px, y: Video.height - py)
         label.zPosition = zPos; zPos += 1
         canvasNode.addChild(label)
     }
@@ -183,8 +183,8 @@ class Video {
     }
 
     func setFont(_ font: GameFont?, _ color: Int) {
-        m_currentFont = font
-        m_fontColor = skColor(color)
+        currentFont = font
+        fontColor = skColor(color)
     }
 
     /// Draws the outline of a rectangle (no fill) with the current colour.

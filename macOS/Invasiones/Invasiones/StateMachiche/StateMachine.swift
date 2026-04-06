@@ -12,17 +12,14 @@ import Foundation
 class StateMachine {
 
     // MARK: - Declarations
-    private var m_currentState: State?
-    private var m_currentStateKey: GameFrame.STATE = .INVALID
-    private var m_prevState: State?
-    private var m_nextState: State?
-    private var m_nextStateKey: GameFrame.STATE = .INVALID
+    private var currentStateObj: State?
+    private(set) var currentState: GameFrame.STATE = .INVALID
+    private var prevState: State?
+    private var nextState: State?
+    private var nextStateKey: GameFrame.STATE = .INVALID
 
     /// Dictionary of all registered states.
-    private var m_allStates: [GameFrame.STATE: State?] = [:]
-
-    // MARK: - Properties
-    var currentState: GameFrame.STATE { m_currentStateKey }
+    private var allStates: [GameFrame.STATE: State?] = [:]
 
     // MARK: - Initializer
     init() {}
@@ -32,51 +29,51 @@ class StateMachine {
     }
 
     func dispose() {
-        m_allStates.removeAll()
+        allStates.removeAll()
     }
 
     // MARK: - Methods
     /// Registers a state in the machine.
     func addState(_ key: GameFrame.STATE, _ state: State?) {
-        m_allStates[key] = state
+        allStates[key] = state
     }
 
     /// Queues the next state to transition into on the next update() call.
     func setNextState(_ key: GameFrame.STATE) {
-        guard m_allStates.keys.contains(key) else {
+        guard allStates.keys.contains(key) else {
             Log.shared.error("La maquina de estados no contiene la clave \(key)")
             return
         }
-        m_nextState = m_allStates[key] ?? nil
-        m_nextStateKey = key
+        nextState = allStates[key] ?? nil
+        nextStateKey = key
     }
 
     /// Immediately switches to the given state (without calling salir/start).
     func setState(_ key: GameFrame.STATE) {
-        m_prevState = m_currentState
-        m_currentState = m_allStates[key] ?? nil
-        m_currentStateKey = key
+        prevState = currentStateObj
+        currentStateObj = allStates[key] ?? nil
+        currentState = key
     }
 
     /// Updates the machine: handles any pending transition and delegates to the current state.
     func update() {
-        if let next = m_nextState {
-            m_prevState = m_currentState
-            m_currentState = next
-            m_currentStateKey = m_nextStateKey
+        if let next = nextState {
+            prevState = currentStateObj
+            currentStateObj = next
+            currentState = nextStateKey
 
-            m_nextState = nil
-            m_nextStateKey = .INVALID
+            nextState = nil
+            nextStateKey = .INVALID
 
-            m_prevState?.exit()
-            m_currentState?.start()
+            prevState?.exit()
+            currentStateObj?.start()
         }
 
-        m_currentState?.update()
+        currentStateObj?.update()
     }
 
     /// Draws the current state.
     func draw(_ g: Video) {
-        m_currentState?.draw(g)
+        currentStateObj?.draw(g)
     }
 }

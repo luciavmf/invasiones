@@ -15,37 +15,37 @@ class Player {
     enum STATE { case START, LOADING, GAME }
 
     // MARK: - Protected attributes
-    var m_completedObjective:         Bool = false
-    var m_faction:                   Episode.BANDO = .ARGENTINE
-    var m_someoneCompletedOrder:   Bool = false
-    var m_ring:                     AnimObject?
+    var objectiveCompleted: Bool = false
+    var faction: Episode.BANDO = .ARGENTINE
+    var someoneCompletedOrder: Bool = false
+    var ring: AnimObject?
 
-    var m_hud:                     Hud
-    var m_units:                [Unit] = []
-    var m_objectsToDraw:          ObjectTable     // [physicalMapHeight][physicalMapWidth]
-    var m_map:                    Map
-    var m_groups:                  [Group]? = nil
-    var m_state:                  STATE = .START
-    var m_camera:                  Camera
-    var m_selectedUnits:   [Unit] = []
-    var m_deadUnits:         [Unit]? = nil
-    var m_visibleUnits:        [Unit]? = nil
-    var m_collidingUnits:   [Unit]? = nil
-    var m_selectedUnit:      Unit?
-    var m_selectedGroup:       Group?
-    var m_objective:                Objective?
-    var m_command:                   Command?
-    var m_objectToTake:            MapObject?
-    var m_fireEffects:               [AnimObject]? = nil
+    var hud: Hud
+    var units: [Unit] = []
+    var objectsToDraw: ObjectTable     // [physicalMapHeight][physicalMapWidth]
+    var map: Map
+    var groups: [Group]? = nil
+    var stateValue: STATE = .START
+    var camera: Camera
+    var selectedUnits: [Unit] = []
+    var deadUnits: [Unit]? = nil
+    var visibleUnits: [Unit]? = nil
+    var collidingUnits: [Unit]? = nil
+    var selectedUnit: Unit?
+    var selectedGroup: Group?
+    var objective: Objective?
+    var command: Command?
+    var objectToTake: MapObject?
+    var fireEffects: [AnimObject]? = nil
 
-    var unitCount: Int { m_units.count }
+    var unitCount: Int { units.count }
 
     // MARK: - Initializer
-    init(map: Map, camera: Camera, objectsToDraw: ObjectTable, hud: Hud) {
-        m_map = map
-        m_camera = camera
-        m_objectsToDraw = objectsToDraw
-        m_hud           = hud
+    init(map mapArg: Map, camera cameraArg: Camera, objectsToDraw tableArg: ObjectTable, hud hudArg: Hud) {
+        self.map = mapArg
+        self.camera = cameraArg
+        self.objectsToDraw = tableArg
+        self.hud = hudArg
     }
 
     // MARK: - Abstract methods (deben ser sobreescritos)
@@ -53,85 +53,85 @@ class Player {
     func loadUnits(_ levelIndex: Int) -> Bool { fatalError("loadUnits must be overridden") }
 
     // MARK: - Objective completion
-    func completedObjective() -> Bool { m_completedObjective }
+    func completedObjective() -> Bool { objectiveCompleted }
 
     // MARK: - Set objective
-    func setObjective(_ objective: Objective?) {
-        m_objective        = objective
-        m_completedObjective = false
+    func setObjective(_ obj: Objective?) {
+        objective = obj
+        objectiveCompleted = false
 
         if let obj = objective {
-            m_command = obj.nextCommand()
+            command = obj.nextCommand()
 
-            if let ord = m_command {
+            if let ord = command {
                 if ord.id == .TAKE_OBJECT, let img = ord.image {
-                    m_objectToTake = MapObject(sup: img, i: ord.point.x, j: ord.point.y)
+                    objectToTake = MapObject(sup: img, i: ord.point.x, j: ord.point.y)
                 }
-                m_ring?.setPosition(ord.point.x, ord.point.y)
+                ring?.setPosition(ord.point.x, ord.point.y)
             }
         } else {
-            m_command = nil
+            command = nil
         }
 
-        m_units.forEach { $0.setObjectiveCommand(m_command) }
+        units.forEach { $0.setObjectiveCommand(command) }
     }
 
     func setNextCommand() {
-        m_someoneCompletedOrder = false
-        m_command = m_objective?.nextCommand()
+        someoneCompletedOrder = false
+        command = objective?.nextCommand()
 
-        if m_command == nil {
-            m_completedObjective = true
+        if command == nil {
+            objectiveCompleted = true
         } else {
             // Automatically process TRIGGERs
-            while let ord = m_command, ord.id == .TRIGGER {
-                if m_fireEffects == nil { m_fireEffects = [] }
+            while let ord = command, ord.id == .TRIGGER {
+                if fireEffects == nil { fireEffects = [] }
                 if let anim = ord.animation {
-                    m_fireEffects!.append(anim)
-                    m_map.invalidateTile(ord.point.x, ord.point.y)
+                    fireEffects!.append(anim)
+                    map.invalidateTile(ord.point.x, ord.point.y)
 
                     let anim2 = AnimObject(Animation(copia: anim.animation),
                                           ord.animation!.physicalTilePos.x - 5,
                                           ord.animation!.physicalTilePos.y - 5)
-                    m_fireEffects!.append(anim2)
-                    m_map.invalidateTile(anim.physicalTilePos.x - 5, anim.physicalTilePos.y - 5)
+                    fireEffects!.append(anim2)
+                    map.invalidateTile(anim.physicalTilePos.x - 5, anim.physicalTilePos.y - 5)
 
                     let anim3 = AnimObject(Animation(copia: anim.animation),
                                           ord.animation!.physicalTilePos.x - 5,
                                           ord.animation!.physicalTilePos.y)
-                    m_fireEffects!.append(anim3)
-                    m_map.invalidateTile(anim.physicalTilePos.x - 5, anim.physicalTilePos.y)
+                    fireEffects!.append(anim3)
+                    map.invalidateTile(anim.physicalTilePos.x - 5, anim.physicalTilePos.y)
                 }
-                m_command = m_objective?.nextCommand()
-                if m_command == nil { m_completedObjective = true }
+                command = objective?.nextCommand()
+                if command == nil { objectiveCompleted = true }
             }
-            if let ord = m_command {
-                m_ring?.setPosition(ord.point.x, ord.point.y)
+            if let ord = command {
+                ring?.setPosition(ord.point.x, ord.point.y)
             }
         }
 
-        m_units.forEach { $0.setObjectiveCommand(m_command) }
+        units.forEach { $0.setObjectiveCommand(command) }
     }
 
     // MARK: - Unit update (shared)
 
     func updateUnits() {
-        m_deadUnits = nil
-        let checkSelection = m_selectedUnit == nil && m_selectedGroup == nil
+        deadUnits = nil
+        let checkSelection = selectedUnit == nil && selectedGroup == nil
 
-        for unit in m_units {
+        for unit in units {
             updateAndMoveUnitInObjectMap(unit)
 
             if checkSelection, unit.isSelected {
-                if m_selectedUnits.count < 6 {
-                    m_hud.selectedUnit = unit
-                    m_selectedUnits.append(unit)
+                if selectedUnits.count < 6 {
+                    hud.selectedUnit = unit
+                    selectedUnits.append(unit)
                 } else {
                     unit.isSelected = false
                 }
             }
 
-            m_visibleUnits = getVisibleUnitsAndTiles(unit)
+            visibleUnits = getVisibleUnitsAndTiles(unit)
 
             if unit.isMoving() {
                 checkCollisions(unit)
@@ -142,27 +142,27 @@ class Player {
             }
 
             if unit.currentState == .DEAD {
-                if m_deadUnits == nil { m_deadUnits = [] }
-                m_deadUnits!.append(unit)
+                if deadUnits == nil { deadUnits = [] }
+                deadUnits!.append(unit)
             }
 
-            if unit.completedOrder { m_someoneCompletedOrder = true }
+            if unit.completedOrder { someoneCompletedOrder = true }
         }
 
         // Check KILL order
-        if let ord = m_command, ord.id == .KILL {
-            m_someoneCompletedOrder = true
+        if let ord = command, ord.id == .KILL {
+            someoneCompletedOrder = true
             let iStart = ord.point.x - ord.width
-            let iEnd   = ord.point.x + ord.width
+            let iEnd = ord.point.x + ord.width
             let jStart = ord.point.y - ord.width
-            let jEnd   = ord.point.y + ord.width
+            let jEnd = ord.point.y + ord.width
 
             for i in iStart..<iEnd {
                 for j in jStart..<jEnd {
-                    guard i >= 0, j >= 0, i < m_objectsToDraw.tabla.count,
-                          j < m_objectsToDraw.tabla[i].count else { continue }
-                    if let u = m_objectsToDraw.tabla[i][j] as? Unit, u.faction == .ENEMY {
-                        m_someoneCompletedOrder = false
+                    guard i >= 0, j >= 0, i < objectsToDraw.tabla.count,
+                          j < objectsToDraw.tabla[i].count else { continue }
+                    if let u = objectsToDraw.tabla[i][j] as? Unit, u.faction == .ENEMY {
+                        someoneCompletedOrder = false
                     }
                 }
             }
@@ -170,14 +170,14 @@ class Player {
     }
 
     func removeDeadUnits() {
-        guard let muertas = m_deadUnits else { return }
+        guard let muertas = deadUnits else { return }
         for dead in muertas {
             let ti = dead.physicalTilePos.x
             let tj = dead.physicalTilePos.y
-            if ti < m_objectsToDraw.tabla.count, tj < m_objectsToDraw.tabla[ti].count {
-                m_objectsToDraw.tabla[ti][tj] = nil
+            if ti < objectsToDraw.tabla.count, tj < objectsToDraw.tabla[ti].count {
+                objectsToDraw.tabla[ti][tj] = nil
             }
-            m_units.removeAll { $0 === dead }
+            units.removeAll { $0 === dead }
         }
     }
 
@@ -188,24 +188,24 @@ class Player {
         if moved {
             let prevI = unit.previousTile.x
             let prevJ = unit.previousTile.y
-            if prevI < m_objectsToDraw.tabla.count, prevJ < m_objectsToDraw.tabla[prevI].count {
-                if m_objectsToDraw.tabla[prevI][prevJ] === unit {
-                    m_objectsToDraw.tabla[prevI][prevJ] = nil
+            if prevI < objectsToDraw.tabla.count, prevJ < objectsToDraw.tabla[prevI].count {
+                if objectsToDraw.tabla[prevI][prevJ] === unit {
+                    objectsToDraw.tabla[prevI][prevJ] = nil
                 }
             }
             let ni = unit.physicalTilePos.x
             let nj = unit.physicalTilePos.y
-            if ni < m_objectsToDraw.tabla.count, nj < m_objectsToDraw.tabla[ni].count {
-                m_objectsToDraw.tabla[ni][nj] = unit
+            if ni < objectsToDraw.tabla.count, nj < objectsToDraw.tabla[ni].count {
+                objectsToDraw.tabla[ni][nj] = unit
             }
         }
     }
 
     private func checkCollisions(_ unit: Unit) {
-        m_collidingUnits = getUnitsToCollide(unit)
-        for other in (m_collidingUnits ?? []) {
+        collidingUnits = getUnitsToCollide(unit)
+        for other in (collidingUnits ?? []) {
             if unit.hasCollision(other) {
-                unit.evadeUnit(other, m_visibleUnits)
+                unit.evadeUnit(other, visibleUnits)
             }
         }
     }
@@ -214,8 +214,8 @@ class Player {
         var visible: [Unit]? = nil
         let iStart = max(0, unit.physicalTilePos.x - Unit.MAX_VISIBILITY)
         let jStart = max(0, unit.physicalTilePos.y - Unit.MAX_VISIBILITY)
-        let iFin    = min(m_map.physicalMapHeight,  unit.physicalTilePos.x + Unit.MAX_VISIBILITY)
-        let jFin    = min(m_map.physicalMapWidth, unit.physicalTilePos.y + Unit.MAX_VISIBILITY)
+        let iFin = min(map.physicalMapHeight, unit.physicalTilePos.x + Unit.MAX_VISIBILITY)
+        let jFin = min(map.physicalMapWidth, unit.physicalTilePos.y + Unit.MAX_VISIBILITY)
         let esVisible = unit.isOnScreen()
 
         for i in iStart..<iFin {
@@ -223,14 +223,14 @@ class Player {
                 let dist = unit.calculateDistance(i, j)
                 guard dist <= Double(unit.visibility) else { continue }
 
-                if i < m_objectsToDraw.tabla.count, j < m_objectsToDraw.tabla[i].count,
-                   let other = m_objectsToDraw.tabla[i][j] as? Unit, other !== unit {
+                if i < objectsToDraw.tabla.count, j < objectsToDraw.tabla[i].count,
+                   let other = objectsToDraw.tabla[i][j] as? Unit, other !== unit {
                     if visible == nil { visible = [] }
                     visible!.append(other)
                 }
 
                 if esVisible && unit.faction == .ARGENTINE {
-                    m_map.visibleTilesLayer[i][j] = Int16(Map.TILE_VISIBLE)
+                    map.visibleTilesLayer[i][j] = Int16(Map.TILE_VISIBLE)
                 }
             }
         }
@@ -242,13 +242,13 @@ class Player {
         let range = Unit.COLLISION_CHECK_DISTANCE
         let iStart = max(0, unit.physicalTilePos.x - range)
         let jStart = max(0, unit.physicalTilePos.y - range)
-        let iFin    = min(m_map.physicalMapHeight,  unit.physicalTilePos.x + range)
-        let jFin    = min(m_map.physicalMapWidth, unit.physicalTilePos.y + range)
+        let iFin = min(map.physicalMapHeight, unit.physicalTilePos.x + range)
+        let jFin = min(map.physicalMapWidth, unit.physicalTilePos.y + range)
 
         for i in iStart..<iFin {
             for j in jStart..<jFin {
-                guard i < m_objectsToDraw.tabla.count, j < m_objectsToDraw.tabla[i].count,
-                      let other = m_objectsToDraw.tabla[i][j] as? Unit, other !== unit else { continue }
+                guard i < objectsToDraw.tabla.count, j < objectsToDraw.tabla[i].count,
+                      let other = objectsToDraw.tabla[i][j] as? Unit, other !== unit else { continue }
                 let dist = other.calculateDistance(unit.physicalTilePos.x,
                                                   unit.physicalTilePos.y)
                 if dist <= Double(range) {
@@ -261,9 +261,9 @@ class Player {
     }
 
     private func attackVisibleUnits(_ unit: Unit) {
-        guard let visible = m_visibleUnits else { return }
+        guard let visible = visibleUnits else { return }
         for enemy in visible {
-            if enemy.faction != m_faction, !enemy.isDead() {
+            if enemy.faction != faction, !enemy.isDead() {
                 unit.attack(enemy)
             }
         }
@@ -275,13 +275,13 @@ class Player {
             return []
         }
 
-        var group:   [Unit] = []
+        var group: [Unit] = []
         var i = 0, j = 0, inc = 2
         var dir = 1  // UP
         var placed = 0
 
         while placed < count {
-            if m_map.isWalkable(x + i, y + j) {
+            if map.isWalkable(x + i, y + j) {
                 if let u = placeUnitInternal(type, x + i, y + j) {
                     group.append(u)
                 }
@@ -300,28 +300,28 @@ class Player {
     }
 
     private func placeUnitInternal(_ type: Int, _ i: Int, _ j: Int) -> Unit? {
-        guard m_map.isWalkable(i, j) else {
+        guard map.isWalkable(i, j) else {
             Log.shared.debug("No se puede position la unit: tile no caminable.")
             return nil
         }
         let unit = Unit(type)
         unit.physicalTilePos = (i, j)
-        unit.previousTile         = (i, j)
+        unit.previousTile = (i, j)
         unit.initializeXY()
-        unit.faction = m_faction
+        unit.faction = faction
 
-        m_units.append(unit)
-        if i < m_objectsToDraw.tabla.count, j < m_objectsToDraw.tabla[i].count {
-            m_objectsToDraw.tabla[i][j] = unit
+        units.append(unit)
+        if i < objectsToDraw.tabla.count, j < objectsToDraw.tabla[i].count {
+            objectsToDraw.tabla[i][j] = unit
         }
         return unit
     }
 
     func clearSelection() {
-        m_selectedGroup?.isSelected = false
-        m_selectedUnit?.isSelected = false
-        m_hud.selectedUnit = nil
-        m_selectedGroup   = nil
-        m_selectedUnit  = nil
+        selectedGroup?.isSelected = false
+        selectedUnit?.isSelected = false
+        hud.selectedUnit = nil
+        selectedGroup = nil
+        selectedUnit = nil
     }
 }

@@ -12,72 +12,72 @@ import Foundation
 class ConfirmationMenu: GUIBox {
 
     // MARK: - Enum
-    enum SELECCION: Int {
-        case NINGUNO   = -1
-        case IZQUIERDO =  0
-        case DERECHO   =  1
+    enum Selection: Int {
+        case none = -1
+        case left =  0
+        case right =  1
     }
 
     // MARK: - Declarations
-    private var m_leftButton: Button
-    private var m_rightButton: Button
+    private var leftButton: Button
+    private var rightButton: Button
 
     // MARK: - Initializer
-    init(_ label: Int, _ boton1: Int, _ boton2: Int) {
-        m_leftButton = Button(label: boton1, font: nil)
-        m_leftButton.setPosition(0, 0, 0)
-        m_rightButton = Button(label: boton2, font: nil)
-        m_rightButton.setPosition(200, 200, 0)
+    init(_ lbl: Int, _ boton1: Int, _ boton2: Int) {
+        leftButton = Button(label: boton1, font: nil)
+        leftButton.setPosition(0, 0, 0)
+        rightButton = Button(label: boton2, font: nil)
+        rightButton.setPosition(200, 200, 0)
         super.init()
-        m_label = label
-        m_width   = Definitions.CONFIRMATION_WIDTH
-        m_height    = Definitions.CONFIRMATION_HEIGHT
+        label = lbl
+        width = Definitions.CONFIRMATION_WIDTH
+        height = Definitions.CONFIRMATION_HEIGHT
     }
 
     // MARK: - GUIBox overrides
 
     override func setPosition(_ x: Int, _ y: Int, _ anchor: Int) {
-        m_x = x
-        m_y = y
-        if (anchor & Surface.centerHorizontal) != 0 { m_x += (Video.width >> 1) - (m_width >> 1) }
-        if (anchor & Surface.centerVertical) != 0 { m_y += (Video.height  >> 1) - (m_height  >> 1) }
+        posX = x
+        posY = y
+        if (anchor & Surface.centerHorizontal) != 0 { posX += (Video.width >> 1) - (width >> 1) }
+        if (anchor & Surface.centerVertical) != 0 { posY += (Video.height >> 1) - (height >> 1) }
 
-        m_leftButton.setPosition(
-            m_x + Button.OFFSET_LIMITE_PANTALLA,
-            m_y + m_height - m_leftButton.height - Button.OFFSET_LIMITE_PANTALLA,
+        leftButton.setPosition(
+            posX + Button.OFFSET_LIMITE_PANTALLA,
+            posY + height - leftButton.height - Button.OFFSET_LIMITE_PANTALLA,
             0
         )
 
-        m_rightButton.setPosition(
-            m_x + m_width - m_rightButton.width - Button.OFFSET_LIMITE_PANTALLA,
-            m_y + m_height  - m_rightButton.height  - Button.OFFSET_LIMITE_PANTALLA,
+        rightButton.setPosition(
+            posX + width - rightButton.width - Button.OFFSET_LIMITE_PANTALLA,
+            posY + height  - rightButton.height  - Button.OFFSET_LIMITE_PANTALLA,
             0
         )
     }
 
     @discardableResult
     override func update() -> Int {
-        if m_leftButton.update() != 0 { return SELECCION.IZQUIERDO.rawValue }
-        if m_rightButton.update() != 0 { return SELECCION.DERECHO.rawValue   }
-        return SELECCION.NINGUNO.rawValue
+        if leftButton.update() != 0 { return Selection.left.rawValue }
+        if rightButton.update() != 0 { return Selection.right.rawValue }
+        return Selection.none.rawValue
     }
 
     override func draw(_ g: Video) {
         g.setColor(Definitions.GUI_COLOR_MENUS)
-        g.fillRect(m_x, m_y, m_width, m_height, Definitions.CONFIRMATION_ALPHA)
+        g.fillRect(posX, posY, width, height, Definitions.CONFIRMATION_ALPHA)
 
         g.setFont(
             ResourceManager.shared.fonts[Definitions.FONT_MENU],
             Definitions.GUI_COLOR_TEXT
         )
         g.write(
-            m_label,
-            m_x - (Video.width >> 1) + (m_width >> 1),
-            m_y + m_height / 5,
+            label,
+            posX - (Video.width >> 1) + (width >> 1),
+            posY + height / 5,
             Surface.centerHorizontal
         )
 
-        m_leftButton.draw(g)
-        m_rightButton.draw(g)
+        leftButton.draw(g)
+        rightButton.draw(g)
     }
 }

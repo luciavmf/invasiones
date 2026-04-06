@@ -15,10 +15,10 @@ class Keyboard {
     // MARK: - Key constants (Carbon virtual key codes on macOS)
     static let KEY_REPEAT_INTERVAL = 15
 
-    static let KEY_UP      = 126   // kVK_UpArrow
-    static let KEY_DOWN      = 125   // kVK_DownArrow
-    static let KEY_LEFT      = 123   // kVK_LeftArrow
-    static let KEY_RIGHT      = 124   // kVK_RightArrow
+    static let KEY_UP = 126   // kVK_UpArrow
+    static let KEY_DOWN = 125   // kVK_DownArrow
+    static let KEY_LEFT = 123   // kVK_LeftArrow
+    static let KEY_RIGHT = 124   // kVK_RightArrow
 
     static let KEY_A = 0;  static let KEY_B = 11; static let KEY_C = 8
     static let KEY_D = 2;  static let KEY_E = 14; static let KEY_F = 3
@@ -30,20 +30,15 @@ class Keyboard {
     static let KEY_V = 9;  static let KEY_W = 13; static let KEY_X = 7
     static let KEY_Y = 16; static let KEY_Z = 6
 
-    static let KEY_RSHIFT    = 60   // kVK_RightShift
-    static let KEY_LSHIFT    = 56   // kVK_Shift
+    static let KEY_RSHIFT = 60   // kVK_RightShift
+    static let KEY_LSHIFT = 56   // kVK_Shift
     static let KEY_CAPSLOCK = 57   // kVK_CapsLock
     static let KEY_BACKSPACE = 51   // kVK_Delete
-    static let KEY_ENTER     = 36   // kVK_Return
-    static let KEY_ESC       = 53   // kVK_Escape
+    static let KEY_ENTER = 36   // kVK_Return
+    static let KEY_ESC = 53   // kVK_Escape
 
     // MARK: - Singleton
-    private static var instance: Keyboard?
-
-    static var shared: Keyboard {
-        if instance == nil { instance = Keyboard() }
-        return instance!
-    }
+    static let shared = Keyboard()
 
     // MARK: - Declarations
     /// Teclas actualmente presionadas (keyCode de NSEvent).
