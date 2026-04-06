@@ -1,5 +1,5 @@
 //
-//  Mapa.swift
+//  Map.swift
 //  Invasiones
 //
 //  Created by Lucia Medina Fretes on 06.04.26.
@@ -10,39 +10,39 @@
 
 import Foundation
 
-class Mapa {
+class Map {
 
     // MARK: - Constants
-    private let NRO_MAXIMO_DE_CAPAS = 8
-    private let CAPA_INFO           = 8
+    private let MAX_LAYERS_COUNT = 8
+    private let INFO_LAYER           = 8
 
     // MARK: - Layer indices (read from XML)
-    private(set) var CAPA_TERRENO:               Int = 0
-    private var CAPA_OBSTACULOS:                 Int = 0
-    private var CAPA_UNIDADES_JUGADOR:           Int = 0
-    private var CAPA_POSICIONES_INVALIDADAS:     Int = 0
+    private(set) var TERRAIN_LAYER:               Int = 0
+    private var OBSTACLES_LAYER:                 Int = 0
+    private var PLAYER_UNITS_LAYER:           Int = 0
+    private var INVALIDATED_POSITIONS_LAYER:     Int = 0
 
     static let TILE_VISIBLE: Int = 1
 
     // MARK: - Datos del mapa
-    /// `m_mapa[capa][i][j]` = tile ID (Int16).
-    private var m_mapa: [[[Int16]]] = []           // [layer][col][row]
-    private var m_nombresCapas: [String: Int] = [:]
-    private var m_mapaCargado  = false
-    private var m_numeroMaximoDeCapas = 0
+    /// `m_map[layer][i][j]` = tile ID (Int16).
+    private var m_map: [[[Int16]]] = []           // [layer][col][row]
+    private var m_layerNames: [String: Int] = [:]
+    private var m_mapLoaded  = false
+    private var m_maxLayers = 0
 
-    private var m_altoEnTiles:          Int = 0
-    private var m_altoEnTilesMapaFisico: Int = 0
-    private var m_anchoEnTiles:         Int = 0
-    private var m_anchoEnTilesMapaFisico: Int = 0
+    private var m_heightInTiles:          Int = 0
+    private var m_physicalHeightInTiles: Int = 0
+    private var m_widthInTiles:         Int = 0
+    private var m_physicalWidthInTiles: Int = 0
 
-    private(set) var tileAncho:      Int = 0
-    private(set) var tileAlto:       Int = 0
-    private(set) var tileFisicoAncho: Int = 0
-    private(set) var tileFisicoAlto:  Int = 0
+    private(set) var tileWidth:      Int = 0
+    private(set) var tileHeight:       Int = 0
+    private(set) var physicalTileWidth: Int = 0
+    private(set) var physicalTileHeight:  Int = 0
 
     private var m_tilesets:      [Tileset?] = Array(repeating: nil, count: Res.TLS_COUNT)
-    private var m_tilesetMaximo: Int = 0
+    private var m_tilesetCount: Int = 0
 
     private static var m_tilesetDebug: Tileset?
 
@@ -51,72 +51,72 @@ class Mapa {
     private var m_tileChicoMouse: (x: Int, y: Int) = (0, 0)
 
     // MARK: - Physical map (small tiles, ×2 resolution)
-    private(set) var capaTilesFisicos:  [[Int16]] = []  // [col * 2][row * 2]
-    var capaTilesVisibles: [[Int16]] = []
+    private(set) var physicalTilesLayer:  [[Int16]] = []  // [col * 2][row * 2]
+    var visibleTilesLayer: [[Int16]] = []
 
     // MARK: - Grey tile image (debug / semi-transparent selection)
-    private var m_imagenTileGris: Superficie?
+    private var m_greyTileImage: Surface?
 
     // MARK: - Camera
-    private let m_camara: Camara
+    private let m_camera: Camera
 
     // MARK: - Public properties
-    var alto:      Int { m_altoEnTiles }
-    var ancho:     Int { m_anchoEnTiles }
-    var altoMapaFisico:  Int { m_altoEnTilesMapaFisico }
-    var anchoMapaFisico: Int { m_anchoEnTilesMapaFisico }
+    var height:      Int { m_heightInTiles }
+    var width:     Int { m_widthInTiles }
+    var physicalMapHeight:  Int { m_physicalHeightInTiles }
+    var physicalMapWidth: Int { m_physicalWidthInTiles }
 
-    var tileBajoMouse:      (x: Int, y: Int) { m_tileMouse }
-    var tileChicoMouse:     (x: Int, y: Int) { m_tileChicoMouse }
+    var tileUnderMouse:      (x: Int, y: Int) { m_tileMouse }
+    var smallTileUnderMouse:     (x: Int, y: Int) { m_tileChicoMouse }
 
-    var capaUnidades: [[Int16]] {
-        guard CAPA_UNIDADES_JUGADOR < m_mapa.count else { return [] }
-        return m_mapa[CAPA_UNIDADES_JUGADOR]
+    var unitsLayer: [[Int16]] {
+        guard PLAYER_UNITS_LAYER < m_map.count else { return [] }
+        return m_map[PLAYER_UNITS_LAYER]
     }
-    var capaObstaculos: [[Int16]] {
-        guard CAPA_OBSTACULOS < m_mapa.count else { return [] }
-        return m_mapa[CAPA_OBSTACULOS]
+    var obstaclesLayer: [[Int16]] {
+        guard OBSTACLES_LAYER < m_map.count else { return [] }
+        return m_map[OBSTACLES_LAYER]
     }
-    var capaEdificios: [[Int16]] {
-        guard CAPA_POSICIONES_INVALIDADAS < m_mapa.count else { return [] }
-        return m_mapa[CAPA_POSICIONES_INVALIDADAS]
+    var buildingsLayer: [[Int16]] {
+        guard INVALIDATED_POSITIONS_LAYER < m_map.count else { return [] }
+        return m_map[INVALIDATED_POSITIONS_LAYER]
     }
-    var capaTerreno: [[Int16]] {
-        guard CAPA_TERRENO < m_mapa.count else { return [] }
-        return m_mapa[CAPA_TERRENO]
+    var terrainLayer: [[Int16]] {
+        guard TERRAIN_LAYER < m_map.count else { return [] }
+        return m_map[TERRAIN_LAYER]
     }
     var tilesets: [Tileset?] { m_tilesets }
 
     // MARK: - Initializer
-    init(camara: Camara) {
-        m_camara = camara
+    init(camera: Camera) {
+        m_camera = camera
     }
 
     // MARK: - Loading
 
     @discardableResult
-    func cargar(_ mapId: Int) -> Bool {
+    func load(_ mapId: Int) -> Bool {
         guard mapId >= Res.TLS_COUNT, mapId < Res.TLS_COUNT + Res.MAP_COUNT else {
-            Log.Instancia.error("Mapa ID \(mapId) inválido.")
+            Log.shared.error("Map ID \(mapId) inválido.")
             return false
         }
-        let paths = AdministradorDeRecursos.Instancia.pathsEscenarios
+        let paths = ResourceManager.shared.scenarioPaths
         guard mapId < paths.count, let mapPath = paths[mapId] else {
-            Log.Instancia.error("No hay path para el mapa \(mapId).")
+            Log.shared.error("No hay path para el mapa \(mapId).")
             return false
         }
 
-        m_tilesetMaximo = 0
-        m_numeroMaximoDeCapas = 0
-        m_mapa = []
-        m_nombresCapas = [:]
+        m_tilesetCount = 0
+        m_maxLayers = 0
+        m_map = []
+        m_layerNames = [:]
 
-        guard leerInfoMapa(mapPath) else { return false }
-        guard leerTilesets(mapPath, paths: paths) else { return false }
-        guard leerCapas(mapPath) else { return false }
+        guard readMapInfo(mapPath) else { return false }
+        guard readTilesets(mapPath, paths: paths) else { return false }
+        guard readLayers(mapPath) else { return false }
 
-        cargarCapaInfo(paths: paths)
-        m_mapaCargado = true
+        loadLayerInfo(paths: paths)
+        m_mapLoaded = true
         return true
     }
 
@@ -124,46 +124,46 @@ class Mapa {
 
     /// Draws layer `layer` onto the given Video using the current camera.
     @discardableResult
-    func dibujarCapa(_ g: Video, _ layer: Int) -> Bool {
-        guard layer < m_numeroMaximoDeCapas, layer >= 0 else { return false }
-        guard m_mapaCargado else { return false }
+    func drawLayer(_ g: Video, _ layer: Int) -> Bool {
+        guard layer < m_maxLayers, layer >= 0 else { return false }
+        guard m_mapLoaded else { return false }
 
-        let oldClip = g.obtenerClip()
-        g.setearClip(m_camara.inicioX, m_camara.inicioY, m_camara.ancho, m_camara.alto)
+        let oldClip = g.getClip()
+        g.setClip(m_camera.startX, m_camera.startY, m_camera.width, m_camera.height)
 
-        var cambio = true
-        let p = calcularPrimerTileAPintar(m_camara.X, m_camara.Y)
+        var toggle = true
+        let p = calculateFirstTileToDraw(m_camera.X, m_camera.Y)
         var XX = p.x, YY = p.y
 
-        var posicionInicioX = m_camara.inicioX + (((XX - YY) * tileAncho) >> 1) + m_camara.X
-        var posicionInicioY = m_camara.inicioY + (((XX + YY) * tileAlto)  >> 1) + m_camara.Y
+        var startPosX = m_camera.startX + (((XX - YY) * tileWidth) >> 1) + m_camera.X
+        var startPosY = m_camera.startY + (((XX + YY) * tileHeight)  >> 1) + m_camera.Y
 
-        while posicionInicioY <= (m_camara.alto + m_camara.inicioY) {
+        while startPosY <= (m_camera.height + m_camera.startY) {
             var tileX = 0
             var i = XX, j = YY
-            while (tileX * tileAncho + posicionInicioX) <= (m_camara.inicioX + m_camara.ancho) && j >= 0 {
-                if i < m_altoEnTiles && i >= 0 && j < m_anchoEnTiles && j >= 0 {
-                    let tileId = Int(m_mapa[layer][i][j])
-                    if tileId != 0, let ts = obtenerTileset(tileId) {
-                        let localId = tileId - Int(ts.primerGid)
-                        let rect = ts.obtenerRectanguloDelTile(localId)
-                        g.dibujar(ts.imagen, rect.x, rect.y, rect.w, rect.h,
-                                  tileX * tileAncho + posicionInicioX, posicionInicioY)
+            while (tileX * tileWidth + startPosX) <= (m_camera.startX + m_camera.width) && j >= 0 {
+                if i < m_heightInTiles && i >= 0 && j < m_widthInTiles && j >= 0 {
+                    let tileId = Int(m_map[layer][i][j])
+                    if tileId != 0, let ts = getTileset(tileId) {
+                        let localId = tileId - Int(ts.firstGid)
+                        let rect = ts.getTileRect(localId)
+                        g.draw(ts.image, rect.x, rect.y, rect.w, rect.h,
+                                  tileX * tileWidth + startPosX, startPosY)
                     }
                 }
                 tileX += 1; i += 1; j -= 1
             }
 
-            posicionInicioY += tileAlto >> 1
+            startPosY += tileHeight >> 1
 
-            if cambio {
-                XX += 1; posicionInicioX += tileAncho >> 1; cambio = false
+            if toggle {
+                XX += 1; startPosX += tileWidth >> 1; toggle = false
             } else {
-                YY += 1; posicionInicioX -= tileAncho >> 1; cambio = true
+                YY += 1; startPosX -= tileWidth >> 1; toggle = true
             }
         }
 
-        g.setearClip(oldClip.x, oldClip.y, oldClip.w, oldClip.h)
+        g.setClip(oldClip.x, oldClip.y, oldClip.w, oldClip.h)
         return true
     }
 
@@ -171,148 +171,148 @@ class Mapa {
 
     /// Draws a small tile (physical map) at the corresponding isometric position.
     /// If `semiTransparente` is true, draws the semi-transparent grey tile (fog-of-war).
-    func dibujarTileChico(_ g: Video, _ i: Int, _ j: Int, _ semiTransparente: Bool) {
-        guard i >= 0, j >= 0, i < m_altoEnTilesMapaFisico, j < m_anchoEnTilesMapaFisico else { return }
+    func drawSmallTile(_ g: Video, _ i: Int, _ j: Int, _ semiTransparente: Bool) {
+        guard i >= 0, j >= 0, i < m_physicalHeightInTiles, j < m_physicalWidthInTiles else { return }
 
-        let posX = m_camara.inicioX + (((i - j) * tileAncho / 2) >> 1) + m_camara.X + tileAncho / 4
-        let posY = m_camara.inicioY + (((i + j) * tileAlto  / 2) >> 1) + m_camara.Y
+        let posX = m_camera.startX + (((i - j) * tileWidth / 2) >> 1) + m_camera.X + tileWidth / 4
+        let posY = m_camera.startY + (((i + j) * tileHeight  / 2) >> 1) + m_camera.Y
 
         if semiTransparente {
-            if m_imagenTileGris == nil {
-                m_imagenTileGris = AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_TILE_GRIS)
+            if m_greyTileImage == nil {
+                m_greyTileImage = ResourceManager.shared.getImage(Res.IMG_TILE_GRIS)
             }
-            g.dibujar(m_imagenTileGris, posX, posY, 128, 0)
+            g.draw(m_greyTileImage, posX, posY, 128, 0)
         }
     }
 
     // MARK: - Update (camera scroll)
 
-    func actualizar() {
-        guard m_mapaCargado else { return }
+    func update() {
+        guard m_mapLoaded else { return }
 
-        let mx = Int(Mouse.Instancia.X)
-        let my = Int(Mouse.Instancia.Y)
+        let mx = Int(Mouse.shared.X)
+        let my = Int(Mouse.shared.Y)
 
-        if mx < m_camara.borde {
-            if m_camara.X + m_camara.velocidad <= (m_anchoEnTiles * tileAncho) / 2 {
-                let p = calcularPrimerTileAPintar(m_camara.X, m_camara.Y)
+        if mx < m_camera.border {
+            if m_camera.X + m_camera.speed <= (m_widthInTiles * tileWidth) / 2 {
+                let p = calculateFirstTileToDraw(m_camera.X, m_camera.Y)
                 if p.x < -13 {
-                    m_camara.Y -= m_camara.velocidad / 2
+                    m_camera.Y -= m_camera.speed / 2
                 } else {
-                    let p2 = calcularPrimerTileAPintar(m_camara.X, m_camara.Y - m_camara.alto)
-                    if p2.y > m_altoEnTiles + 13 { m_camara.Y += m_camara.velocidad / 2 }
+                    let p2 = calculateFirstTileToDraw(m_camera.X, m_camera.Y - m_camera.height)
+                    if p2.y > m_heightInTiles + 13 { m_camera.Y += m_camera.speed / 2 }
                 }
-                m_camara.X += m_camara.velocidad
+                m_camera.X += m_camera.speed
             }
         }
 
-        if my > m_camara.alto - m_camara.borde {
-            if (m_camara.Y - m_camara.velocidad) >= (m_camara.alto - m_altoEnTiles * tileAlto) &&
-               m_camara.Y - m_camara.velocidad <= 0 {
-                let p = calcularPrimerTileAPintar(m_camara.X, m_camara.Y - m_camara.alto)
-                if p.y > m_altoEnTiles + 13 {
-                    m_camara.Y -= m_camara.velocidad / 2
-                    m_camara.X -= m_camara.velocidad
+        if my > m_camera.height - m_camera.border {
+            if (m_camera.Y - m_camera.speed) >= (m_camera.height - m_heightInTiles * tileHeight) &&
+               m_camera.Y - m_camera.speed <= 0 {
+                let p = calculateFirstTileToDraw(m_camera.X, m_camera.Y - m_camera.height)
+                if p.y > m_heightInTiles + 13 {
+                    m_camera.Y -= m_camera.speed / 2
+                    m_camera.X -= m_camera.speed
                 } else {
-                    let p2 = calcularPrimerTileAPintar(m_camara.X - m_camara.ancho, m_camara.Y - m_camara.alto)
-                    if p2.x > m_anchoEnTiles + 13 {
-                        m_camara.Y -= m_camara.velocidad / 2
-                        m_camara.X += m_camara.velocidad
+                    let p2 = calculateFirstTileToDraw(m_camera.X - m_camera.width, m_camera.Y - m_camera.height)
+                    if p2.x > m_widthInTiles + 13 {
+                        m_camera.Y -= m_camera.speed / 2
+                        m_camera.X += m_camera.speed
                     } else {
-                        m_camara.Y -= m_camara.velocidad
+                        m_camera.Y -= m_camera.speed
                     }
                 }
             }
         }
 
-        if my < m_camara.borde {
-            if m_camara.Y + m_camara.velocidad <= 0 {
-                let p = calcularPrimerTileAPintar(m_camara.X, m_camara.Y)
+        if my < m_camera.border {
+            if m_camera.Y + m_camera.speed <= 0 {
+                let p = calculateFirstTileToDraw(m_camera.X, m_camera.Y)
                 if p.x < -13 {
-                    m_camara.X -= m_camara.velocidad
-                    m_camara.Y += m_camara.velocidad / 2
+                    m_camera.X -= m_camera.speed
+                    m_camera.Y += m_camera.speed / 2
                 } else {
-                    let p2 = calcularPrimerTileAPintar(m_camara.X - m_camara.ancho, m_camara.Y)
+                    let p2 = calculateFirstTileToDraw(m_camera.X - m_camera.width, m_camera.Y)
                     if p2.y < -13 {
-                        m_camara.X += m_camara.velocidad
-                        m_camara.Y += m_camara.velocidad / 2
+                        m_camera.X += m_camera.speed
+                        m_camera.Y += m_camera.speed / 2
                     } else {
-                        m_camara.Y += m_camara.velocidad
+                        m_camera.Y += m_camera.speed
                     }
                 }
             }
         }
 
-        if mx > m_camara.ancho - m_camara.borde {
-            let p = calcularPrimerTileAPintar(m_camara.X - m_camara.ancho, m_camara.Y)
-            if (m_camara.X - m_camara.ancho - m_camara.velocidad + tileAncho)
-                >= -(m_anchoEnTiles * tileAncho) / 2 ||
-               (m_camara.X - m_camara.velocidad) > 0 {
+        if mx > m_camera.width - m_camera.border {
+            let p = calculateFirstTileToDraw(m_camera.X - m_camera.width, m_camera.Y)
+            if (m_camera.X - m_camera.width - m_camera.speed + tileWidth)
+                >= -(m_widthInTiles * tileWidth) / 2 ||
+               (m_camera.X - m_camera.speed) > 0 {
                 if p.y < -13 {
-                    m_camara.Y -= m_camara.velocidad / 2
+                    m_camera.Y -= m_camera.speed / 2
                 } else {
-                    let p2 = calcularPrimerTileAPintar(m_camara.X - m_camara.ancho, m_camara.Y - m_camara.alto)
-                    if p2.x > m_altoEnTiles + 13 { m_camara.Y += m_camara.velocidad / 2 }
+                    let p2 = calculateFirstTileToDraw(m_camera.X - m_camera.width, m_camera.Y - m_camera.height)
+                    if p2.x > m_heightInTiles + 13 { m_camera.Y += m_camera.speed / 2 }
                 }
-                m_camara.X -= m_camara.velocidad
+                m_camera.X -= m_camera.speed
             }
         }
 
-        actualizarCoordenadasDelMouse()
+        updateMouseCoords()
     }
 
     // MARK: - Public queries
 
-    func obtenerTileset(_ tileId: Int) -> Tileset? {
-        var resultado: Tileset? = nil
-        for i in 0..<m_tilesetMaximo {
-            if let ts = m_tilesets[i], tileId >= Int(ts.primerGid) {
-                resultado = ts
+    func getTileset(_ tileId: Int) -> Tileset? {
+        var result: Tileset? = nil
+        for i in 0..<m_tilesetCount {
+            if let ts = m_tilesets[i], tileId >= Int(ts.firstGid) {
+                result = ts
             }
         }
-        return resultado
+        return result
     }
 
-    func esPosicionCaminable(_ x: Int, _ y: Int) -> Bool {
+    func isWalkable(_ x: Int, _ y: Int) -> Bool {
         guard x >= 0, y >= 0,
-              x < m_anchoEnTiles * 2, y < m_altoEnTiles * 2,
-              x < capaTilesFisicos.count,
-              y < capaTilesFisicos[x].count else { return false }
-        let id = Int(capaTilesFisicos[x][y])
+              x < m_widthInTiles * 2, y < m_heightInTiles * 2,
+              x < physicalTilesLayer.count,
+              y < physicalTilesLayer[x].count else { return false }
+        let id = Int(physicalTilesLayer[x][y])
         return id == Res.TLS_PASTO || id == Res.TLS_TIERRA
     }
 
     /// Walks from (x1,y1) toward (x2,y2) along the Bresenham-style parametric line and
     /// returns the first walkable tile it encounters (port of C# ObtenerPosicionEnLineaDeVision).
     /// Returns (-1,-1) if no walkable tile is found.
-    func obtenerPosicionEnLineaDeVision(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> (x: Int, y: Int) {
-        var columna = Float(x1)
-        var fila    = Float(y1)
+    func getLineOfSightPosition(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> (x: Int, y: Int) {
+        var col = Float(x1)
+        var row    = Float(y1)
 
-        let decliveFila    = obtenerDecliveFila(x1, x2, y1, y2)
-        let decliveColumna = obtenerDecliveColumna(x1, x2, y1, y2)
+        let rowSlope    = getRowSlope(x1, x2, y1, y2)
+        let colSlope = getColumnSlope(x1, x2, y1, y2)
 
-        if abs(decliveFila) == 1.0 {
-            while Int(fila.rounded(.down)) != y2 {
-                let ci = Int(columna.rounded(.down))
-                let fi = Int(fila.rounded(.down))
-                if esPosicionCaminable(ci, fi) { return (ci, fi) }
-                fila    += decliveFila
-                columna += decliveColumna
+        if abs(rowSlope) == 1.0 {
+            while Int(row.rounded(.down)) != y2 {
+                let ci = Int(col.rounded(.down))
+                let fi = Int(row.rounded(.down))
+                if isWalkable(ci, fi) { return (ci, fi) }
+                row    += rowSlope
+                col += colSlope
             }
         } else {
-            while Int(columna.rounded(.down)) != x2 {
-                let ci = Int(columna.rounded(.down))
-                let fi = Int(fila.rounded(.down))
-                if esPosicionCaminable(ci, fi) { return (ci, fi) }
-                fila    += decliveFila
-                columna += decliveColumna
+            while Int(col.rounded(.down)) != x2 {
+                let ci = Int(col.rounded(.down))
+                let fi = Int(row.rounded(.down))
+                if isWalkable(ci, fi) { return (ci, fi) }
+                row    += rowSlope
+                col += colSlope
             }
         }
         return (-1, -1)
     }
 
-    private func obtenerDecliveFila(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> Float {
+    private func getRowSlope(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> Float {
         if abs(y2 - y1) > abs(x2 - x1) {
             return y2 > y1 ? 1 : -1
         } else {
@@ -321,7 +321,7 @@ class Mapa {
         }
     }
 
-    private func obtenerDecliveColumna(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> Float {
+    private func getColumnSlope(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> Float {
         if abs(x2 - x1) > abs(y2 - y1) {
             return x2 > x1 ? 1 : -1
         } else {
@@ -330,49 +330,49 @@ class Mapa {
         }
     }
 
-    func invalidarTile(_ x: Int, _ y: Int) {
+    func invalidateTile(_ x: Int, _ y: Int) {
         guard x >= 0, y >= 0,
-              x + 1 < m_anchoEnTiles * 2,
-              y + 1 < m_altoEnTiles * 2 else { return }
+              x + 1 < m_widthInTiles * 2,
+              y + 1 < m_heightInTiles * 2 else { return }
         let v = Int16(Res.TLS_ARBOLES)
-        capaTilesFisicos[x][y]         = v
-        capaTilesFisicos[x + 1][y]     = v
-        capaTilesFisicos[x + 1][y + 1] = v
-        capaTilesFisicos[x][y + 1]     = v
+        physicalTilesLayer[x][y]         = v
+        physicalTilesLayer[x + 1][y]     = v
+        physicalTilesLayer[x + 1][y + 1] = v
+        physicalTilesLayer[x][y + 1]     = v
     }
 
     // MARK: - Private
 
-    private func calcularPrimerTileAPintar(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
-        let a = tileAlto > 0 ? -y / tileAlto : 0
-        var b = tileAncho > 0 ? x / tileAncho : 0
+    private func calculateFirstTileToDraw(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
+        let a = tileHeight > 0 ? -y / tileHeight : 0
+        var b = tileWidth > 0 ? x / tileWidth : 0
         if x > 0 { b += 1 }
         return (a - b - 2, a + b - 1)
     }
 
-    private func actualizarCoordenadasDelMouse() {
-        guard m_mapaCargado else { return }
-        let p = calcularPosicionDelTileEnXY(Int(Mouse.Instancia.X), Int(Mouse.Instancia.Y))
+    private func updateMouseCoords() {
+        guard m_mapLoaded else { return }
+        let p = tilePositionFromXY(Int(Mouse.shared.X), Int(Mouse.shared.Y))
         m_tileMouse = p
     }
 
-    private func calcularPosicionDelTileEnXY(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
-        guard tileAlto > 0, tileAncho > 0 else { return (0, 0) }
+    private func tilePositionFromXY(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
+        guard tileHeight > 0, tileWidth > 0 else { return (0, 0) }
         // Logical tile coords (for m_tileMouse — buildings, obstacles)
-        let a = (y - m_camara.Y - m_camara.inicioY) / tileAlto
+        let a = (y - m_camera.Y - m_camera.startY) / tileHeight
         let b: Int
-        if x - m_camara.X > 0 {
-            b = (x - m_camara.X - m_camara.inicioX) / tileAncho
+        if x - m_camera.X > 0 {
+            b = (x - m_camera.X - m_camera.startX) / tileWidth
         } else {
-            b = (x - m_camara.X - m_camara.inicioX - tileAncho) / tileAncho
+            b = (x - m_camera.X - m_camera.startX - tileWidth) / tileWidth
         }
         // Physical tile coords (2× resolution — for m_tileChicoMouse, pathfinding, movement)
-        let aF = (y - m_camara.Y - m_camara.inicioY) / tileFisicoAlto
+        let aF = (y - m_camera.Y - m_camera.startY) / physicalTileHeight
         let bF: Int
-        if x - m_camara.X > 0 {
-            bF = (x - m_camara.X - m_camara.inicioX) / tileFisicoAncho
+        if x - m_camera.X > 0 {
+            bF = (x - m_camera.X - m_camera.startX) / physicalTileWidth
         } else {
-            bF = (x - m_camara.X - m_camara.inicioX - tileFisicoAncho) / tileFisicoAncho
+            bF = (x - m_camera.X - m_camera.startX - physicalTileWidth) / physicalTileWidth
         }
         m_tileChicoMouse = (aF + bF, aF - bF)
         return (a + b, a - b)
@@ -380,24 +380,24 @@ class Mapa {
 
     // MARK: - Internal TMX loading
 
-    private func leerInfoMapa(_ path: String) -> Bool {
+    private func readMapInfo(_ path: String) -> Bool {
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else { return false }
         let d = MapInfoDelegate()
         parser.delegate = d
         guard parser.parse() else { return false }
-        guard d.orientacion == "isometric" else {
-            Log.Instancia.error("Mapa: orientación no isométrica."); return false
+        guard d.orientation == "isometric" else {
+            Log.shared.error("Map: orientación no isométrica."); return false
         }
-        m_anchoEnTiles = d.ancho;  m_anchoEnTilesMapaFisico = d.ancho * 2
-        m_altoEnTiles  = d.alto;   m_altoEnTilesMapaFisico  = d.alto  * 2
-        tileAncho = d.tileAncho;   tileFisicoAncho = d.tileAncho / 2
-        tileAlto  = d.tileAlto;    tileFisicoAlto  = d.tileAlto  / 2
-        m_camara.X = ((d.tileCamaraJ - d.tileCamaraI) * tileAncho) >> 1
-        m_camara.Y = -((d.tileCamaraJ + d.tileCamaraI) * tileAlto) >> 1
+        m_widthInTiles = d.width;  m_physicalWidthInTiles = d.width * 2
+        m_heightInTiles  = d.height;   m_physicalHeightInTiles  = d.height  * 2
+        tileWidth = d.tileWidth;   physicalTileWidth = d.tileWidth / 2
+        tileHeight  = d.tileHeight;    physicalTileHeight  = d.tileHeight  / 2
+        m_camera.X = ((d.tileCamaraJ - d.tileCamaraI) * tileWidth) >> 1
+        m_camera.Y = -((d.tileCamaraJ + d.tileCamaraI) * tileHeight) >> 1
         return true
     }
 
-    private func leerTilesets(_ mapPath: String, paths: [String?]) -> Bool {
+    private func readTilesets(_ mapPath: String, paths: [String?]) -> Bool {
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: mapPath)) else { return false }
         let base = (mapPath as NSString).deletingLastPathComponent
         let d = TilesetRefDelegate(base: base)
@@ -408,100 +408,100 @@ class Mapa {
         // Load each TSX *after* the TMX parser has fully finished — avoids reentrant XMLParser.
         for entry in d.collected {
             let ts = Tileset()
-            ts.primerGid = entry.gid
-            ts.cargar(entry.path)
-            agregarTileset(ts)
+            ts.firstGid = entry.gid
+            ts.load(entry.path)
+            addTileset(ts)
         }
         return true
     }
 
-    private func leerCapas(_ path: String) -> Bool {
+    private func readLayers(_ path: String) -> Bool {
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else { return false }
-        let d = LayerDelegate(mapa: self)
+        let d = LayerDelegate(map: self)
         parser.delegate = d
         let ok = parser.parse()
         withExtendedLifetime(d) {}
         return ok
     }
 
-    private func cargarCapaInfo(paths: [String?]) {
-        if Mapa.m_tilesetDebug == nil {
+    private func loadLayerInfo(paths: [String?]) {
+        if Map.m_tilesetDebug == nil {
             let ts = Tileset()
-            if let p = paths[Res.TLS_DEBUG] { ts.cargar(p) }
-            Mapa.m_tilesetDebug = ts
+            if let p = paths[Res.TLS_DEBUG] { ts.load(p) }
+            Map.m_tilesetDebug = ts
         }
 
-        // Expand the map to the INFO layer (CAPA_INFO = 8)
-        while m_mapa.count <= CAPA_INFO {
-            m_mapa.append(Array(repeating: Array(repeating: 0, count: m_altoEnTiles),
-                                count: m_anchoEnTiles))
+        // Expand the map to the INFO layer (INFO_LAYER = 8)
+        while m_map.count <= INFO_LAYER {
+            m_map.append(Array(repeating: Array(repeating: 0, count: m_heightInTiles),
+                                count: m_widthInTiles))
         }
 
         // Initialize the physical map and visibility map (double resolution)
-        capaTilesFisicos  = Array(repeating: Array(repeating: 0, count: m_altoEnTiles * 2),
-                                  count: m_anchoEnTiles * 2)
-        capaTilesVisibles = Array(repeating: Array(repeating: 0, count: m_altoEnTiles * 2),
-                                  count: m_anchoEnTiles * 2)
+        physicalTilesLayer  = Array(repeating: Array(repeating: 0, count: m_heightInTiles * 2),
+                                  count: m_widthInTiles * 2)
+        visibleTilesLayer = Array(repeating: Array(repeating: 0, count: m_heightInTiles * 2),
+                                  count: m_widthInTiles * 2)
 
-        for capa in 0..<m_numeroMaximoDeCapas {
-            for i in 0..<m_anchoEnTiles {
-                for j in 0..<m_altoEnTiles {
-                    if let ts = obtenerTileset(Int(m_mapa[capa][i][j])),
+        for layer in 0..<m_maxLayers {
+            for i in 0..<m_widthInTiles {
+                for j in 0..<m_heightInTiles {
+                    if let ts = getTileset(Int(m_map[layer][i][j])),
                        ts.id != Int16(Res.TLS_UNIDADES) {
                         let tsId = ts.id
-                        m_mapa[CAPA_INFO][i][j] = tsId
+                        m_map[INFO_LAYER][i][j] = tsId
                         let ci = i * 2, cj = j * 2
-                        if ci + 1 < capaTilesFisicos.count && cj + 1 < capaTilesFisicos[ci].count {
-                            capaTilesFisicos[ci][cj]     = tsId
-                            capaTilesFisicos[ci][cj + 1] = tsId
-                            capaTilesFisicos[ci + 1][cj] = tsId
-                            capaTilesFisicos[ci + 1][cj + 1] = tsId
+                        if ci + 1 < physicalTilesLayer.count && cj + 1 < physicalTilesLayer[ci].count {
+                            physicalTilesLayer[ci][cj]     = tsId
+                            physicalTilesLayer[ci][cj + 1] = tsId
+                            physicalTilesLayer[ci + 1][cj] = tsId
+                            physicalTilesLayer[ci + 1][cj + 1] = tsId
                         }
                     }
                 }
             }
         }
-        _ = PathFinder.Instancia.cargarMapa(self)
+        _ = PathFinder.instance.loadMap(self)
     }
 
     // MARK: - Helpers called from delegates
 
-    fileprivate func agregarNombreCapa(_ nombre: String, _ index: Int) {
-        m_nombresCapas[nombre] = index
-        switch nombre.trimmingCharacters(in: .whitespaces).lowercased() {
-        case "obstaculos":          CAPA_OBSTACULOS = index
-        case "terreno":             CAPA_TERRENO    = index
-        case "unidades":            CAPA_UNIDADES_JUGADOR = index
-        case "posicion invalidada": CAPA_POSICIONES_INVALIDADAS = index
+    fileprivate func addLayerName(_ name: String, _ index: Int) {
+        m_layerNames[name] = index
+        switch name.trimmingCharacters(in: .whitespaces).lowercased() {
+        case "obstaculos":          OBSTACLES_LAYER = index
+        case "terreno":             TERRAIN_LAYER    = index
+        case "unidades":            PLAYER_UNITS_LAYER = index
+        case "posicion invalidada": INVALIDATED_POSITIONS_LAYER = index
         default: break
         }
     }
 
-    fileprivate func agregarCapa(_ datos: [[Int16]]) {
-        guard m_numeroMaximoDeCapas < NRO_MAXIMO_DE_CAPAS else { return }
-        while m_mapa.count <= m_numeroMaximoDeCapas {
-            m_mapa.append(Array(repeating: Array(repeating: 0, count: m_altoEnTiles),
-                                count: m_anchoEnTiles))
+    fileprivate func addLayer(_ layerData: [[Int16]]) {
+        guard m_maxLayers < MAX_LAYERS_COUNT else { return }
+        while m_map.count <= m_maxLayers {
+            m_map.append(Array(repeating: Array(repeating: 0, count: m_heightInTiles),
+                                count: m_widthInTiles))
         }
-        m_mapa[m_numeroMaximoDeCapas] = datos
-        m_numeroMaximoDeCapas += 1
+        m_map[m_maxLayers] = layerData
+        m_maxLayers += 1
     }
 
-    fileprivate func agregarTileset(_ ts: Tileset) {
-        guard m_tilesetMaximo < m_tilesets.count else { return }
-        m_tilesets[m_tilesetMaximo] = ts
-        m_tilesetMaximo += 1
+    fileprivate func addTileset(_ ts: Tileset) {
+        guard m_tilesetCount < m_tilesets.count else { return }
+        m_tilesets[m_tilesetCount] = ts
+        m_tilesetCount += 1
     }
 
-    fileprivate var anchoEnTiles:  Int { m_anchoEnTiles }
-    fileprivate var altoEnTilesInt: Int { m_altoEnTiles }
+    fileprivate var widthInTiles:  Int { m_widthInTiles }
+    fileprivate var heightInTiles: Int { m_heightInTiles }
 }
 
 // MARK: - Private XML delegates
 
 private class MapInfoDelegate: NSObject, XMLParserDelegate {
-    var orientacion = ""; var ancho = 0; var alto = 0
-    var tileAncho = 0; var tileAlto = 0
+    var orientation = ""; var width = 0; var height = 0
+    var tileWidth = 0; var tileHeight = 0
     var tileCamaraI = 0; var tileCamaraJ = 0
     private var enProperties = false
 
@@ -510,10 +510,10 @@ private class MapInfoDelegate: NSObject, XMLParserDelegate {
                 attributes a: [String: String]) {
         if name == "map" {
             orientacao = a["orientation"] ?? ""
-            ancho     = Int(a["width"]      ?? "0") ?? 0
-            alto      = Int(a["height"]     ?? "0") ?? 0
-            tileAncho = Int(a["tilewidth"]  ?? "0") ?? 0
-            tileAlto  = Int(a["tileheight"] ?? "0") ?? 0
+            width     = Int(a["width"]      ?? "0") ?? 0
+            height      = Int(a["height"]     ?? "0") ?? 0
+            tileWidth = Int(a["tilewidth"]  ?? "0") ?? 0
+            tileHeight  = Int(a["tileheight"] ?? "0") ?? 0
         } else if name == "properties" {
             enProperties = true
         } else if enProperties && name == "property" {
@@ -530,7 +530,7 @@ private class MapInfoDelegate: NSObject, XMLParserDelegate {
     }
     // Alias para evitar typo en Swift
     private var orientacao: String {
-        get { orientacion } set { orientacion = newValue }
+        get { orientation } set { orientation = newValue }
     }
 }
 
@@ -549,33 +549,33 @@ private class TilesetRefDelegate: NSObject, XMLParserDelegate {
         guard name == "tileset", let src = a["source"] else { return }
         let gid = Int16(a["firstgid"] ?? "0") ?? 0
         let candidate1 = (base as NSString).appendingPathComponent(src)
-        let candidate2 = (Programa.PATH_ESCENARIOS as NSString).appendingPathComponent(src)
-        if let p = Utilidades.obtenerPath(candidate1)
-                ?? Utilidades.obtenerPath(candidate2)
-                ?? Utilidades.obtenerPath(src) {
+        let candidate2 = (Program.SCENARIOS_PATH as NSString).appendingPathComponent(src)
+        if let p = Utils.getPath(candidate1)
+                ?? Utils.getPath(candidate2)
+                ?? Utils.getPath(src) {
             collected.append((gid: gid, path: p))
         } else {
-            Log.Instancia.error("Mapa: no se encuentra tileset \(src)")
+            Log.shared.error("Map: no se encuentra tileset \(src)")
         }
     }
 }
 
 private class LayerDelegate: NSObject, XMLParserDelegate {
-    private weak var mapa: Mapa?
-    private var capaNombre = ""
-    private var capaIndex  = 0
+    private weak var map: Map?
+    private var layerName = ""
+    private var layerIndex  = 0
     private var inLayer    = false
     private var inData     = false
     private var encoding   = ""
     private var dataBuffer = ""
 
-    init(mapa: Mapa) { self.mapa = mapa }
+    init(map: Map) { self.map = map }
 
     func parser(_ parser: XMLParser, didStartElement name: String,
                 namespaceURI: String?, qualifiedName: String?,
                 attributes a: [String: String]) {
         if name == "layer" {
-            capaNombre = a["name"] ?? ""
+            layerName = a["name"] ?? ""
             inLayer    = true
         } else if inLayer && name == "data" {
             encoding   = a["encoding"] ?? ""
@@ -590,34 +590,34 @@ private class LayerDelegate: NSObject, XMLParserDelegate {
 
     func parser(_ parser: XMLParser, didEndElement name: String,
                 namespaceURI: String?, qualifiedName: String?) {
-        guard let m = mapa else { return }
+        guard let m = map else { return }
         if name == "data" && inData {
             inData = false
             if encoding == "base64" {
                 let trimmed = dataBuffer.trimmingCharacters(in: .whitespacesAndNewlines)
                 if let decoded = Data(base64Encoded: trimmed, options: .ignoreUnknownCharacters) {
-                    var datos = Array(repeating: Array(repeating: Int16(0), count: m.altoEnTilesInt),
-                                      count: m.anchoEnTiles)
+                    var tiles = Array(repeating: Array(repeating: Int16(0), count: m.heightInTiles),
+                                      count: m.widthInTiles)
                     let bytes = [UInt8](decoded)
                     var idx = 0
                     // TMX stores tiles row by row (row-major): first all columns
                     // of row 0, then those of row 1, etc.
-                    for j in 0..<m.altoEnTilesInt {
-                        for i in 0..<m.anchoEnTiles {
+                    for j in 0..<m.heightInTiles {
+                        for i in 0..<m.widthInTiles {
                             if idx + 3 < bytes.count {
                                 // 32-bit little-endian tile ID
                                 let id = UInt32(bytes[idx])
                                     | UInt32(bytes[idx+1]) << 8
                                     | UInt32(bytes[idx+2]) << 16
                                     | UInt32(bytes[idx+3]) << 24
-                                datos[i][j] = Int16(id & 0x1FFF) // flip bit mask (bits 29-31)
+                                tiles[i][j] = Int16(id & 0x1FFF) // flip bit mask (bits 29-31)
                             }
                             idx += 4
                         }
                     }
-                    m.agregarNombreCapa(capaNombre, m.altoEnTilesInt == 0 ? 0 : capaIndex)
-                    m.agregarCapa(datos)
-                    capaIndex += 1
+                    m.addLayerName(layerName, m.heightInTiles == 0 ? 0 : layerIndex)
+                    m.addLayer(tiles)
+                    layerIndex += 1
                 }
             }
             dataBuffer = ""

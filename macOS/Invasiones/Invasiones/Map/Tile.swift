@@ -11,8 +11,8 @@ import Foundation
 
 class Tile {
     var id:       Int16 = 0
-    var cantidad: Int   = 0
-    var costo:    Int16 = 0
+    var count: Int   = 0
+    var cost:    Int16 = 0
 
     init() {}
 }

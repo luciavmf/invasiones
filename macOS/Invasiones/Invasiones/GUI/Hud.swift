@@ -14,101 +14,101 @@ class Hud {
     // MARK: - Position constants
     static let AVATAR_X         = 61
     static let AVATAR_Y         = 11
-    static let AVATAR_NOMBRE_X  = 126
-    static let AVATAR_NOMBRE_ANCHO = 82
-    static let AVATAR_NOMBRE_Y  = 6
-    static let ATRIBUTOS_INICIO_X_1 = 141
-    static let ATRIBUTOS_INICIO_X_2 = 215
-    static let ATRIBUTOS_INICIO_X_3 = 338
-    static let ATRIBUTOS_INICIO_Y   = 25
-    static let ATRIBUTOS_CANT_Y     = 35
-    static let ATRIBUTOS_CANT_INGL_X = 705
-    static let ATRIBUTOS_CANT_ARG_X  = 570
+    static let AVATAR_NAME_X  = 126
+    static let AVATAR_NAME_WIDTH = 82
+    static let AVATAR_NAME_Y  = 6
+    static let ATTRS_START_X1 = 141
+    static let ATTRS_START_X2 = 215
+    static let ATTRS_START_X3 = 338
+    static let ATTRS_START_Y   = 25
+    static let ATTRS_COUNT_Y     = 35
+    static let ATTRS_ENEMY_COUNT_X = 705
+    static let ATTRS_ARGENTINE_COUNT_X  = 570
 
     // MARK: - Declarations
-    private var m_imagen:            Superficie?
-    private var m_unidadAMostrar:    Unidad?
-    private var m_cantidadEnemigos:  Int = 0
-    private var m_cantidadArgentinos:Int = 0
+    private var m_image:            Surface?
+    private var m_unitToShow:    Unit?
+    private var m_enemyCount:  Int = 0
+    private var m_argentineCount:Int = 0
     private var m_y:                 Int = 0
-    private let m_espaciadoLineas    = 12
-    private var m_tipVentana:        Tips
+    private let m_lineSpacing    = 12
+    private var m_tipsWindow:        Tips
 
     // MARK: - Properties
-    var unidadSeleccionada: Unidad? {
-        set { m_unidadAMostrar = newValue }
-        get { m_unidadAMostrar }
+    var selectedUnit: Unit? {
+        set { m_unitToShow = newValue }
+        get { m_unitToShow }
     }
 
-    var cantidadArgentinos: Int {
-        get { m_cantidadArgentinos }
-        set { m_cantidadArgentinos = newValue }
+    var argentineCount: Int {
+        get { m_argentineCount }
+        set { m_argentineCount = newValue }
     }
 
-    var cantidadEnemigos: Int {
-        get { m_cantidadEnemigos }
-        set { m_cantidadEnemigos = newValue }
+    var enemyCount: Int {
+        get { m_enemyCount }
+        set { m_enemyCount = newValue }
     }
 
-    var alto: Int { m_imagen?.alto ?? 0 }
+    var height: Int { m_image?.height ?? 0 }
 
     // MARK: - Initializer
     init() {
-        m_imagen     = AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_HUD)
-        m_y          = Video.Alto - (m_imagen?.alto ?? 0)
-        m_tipVentana = Tips()
-        m_tipVentana.setearPosicion(
-            ((Video.Ancho - m_tipVentana.ancho) / 2) + 175,
-            m_y - m_tipVentana.alto - 75,
+        m_image     = ResourceManager.shared.getImage(Res.IMG_HUD)
+        m_y          = Video.height - (m_image?.height ?? 0)
+        m_tipsWindow = Tips()
+        m_tipsWindow.setPosition(
+            ((Video.width - m_tipsWindow.width) / 2) + 175,
+            m_y - m_tipsWindow.height - 75,
             0)
     }
 
     // MARK: - Update
-    func actualizar() {
-        if let u = m_unidadAMostrar, u.estaMuerto() {
-            m_unidadAMostrar = nil
+    func update() {
+        if let u = m_unitToShow, u.isDead() {
+            m_unitToShow = nil
         }
-        m_tipVentana.actualizar()
+        m_tipsWindow.update()
     }
 
     // MARK: - Draw
-    func dibujar(_ g: Video) {
-        if let img = m_imagen {
+    func draw(_ g: Video) {
+        if let img = m_image {
             // V_FONDO = draws at the bottom
-            g.dibujar(img, 0, m_y, 0)
+            g.draw(img, 0, m_y, 0)
         }
-        m_tipVentana.dibujar(g)
+        m_tipsWindow.draw(g)
 
-        g.setearFuente(AdministradorDeRecursos.Instancia.fuentes[Definiciones.FNT.SANS12.rawValue],
-                       Definiciones.COLOR_NEGRO)
-        g.escribir("\(m_cantidadEnemigos)",   Hud.ATRIBUTOS_CANT_INGL_X, m_y + Hud.ATRIBUTOS_CANT_Y, 0)
-        g.escribir("\(m_cantidadArgentinos)", Hud.ATRIBUTOS_CANT_ARG_X,  m_y + Hud.ATRIBUTOS_CANT_Y, 0)
+        g.setFont(ResourceManager.shared.fonts[Definitions.FNT.SANS12.rawValue],
+                       Definitions.COLOR_BLACK)
+        g.write("\(m_enemyCount)",   Hud.ATTRS_ENEMY_COUNT_X, m_y + Hud.ATTRS_COUNT_Y, 0)
+        g.write("\(m_argentineCount)", Hud.ATTRS_ARGENTINE_COUNT_X,  m_y + Hud.ATTRS_COUNT_Y, 0)
 
-        g.setearFuente(AdministradorDeRecursos.Instancia.fuentes[Definiciones.FNT.SANS12.rawValue],
-                       Definiciones.COLOR_BLANCO)
+        g.setFont(ResourceManager.shared.fonts[Definitions.FNT.SANS12.rawValue],
+                       Definitions.COLOR_WHITE)
 
-        guard let uni = m_unidadAMostrar else { return }
+        guard let uni = m_unitToShow else { return }
 
         if let av = uni.avatar {
-            g.dibujar(av, Hud.AVATAR_X, m_y + Hud.AVATAR_Y, 0)
+            g.draw(av, Hud.AVATAR_X, m_y + Hud.AVATAR_Y, 0)
         }
-        g.escribir(uni.nombre, Hud.AVATAR_NOMBRE_X, m_y + Hud.AVATAR_NOMBRE_Y, 0)
+        g.write(uni.name, Hud.AVATAR_NAME_X, m_y + Hud.AVATAR_NAME_Y, 0)
 
-        g.setearColor(Definiciones.COLOR_NEGRO)
+        g.setColor(Definitions.COLOR_BLACK)
 
-        let s = Texto.Strings
-        g.escribir("\(s[safe: Res.STR_ALCANCE] ?? ""):\(uni.alcance)",
-                   Hud.ATRIBUTOS_INICIO_X_1, m_y + Hud.ATRIBUTOS_INICIO_Y, 0)
-        g.escribir("\(s[safe: Res.STR_PUNTERIA] ?? ""):\(uni.punteria)",
-                   Hud.ATRIBUTOS_INICIO_X_1, m_y + Hud.ATRIBUTOS_INICIO_Y + m_espaciadoLineas, 0)
-        g.escribir("\(s[safe: Res.STR_PUNTOS_DE_ATAQUE] ?? ""):\(uni.puntosDeAtaque)",
-                   Hud.ATRIBUTOS_INICIO_X_2, m_y + Hud.ATRIBUTOS_INICIO_Y, 0)
-        g.escribir("\(s[safe: Res.STR_PUNTOS_DE_RESISTENCIA] ?? ""):\(uni.salud)/\(uni.puntosDeResistencia)",
-                   Hud.ATRIBUTOS_INICIO_X_2, m_y + Hud.ATRIBUTOS_INICIO_Y + m_espaciadoLineas, 0)
-        g.escribir("\(s[safe: Res.STR_VELOCIDAD] ?? ""):\(uni.velocidadPorDefecto)",
-                   Hud.ATRIBUTOS_INICIO_X_3, m_y + Hud.ATRIBUTOS_INICIO_Y, 0)
-        g.escribir("\(s[safe: Res.STR_VISIBILIDAD] ?? ""):\(uni.visibilidad)",
-                   Hud.ATRIBUTOS_INICIO_X_3, m_y + Hud.ATRIBUTOS_INICIO_Y + m_espaciadoLineas, 0)
+        let s = GameText.Strings
+        g.write("\(s[safe: Res.STR_ALCANCE] ?? ""):\(uni.range)",
+                   Hud.ATTRS_START_X1, m_y + Hud.ATTRS_START_Y, 0)
+        g.write("\(s[safe: Res.STR_PUNTERIA] ?? ""):\(uni.aim)",
+                   Hud.ATTRS_START_X1, m_y + Hud.ATTRS_START_Y + m_lineSpacing, 0)
+        g.write("\(s[safe: Res.STR_PUNTOS_DE_ATAQUE] ?? ""):\(uni.attackPoints)",
+                   Hud.ATTRS_START_X2, m_y + Hud.ATTRS_START_Y, 0)
+        g.write("\(s[safe: Res.STR_PUNTOS_DE_RESISTENCIA] ?? ""):\(uni.health)/\(uni.resistancePoints)",
+                   Hud.ATTRS_START_X2, m_y + Hud.ATTRS_START_Y + m_lineSpacing, 0)
+        g.write("\(s[safe: Res.STR_VELOCIDAD] ?? ""):\(uni.defaultSpeed)",
+                   Hud.ATTRS_START_X3, m_y + Hud.ATTRS_START_Y, 0)
+        g.write("\(s[safe: Res.STR_VISIBILIDAD] ?? ""):\(uni.visibility)",
+                   Hud.ATTRS_START_X3, m_y + Hud.ATTRS_START_Y + m_lineSpacing, 0)
     }
 }
 
