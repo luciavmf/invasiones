@@ -62,6 +62,8 @@ class EstadoMenuPpal: Estado {
 
         menu.setearFuente(AdministradorDeRecursos.Instancia.fuentes[Definiciones.FUENTE_MENU])
         m_menu = menu
+
+        Sonido.Instancia.reproducir(Res.SFX_SPLASH, -1)
     }
 
     override func actualizar() {

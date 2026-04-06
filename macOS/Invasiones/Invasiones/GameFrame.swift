@@ -54,6 +54,9 @@ class GameFrame {
         AdministradorDeRecursos.Instancia.leerInfoAnimaciones()
         AdministradorDeRecursos.Instancia.cargarFuentes()
 
+        Sonido.Instancia.inicializar()
+        Sonido.Instancia.cargarTodosLosSonidos()
+
         maquinaDeEstados = MaquinaDeEstados()
         maquinaDeEstados.agregarEstado(.LOGO,           EstadoLogo(maquinaDeEstados))
         maquinaDeEstados.agregarEstado(.MENU_PRINCIPAL, EstadoMenuPpal(maquinaDeEstados))

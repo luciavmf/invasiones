@@ -599,6 +599,9 @@ class Unidad: Objeto {
         Log.Instancia.debug("Me mori.")
         setearEstado(.MURIENDO)
         m_enemigo = nil
+        if m_tipo == Res.UNIDAD_PATRICIO {
+            Sonido.Instancia.reproducir(Res.SFX_MUERTE_PATRICIO, 0)
+        }
     }
 
     private func actualizarEstadoMuriendo() {
