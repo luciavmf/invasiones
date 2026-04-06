@@ -16,7 +16,7 @@ class Jugador {
 
     var m_hud:                     Hud
     var m_unidades:                [Unidad] = []
-    var m_objetosAPintar:          [[Objeto?]]      // [altoMapaFisico][anchoMapaFisico]
+    var m_objetosAPintar:          TablaObjetos     // [altoMapaFisico][anchoMapaFisico]
     var m_mapa:                    Mapa
     var m_grupos:                  [Grupo]? = nil
     var m_estado:                  ESTADO = .INICIO
@@ -35,7 +35,7 @@ class Jugador {
     var cantidadDeUnidades: Int { m_unidades.count }
 
     // MARK: - Constructor
-    init(mapa: Mapa, camara: Camara, objetosAPintar: inout [[Objeto?]], hud: Hud) {
+    init(mapa: Mapa, camara: Camara, objetosAPintar: TablaObjetos, hud: Hud) {
         m_mapa          = mapa
         m_camara        = camara
         m_objetosAPintar = objetosAPintar
@@ -153,9 +153,9 @@ class Jugador {
 
             for i in iStart..<iEnd {
                 for j in jStart..<jEnd {
-                    guard i >= 0, j >= 0, i < m_objetosAPintar.count,
-                          j < m_objetosAPintar[i].count else { continue }
-                    if let u = m_objetosAPintar[i][j] as? Unidad, u.bando == .ENEMIGO {
+                    guard i >= 0, j >= 0, i < m_objetosAPintar.tabla.count,
+                          j < m_objetosAPintar.tabla[i].count else { continue }
+                    if let u = m_objetosAPintar.tabla[i][j] as? Unidad, u.bando == .ENEMIGO {
                         m_alguienCumplioLaOrden = false
                     }
                 }
@@ -168,8 +168,8 @@ class Jugador {
         for muerta in muertas {
             let ti = muerta.posicionEnTileFisico.x
             let tj = muerta.posicionEnTileFisico.y
-            if ti < m_objetosAPintar.count, tj < m_objetosAPintar[ti].count {
-                m_objetosAPintar[ti][tj] = nil
+            if ti < m_objetosAPintar.tabla.count, tj < m_objetosAPintar.tabla[ti].count {
+                m_objetosAPintar.tabla[ti][tj] = nil
             }
             m_unidades.removeAll { $0 === muerta }
         }
@@ -182,15 +182,15 @@ class Jugador {
         if movio {
             let antI = unidad.tileAnterior.x
             let antJ = unidad.tileAnterior.y
-            if antI < m_objetosAPintar.count, antJ < m_objetosAPintar[antI].count {
-                if m_objetosAPintar[antI][antJ] === unidad {
-                    m_objetosAPintar[antI][antJ] = nil
+            if antI < m_objetosAPintar.tabla.count, antJ < m_objetosAPintar.tabla[antI].count {
+                if m_objetosAPintar.tabla[antI][antJ] === unidad {
+                    m_objetosAPintar.tabla[antI][antJ] = nil
                 }
             }
             let ni = unidad.posicionEnTileFisico.x
             let nj = unidad.posicionEnTileFisico.y
-            if ni < m_objetosAPintar.count, nj < m_objetosAPintar[ni].count {
-                m_objetosAPintar[ni][nj] = unidad
+            if ni < m_objetosAPintar.tabla.count, nj < m_objetosAPintar.tabla[ni].count {
+                m_objetosAPintar.tabla[ni][nj] = unidad
             }
         }
     }
@@ -217,8 +217,8 @@ class Jugador {
                 let dist = unidad.calcularDistancia(i, j)
                 guard dist <= Double(unidad.visibilidad) else { continue }
 
-                if i < m_objetosAPintar.count, j < m_objetosAPintar[i].count,
-                   let otra = m_objetosAPintar[i][j] as? Unidad, otra !== unidad {
+                if i < m_objetosAPintar.tabla.count, j < m_objetosAPintar.tabla[i].count,
+                   let otra = m_objetosAPintar.tabla[i][j] as? Unidad, otra !== unidad {
                     if visibles == nil { visibles = [] }
                     visibles!.append(otra)
                 }
@@ -241,8 +241,8 @@ class Jugador {
 
         for i in iInicio..<iFin {
             for j in jInicio..<jFin {
-                guard i < m_objetosAPintar.count, j < m_objetosAPintar[i].count,
-                      let otra = m_objetosAPintar[i][j] as? Unidad, otra !== unidad else { continue }
+                guard i < m_objetosAPintar.tabla.count, j < m_objetosAPintar.tabla[i].count,
+                      let otra = m_objetosAPintar.tabla[i][j] as? Unidad, otra !== unidad else { continue }
                 let dist = otra.calcularDistancia(unidad.posicionEnTileFisico.x,
                                                   unidad.posicionEnTileFisico.y)
                 if dist <= Double(rango) {
@@ -305,8 +305,8 @@ class Jugador {
         unit.bando = m_bando
 
         m_unidades.append(unit)
-        if i < m_objetosAPintar.count, j < m_objetosAPintar[i].count {
-            m_objetosAPintar[i][j] = unit
+        if i < m_objetosAPintar.tabla.count, j < m_objetosAPintar.tabla[i].count {
+            m_objetosAPintar.tabla[i][j] = unit
         }
         return unit
     }

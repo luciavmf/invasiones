@@ -18,8 +18,8 @@ class Superficie {
     /// La sub-textura activa tras SetearClip (nil = usar textura completa).
     private(set) var texturaActual: SKTexture?
 
-    /// Alpha actual (0-255).
-    private(set) var alphaActual: CGFloat = 1.0
+    /// Alpha actual (0.0–1.0).
+    var alphaActual: CGFloat = 1.0
 
     /// Tamaño de la textura COMPLETA (no del clip).
     var ancho: Int { Int(textura?.size().width  ?? 0) }
@@ -63,10 +63,9 @@ class Superficie {
         return SKSpriteNode()
     }
 
-    /// Aplica un nivel de alpha (0–255) a la textura — se aplica al nodo al dibujar.
-    /// En SpriteKit el alpha se setea en el SKSpriteNode, no en la textura.
+    /// Almacena el nivel de alpha (0–255); se aplica al nodo al dibujar.
     func setearAlpha(_ alpha: Int) {
-        // No-op: el alpha se aplica en el nodo destino al momento de dibujarlo.
+        alphaActual = CGFloat(max(0, min(alpha, 255))) / 255.0
     }
 
     /// Devuelve el color del pixel en (x, y) como Int RGB.

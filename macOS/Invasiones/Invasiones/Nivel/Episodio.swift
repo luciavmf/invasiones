@@ -26,7 +26,7 @@ class Episodio {
     private var m_obstaculos:   [Obstaculo] = []
     private var m_nivelActual:  Nivel?
     private var m_nroNivel:     Int = 0
-    private var m_objetosAPintar: [[Objeto?]] = []
+    private var m_objetosAPintar = TablaObjetos([[]])
     private var m_camara:       Camara?
     private var m_objetivo:     Objetivo?
     private var m_enemigo:      BandoEnemigo?
@@ -131,8 +131,8 @@ class Episodio {
     private func cargarObjetosAPintar() -> Bool {
         guard let mapa = m_mapa else { return false }
 
-        m_objetosAPintar = Array(repeating: Array(repeating: nil, count: mapa.anchoMapaFisico),
-                                 count: mapa.altoMapaFisico)
+        m_objetosAPintar.tabla = Array(repeating: Array(repeating: nil, count: mapa.anchoMapaFisico),
+                                       count: mapa.altoMapaFisico)
         m_obstaculos = []
 
         for i in 0..<mapa.alto {
@@ -146,8 +146,8 @@ class Episodio {
                 m_obstaculos.append(obs)
 
                 let fi = i * 2, fj = j * 2
-                if fi < m_objetosAPintar.count, fj < m_objetosAPintar[fi].count {
-                    m_objetosAPintar[fi][fj] = obs
+                if fi < m_objetosAPintar.tabla.count, fj < m_objetosAPintar.tabla[fi].count {
+                    m_objetosAPintar.tabla[fi][fj] = obs
                 }
             }
         }
@@ -189,9 +189,9 @@ class Episodio {
                 m_cuenta += 1; return false
             }
             m_jugador = BandoArgentino(mapa: mapa, camara: camara,
-                                       objetosAPintar: &m_objetosAPintar, hud: hud)
+                                       objetosAPintar: m_objetosAPintar, hud: hud)
             m_enemigo = BandoEnemigo(mapa: mapa, camara: camara,
-                                     objetosAPintar: &m_objetosAPintar, hud: hud)
+                                     objetosAPintar: m_objetosAPintar, hud: hud)
 
         } else if m_cuenta == 6 {
             if !(m_jugador?.cargarUnidades(m_nroNivel) ?? true) { return false }
@@ -444,7 +444,7 @@ class Episodio {
             var i = XX, j = YY
             while tileX <= finI && j >= 0 {
                 if i >= 0 && i < mapa.altoMapaFisico && j < mapa.anchoMapaFisico {
-                    if let obj = m_objetosAPintar[i][j] {
+                    if let obj = m_objetosAPintar.tabla[i][j] {
                         if let uni = obj as? Unidad  { uni.dibujar(g) }
                         if let obs = obj as? Obstaculo { obs.dibujar(g) }
                     }

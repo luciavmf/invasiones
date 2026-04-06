@@ -22,12 +22,24 @@ class GameScene: SKScene {
         // El original corría a 20 FPS con SDL_Delay; SpriteKit también acepta mouseMoved.
         view.preferredFramesPerSecond = Programa.FPS_POR_DEFECTO
         view.window?.acceptsMouseMovedEvents = true
+        // Hacer del SKView el primer respondedor para recibir mouseMoved sin necesidad de clic previo.
+        view.window?.makeFirstResponder(view)
 
         gameFrame.iniciarJuego(en: self)
     }
 
     // MARK: - Loop (SpriteKit llama a update(_:) cada frame)
     override func update(_ currentTime: TimeInterval) {
+        // Sincronizar posición del mouse desde la posición global del cursor.
+        // NSEvent.mouseLocation es siempre preciso; no depende de que mouseMoved dispare.
+        if let v = view, let win = v.window {
+            let screenPos = NSEvent.mouseLocation
+            let winPos    = win.convertPoint(fromScreen: screenPos)
+            let viewPos   = v.convert(winPos, from: nil)
+            let scenePos  = convertPoint(fromView: viewPos)
+            Mouse.Instancia.X = scenePos.x
+            Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - scenePos.y
+        }
         gameFrame.actualizar()
         gameFrame.dibujar()
     }

@@ -45,7 +45,8 @@ class Video {
 
     /// Dibuja una superficie (o su clip activo) en coordenadas C# (x, y) con ancla.
     func dibujar(_ superficie: Superficie?, _ x: Int, _ y: Int, _ ancla: Int) {
-        dibujar(superficie, x, y, 255, ancla)
+        let alpha = Int((superficie?.alphaActual ?? 1.0) * 255.0)
+        dibujar(superficie, x, y, alpha, ancla)
     }
 
     /// Dibuja una superficie con transparencia explícita (alpha 0-255).
@@ -87,6 +88,7 @@ class Video {
         let node = SKSpriteNode(texture: subTex)
         node.anchorPoint = CGPoint(x: 0, y: 1)
         node.position    = CGPoint(x: destX, y: Video.Alto - destY)
+        node.alpha       = sup.alphaActual
         node.zPosition   = zPos; zPos += 1
         canvasNode.addChild(node)
     }

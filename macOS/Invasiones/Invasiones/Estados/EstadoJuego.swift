@@ -117,3 +117,4 @@ class EstadoJuego: Estado {
         m_estado = estado
     }
 }
+

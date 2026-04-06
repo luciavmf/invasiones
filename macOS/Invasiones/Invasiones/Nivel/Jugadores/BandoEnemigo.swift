@@ -6,8 +6,8 @@ import Foundation
 class BandoEnemigo: Jugador {
 
     // MARK: - Constructor
-    override init(mapa: Mapa, camara: Camara, objetosAPintar: inout [[Objeto?]], hud: Hud) {
-        super.init(mapa: mapa, camara: camara, objetosAPintar: &objetosAPintar, hud: hud)
+    override init(mapa: Mapa, camara: Camara, objetosAPintar: TablaObjetos, hud: Hud) {
+        super.init(mapa: mapa, camara: camara, objetosAPintar: objetosAPintar, hud: hud)
         m_bando = .ENEMIGO
     }
 

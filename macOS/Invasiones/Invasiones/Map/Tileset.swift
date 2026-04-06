@@ -37,11 +37,11 @@ class Tileset {
 
     /// Devuelve el rectángulo (x, y, w, h) dentro de la imagen del tileset para el tile dado.
     func obtenerRectanguloDelTile(_ tileId: Int) -> (x: Int, y: Int, w: Int, h: Int) {
-        guard let img = imagen, altoDelTile > 0 else { return (0, 0, 0, 0) }
-        let filas = img.alto / Int(altoDelTile)
-        let fila   = filas > 0 ? tileId % filas : 0
-        let col    = filas > 0 ? tileId / filas : 0
-        return (col * Int(anchoDelTile), fila * Int(anchoDelTile),
+        guard let img = imagen, anchoDelTile > 0, altoDelTile > 0 else { return (0, 0, 0, 0) }
+        let cols = img.ancho / Int(anchoDelTile)
+        let col  = cols > 0 ? tileId % cols : 0
+        let fila = cols > 0 ? tileId / cols : 0
+        return (col * Int(anchoDelTile), fila * Int(altoDelTile),
                 Int(anchoDelTile), Int(altoDelTile))
     }
 

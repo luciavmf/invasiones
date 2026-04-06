@@ -175,7 +175,7 @@ class Mapa {
             if m_imagenTileGris == nil {
                 m_imagenTileGris = AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_TILE_GRIS)
             }
-            g.dibujar(m_imagenTileGris, 0, 0, 32, 16, posX, posY)
+            g.dibujar(m_imagenTileGris, posX, posY, 128, 0)
         }
     }
 
@@ -304,6 +304,7 @@ class Mapa {
 
     private func calcularPosicionDelTileEnXY(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
         guard tileAlto > 0, tileAncho > 0 else { return (0, 0) }
+        // Logical tile coords (for m_tileMouse — buildings, obstacles)
         let a = (y - m_camara.Y - m_camara.inicioY) / tileAlto
         let b: Int
         if x - m_camara.X > 0 {
@@ -311,7 +312,15 @@ class Mapa {
         } else {
             b = (x - m_camara.X - m_camara.inicioX - tileAncho) / tileAncho
         }
-        m_tileChicoMouse = (a + b, a - b)  // aproximación
+        // Physical tile coords (2× resolution — for m_tileChicoMouse, pathfinding, movement)
+        let aF = (y - m_camara.Y - m_camara.inicioY) / tileFisicoAlto
+        let bF: Int
+        if x - m_camara.X > 0 {
+            bF = (x - m_camara.X - m_camara.inicioX) / tileFisicoAncho
+        } else {
+            bF = (x - m_camara.X - m_camara.inicioX - tileFisicoAncho) / tileFisicoAncho
+        }
+        m_tileChicoMouse = (aF + bF, aF - bF)
         return (a + b, a - b)
     }
 
@@ -532,17 +541,24 @@ private class LayerDelegate: NSObject, XMLParserDelegate {
             inData = false
             if encoding == "base64" {
                 let trimmed = dataBuffer.trimmingCharacters(in: .whitespacesAndNewlines)
-                if let decoded = Data(base64Encoded: trimmed) {
+                if let decoded = Data(base64Encoded: trimmed, options: .ignoreUnknownCharacters) {
                     var datos = Array(repeating: Array(repeating: Int16(0), count: m.altoEnTilesInt),
                                       count: m.anchoEnTiles)
                     let bytes = [UInt8](decoded)
                     var idx = 0
-                    for i in 0..<m.anchoEnTiles {
-                        for j in 0..<m.altoEnTilesInt {
-                            if idx < bytes.count {
-                                datos[i][j] = Int16(bytes[idx])
-                                idx += 4  // 32-bit LE tile ID; tomamos solo el primer byte
+                    // TMX almacena los tiles fila por fila (row-major): primero todas las columnas
+                    // de la fila 0, luego las de la fila 1, etc.
+                    for j in 0..<m.altoEnTilesInt {
+                        for i in 0..<m.anchoEnTiles {
+                            if idx + 3 < bytes.count {
+                                // ID de 32 bits little-endian
+                                let id = UInt32(bytes[idx])
+                                    | UInt32(bytes[idx+1]) << 8
+                                    | UInt32(bytes[idx+2]) << 16
+                                    | UInt32(bytes[idx+3]) << 24
+                                datos[i][j] = Int16(id & 0x1FFF) // máscara de flip bits (bits 29-31)
                             }
+                            idx += 4
                         }
                     }
                     m.agregarNombreCapa(capaNombre, m.altoEnTilesInt == 0 ? 0 : capaIndex)

@@ -18,8 +18,8 @@ class BandoArgentino: Jugador {
     private let CUENTA_MAX_FLECHA = 100
 
     // MARK: - Constructor
-    override init(mapa: Mapa, camara: Camara, objetosAPintar: inout [[Objeto?]], hud: Hud) {
-        super.init(mapa: mapa, camara: camara, objetosAPintar: &objetosAPintar, hud: hud)
+    override init(mapa: Mapa, camara: Camara, objetosAPintar: TablaObjetos, hud: Hud) {
+        super.init(mapa: mapa, camara: camara, objetosAPintar: objetosAPintar, hud: hud)
         m_bando = .ARGENTINO
         Grupo.mapa = mapa
 
@@ -144,6 +144,7 @@ class BandoArgentino: Jugador {
         m_unidadBajoMouse = obtenerUnidadBajoMouse()
         m_unidadesSeleccionadas = []
 
+        seleccionarUnidadesEnRectanguloArrastre()
         actualizarUnidades()
         crearGrupos()
         chequearOrdenesAUnidades()
@@ -240,7 +241,7 @@ class BandoArgentino: Jugador {
             var i = XX, j = YY
             while tileX <= finI && j >= 0 {
                 if i >= 0 && i < m_mapa.altoMapaFisico && j < m_mapa.anchoMapaFisico {
-                    if let uni = m_objetosAPintar[i][j] as? Unidad,
+                    if let uni = m_objetosAPintar.tabla[i][j] as? Unidad,
                        uni.chequearSiEstaBajoElMouse() {
                         return uni
                     }
@@ -334,8 +335,13 @@ class BandoArgentino: Jugador {
 
         // Click izquierdo sin arrastrar: deseleccionar
         if Mouse.Instancia.BotonesApretados.contains(Mouse.BOTON_IZQ) {
-            m_unidadesSeleccionadas.forEach { $0.esSeleccionada = false }
-            borrarUnidadesSeleccionadas()
+            let arr = Mouse.Instancia.RectanguloArrastrado
+            let arrastrando = Mouse.Instancia.arrastrando()
+                && Int(arr.width) >= 4 && Int(arr.height) >= 4
+            if !arrastrando {
+                m_unidadesSeleccionadas.forEach { $0.esSeleccionada = false }
+                borrarUnidadesSeleccionadas()
+            }
         }
     }
 
@@ -344,6 +350,7 @@ class BandoArgentino: Jugador {
     private func crearGrupos() {
         guard !m_unidadesSeleccionadas.isEmpty else { return }
         guard m_grupoSeleccionado == nil && m_unidadSeleccionada == nil else { return }
+        guard !Mouse.Instancia.arrastrando() else { return }
 
         if m_unidadesSeleccionadas.count > 1 {
             if m_grupos == nil { m_grupos = [] }
@@ -446,6 +453,20 @@ class BandoArgentino: Jugador {
     }
 
     // MARK: - Helpers privados
+
+    private func seleccionarUnidadesEnRectanguloArrastre() {
+        let arr = Mouse.Instancia.RectanguloArrastrado
+        guard Mouse.Instancia.arrastrando()
+              && Int(arr.width) >= 4 && Int(arr.height) >= 4 else { return }
+
+        guard m_unidadSeleccionada == nil && m_grupoSeleccionado == nil else { return }
+
+        for unidad in m_unidades where unidad.bando == .ARGENTINO {
+            _ = unidad.seleccionarSiEstaEnRectangulo(
+                Int(arr.origin.x), Int(arr.origin.y),
+                Int(arr.width),    Int(arr.height))
+        }
+    }
 
     private func calcularPrimerTileAPintar(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
         let th = m_mapa.tileAlto > 0 ? m_mapa.tileAlto / 2 : 1

@@ -206,7 +206,7 @@ class Unidad: Objeto {
 
         if let c = camino, !c.isEmpty {
             // El primer elemento es destino, último es origen. Usamos como pila (popLast = próximo paso).
-            m_caminoASeguir = Array(c.dropFirst())  // quita el nodo inicio (último)
+            m_caminoASeguir = Array(c.dropLast())   // quita el nodo inicio (último = origen)
         } else {
             setearEstado(.OCIO)
             m_caminoASeguir = nil
@@ -331,7 +331,7 @@ class Unidad: Objeto {
             m_posEnTileFisico.x, m_posEnTileFisico.y, x, y)
 
         if let c = camino, !c.isEmpty {
-            m_caminoASeguir = Array(c.dropFirst())
+            m_caminoASeguir = Array(c.dropLast())
         } else {
             Log.Instancia.debug("No se encontro el camino para sanar...")
             setearEstado(.OCIO)
@@ -431,26 +431,20 @@ class Unidad: Objeto {
     }
 
     private func moverseHaciaProximoPaso() -> Bool {
-        guard let cam = Objeto.camara else { return false }
-        let targetX = cam.inicioX + m_proximoPaso.x + cam.X
-        let targetY = cam.inicioY + m_proximoPaso.y + cam.Y
-
         let spd = m_velocidadPorDefecto.x
 
-        let dx = targetX - m_x
-        let dy = targetY - m_y
+        let dx = m_proximoPaso.x - m_posEnMundoPlano.x
+        let dy = m_proximoPaso.y - m_posEnMundoPlano.y
         let dist = sqrt(Double(dx * dx + dy * dy))
 
         if dist <= Double(spd) {
-            m_x = targetX
-            m_y = targetY
             m_posEnMundoPlano = m_proximoPaso
             return true
         }
 
         let ratio = Double(spd) / dist
-        m_x += Int(Double(dx) * ratio)
-        m_y += Int(Double(dy) * ratio)
+        m_posEnMundoPlano.x += Int(Double(dx) * ratio)
+        m_posEnMundoPlano.y += Int(Double(dy) * ratio)
         return false
     }
 
@@ -477,11 +471,8 @@ class Unidad: Objeto {
     }
 
     private func obtenerDireccion(_ targetX: Int, _ targetY: Int) -> Int {
-        guard let cam = Objeto.camara else { return -1 }
-        let currentX = cam.inicioX + m_posEnMundoPlano.x + cam.X
-        let currentY = cam.inicioY + m_posEnMundoPlano.y + cam.Y
-        let dx = targetX - currentX
-        let dy = targetY - currentY
+        let dx = targetX - m_posEnMundoPlano.x
+        let dy = targetY - m_posEnMundoPlano.y
         if dx == 0 && dy == 0 { return -1 }
 
         let angle = atan2(Double(dy), Double(dx)) * 180.0 / Double.pi
