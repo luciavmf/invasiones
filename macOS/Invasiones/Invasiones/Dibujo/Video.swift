@@ -20,6 +20,13 @@ class Video {
     private var colorFuenteActual: SKColor = .white
     private var zPos:              CGFloat = 0
 
+    // Clip rect en coordenadas C# (top-left origin). Sólo se persiste el estado;
+    // la restricción visual real la hace el propio renderizador del mapa.
+    private var clipX: Int = 0
+    private var clipY: Int = 0
+    private var clipW: Int = Programa.ANCHO_DE_LA_PANTALLA
+    private var clipH: Int = Programa.ALTO_DE_LA_PANTALLA
+
     // MARK: - Constructor
     init(escena: SKScene) {
         canvasNode = SKNode()
@@ -61,6 +68,37 @@ class Video {
         canvasNode.addChild(node)
     }
 
+    /// Dibuja una sub-región de una superficie en una posición destino (blit de tile).
+    func dibujar(_ superficie: Superficie?, _ srcX: Int, _ srcY: Int, _ srcW: Int, _ srcH: Int,
+                 _ destX: Int, _ destY: Int) {
+        guard let sup = superficie, let tex = sup.textura else { return }
+        let texW = tex.size().width
+        let texH = tex.size().height
+        guard texW > 0, texH > 0, srcW > 0, srcH > 0 else { return }
+
+        let nx  = CGFloat(srcX) / texW
+        let ny  = 1.0 - CGFloat(srcY + srcH) / texH
+        let nw  = CGFloat(srcW) / texW
+        let nh  = CGFloat(srcH) / texH
+
+        let subTex = SKTexture(rect: CGRect(x: nx, y: ny, width: nw, height: nh), in: tex)
+        subTex.filteringMode = .nearest
+
+        let node = SKSpriteNode(texture: subTex)
+        node.anchorPoint = CGPoint(x: 0, y: 1)
+        node.position    = CGPoint(x: destX, y: Video.Alto - destY)
+        node.zPosition   = zPos; zPos += 1
+        canvasNode.addChild(node)
+    }
+
+    // MARK: - Clip
+
+    func obtenerClip() -> (x: Int, y: Int, w: Int, h: Int) { (clipX, clipY, clipW, clipH) }
+
+    func setearClip(_ x: Int, _ y: Int, _ w: Int, _ h: Int) {
+        clipX = x; clipY = y; clipW = w; clipH = h
+    }
+
     // MARK: - Escribir texto
 
     /// Escribe el string identificado por su ID (índice en Texto.Strings) con ancla.
@@ -68,6 +106,11 @@ class Video {
         let strings = Texto.Strings
         guard stringId >= 0, stringId < strings.count else { return }
         escribirTexto(strings[stringId], x, y, ancla)
+    }
+
+    /// Escribe un string literal (para debug y texto dinámico).
+    func escribir(_ texto: String, _ x: Int, _ y: Int, _ ancla: Int) {
+        escribirTexto(texto, x, y, ancla)
     }
 
     private func escribirTexto(_ text: String, _ x: Int, _ y: Int, _ ancla: Int) {
@@ -93,13 +136,16 @@ class Video {
 
     // MARK: - Primitivas de relleno
 
-    /// Rellena un rectángulo con el color actual y alpha (0-255).
+    /// Rellena un rectángulo con el color actual, alpha y ancla opcionales.
     func llenarRectangulo(_ x: Int, _ y: Int, _ w: Int, _ h: Int,
-                          _ alpha: Int = 255, _ unused: Int = 0) {
+                          _ alpha: Int = 255, _ ancla: Int = 0) {
+        var px = x, py = y
+        if (ancla & Superficie.H_CENTRO) != 0 { px += Video.Ancho / 2 - w / 2 }
+        if (ancla & Superficie.V_CENTRO) != 0 { py += Video.Alto  / 2 - h / 2 }
         let node = SKSpriteNode(color: colorActual,
                                 size: CGSize(width: w, height: h))
         node.anchorPoint = CGPoint(x: 0, y: 1)
-        node.position    = CGPoint(x: x, y: Video.Alto - y)
+        node.position    = CGPoint(x: px, y: Video.Alto - py)
         node.alpha       = CGFloat(max(0, min(alpha, 255))) / 255.0
         node.zPosition   = zPos; zPos += 1
         canvasNode.addChild(node)
@@ -120,6 +166,20 @@ class Video {
     func setearFuente(_ fuente: Fuente?, _ color: Int) {
         fuenteActual      = fuente
         colorFuenteActual = skColor(color)
+    }
+
+    /// Dibuja el contorno de un rectángulo (sin relleno) con el color actual.
+    func dibujarRectangulo(_ x: Int, _ y: Int, _ w: Int, _ h: Int, _ ancla: Int) {
+        var px = x, py = y
+        if (ancla & Superficie.H_CENTRO) != 0 { px += Video.Ancho / 2 - w / 2 }
+        if (ancla & Superficie.V_CENTRO) != 0 { py += Video.Alto  / 2 - h / 2 }
+
+        let shape = SKShapeNode(rect: CGRect(x: px, y: Video.Alto - py - h, width: w, height: h))
+        shape.strokeColor = colorActual
+        shape.fillColor   = .clear
+        shape.lineWidth   = 1
+        shape.zPosition   = zPos; zPos += 1
+        canvasNode.addChild(shape)
     }
 
     /// No-op: SpriteKit gestiona el doble buffer automáticamente.

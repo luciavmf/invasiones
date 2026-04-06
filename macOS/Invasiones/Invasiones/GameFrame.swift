@@ -44,6 +44,8 @@ class GameFrame {
 
         Texto.cargar()
         AdministradorDeRecursos.Instancia.cargarPathsRecursos()
+        AdministradorDeRecursos.Instancia.leerInfoSprites()
+        AdministradorDeRecursos.Instancia.leerInfoAnimaciones()
         AdministradorDeRecursos.Instancia.cargarFuentes()
 
         maquinaDeEstados = MaquinaDeEstados()

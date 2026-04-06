@@ -69,6 +69,16 @@ class Superficie {
         // No-op: el alpha se aplica en el nodo destino al momento de dibujarlo.
     }
 
+    /// Devuelve el color del pixel en (x, y) como Int RGB.
+    /// Usado para la detección isométrica de tile bajo el mouse.
+    /// Requiere acceso a los datos raw de la imagen — stub por ahora.
+    func colorPixel(_ x: Int, _ y: Int) -> Int {
+        guard let imagen = NSImage(named: "") else { return 0 }
+        _ = imagen  // suprime warning
+        // TODO: implementar lectura de pixel real desde NSImage si se necesita hit-testing preciso.
+        return 0
+    }
+
     /// Establece la sub-textura activa (equivalente a SDL_SetClipRect sobre la superficie).
     /// x, y: origen del clip en píxeles de la textura completa (top-left).
     /// w, h: tamaño del clip en píxeles.

@@ -29,6 +29,15 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
     /// Fuentes cargadas (una por cada variante de Definiciones.FNT).
     private(set) var fuentes: [Fuente?] = []
 
+    /// Sprites cargados (Res.SPR_COUNT = 2).
+    private(set) var sprites: [Sprite?] = []
+
+    /// Animaciones cargadas (Res.ANIM_COUNT = 13).
+    private(set) var animaciones: [Animaciones?] = []
+
+    /// Tipos de unidades template (Res.UNIDAD_COUNT = 2).
+    private(set) var tipoDeUnidades: [Unidad?] = []
+
     // MARK: - Constructor (privado)
     private override init() {}
 
@@ -125,6 +134,47 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
         fuentes[Definiciones.FNT.LBLACK28.rawValue] = Fuente(idFuente: Res.FNT_LBLACK, tamanio: 28)
 
         return fuentes[Definiciones.FNT.SANS12.rawValue] != nil
+    }
+
+    // MARK: - Tipo de Unidades
+
+    func cargarTipoDeUnidades() {
+        tipoDeUnidades = Array(repeating: nil, count: Res.UNIDAD_COUNT)
+        for i in 0..<Res.UNIDAD_COUNT {
+            let u = Unidad()
+            u.leerUnidad(i)
+            tipoDeUnidades[i] = u
+        }
+    }
+
+    // MARK: - Sprites (lee sección <sprites> de res.xml)
+
+    @discardableResult
+    func leerInfoSprites() -> Bool {
+        guard let path = Utilidades.obtenerPath(Programa.ARCHIVO_XML_RECURSOS) else { return false }
+
+        let parser = SpritesXMLParser()
+        let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
+        xmlParser?.delegate = parser
+        guard xmlParser?.parse() == true else { return false }
+
+        sprites = parser.sprites
+        return true
+    }
+
+    // MARK: - Animaciones (lee sección <anims> de res.xml)
+
+    @discardableResult
+    func leerInfoAnimaciones() -> Bool {
+        guard let path = Utilidades.obtenerPath(Programa.ARCHIVO_XML_RECURSOS) else { return false }
+
+        let parser = AnimsXMLParser()
+        let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
+        xmlParser?.delegate = parser
+        guard xmlParser?.parse() == true else { return false }
+
+        animaciones = parser.animaciones
+        return true
     }
 }
 
@@ -224,5 +274,101 @@ private class ResXMLParser: NSObject, XMLParserDelegate {
         let path = Utilidades.obtenerPath(file)
         if iUnidades < unidades.count { unidades[iUnidades] = path; iUnidades += 1 }
         atributoFile = nil
+    }
+}
+
+// MARK: - Parser de <sprites> de res.xml
+
+private class SpritesXMLParser: NSObject, XMLParserDelegate {
+
+    var sprites: [Sprite?] = Array(repeating: nil, count: Res.SPR_COUNT)
+
+    private var enSprites   = false
+    private var spriteIdx   = 0
+    private var animaciones: [Animaciones] = []
+
+    // Atributos corrientes del <image>
+    private var imgPath    = ""
+    private var frameAncho = 0
+    private var frameAlto  = 0
+    private var ticks      = 0
+    private var offsetX    = 0
+    private var offsetY    = 0
+
+    func parser(_ parser: XMLParser, didStartElement name: String, namespaceURI: String?,
+                qualifiedName: String?, attributes: [String: String]) {
+        switch name {
+        case "sprites":
+            enSprites = true; spriteIdx = 0
+
+        case "sprite" where enSprites:
+            animaciones = []
+
+        case "image" where enSprites:
+            imgPath    = Utilidades.obtenerPath(attributes["path"] ?? "") ?? ""
+            frameAncho = Int(attributes["framewidth"]  ?? "0") ?? 0
+            frameAlto  = Int(attributes["frameheight"] ?? "0") ?? 0
+            ticks      = Int(attributes["frameticks"]  ?? "0") ?? 0
+            offsetX    = Int(attributes["offsetX"]     ?? "0") ?? 0
+            offsetY    = Int(attributes["offsetY"]     ?? "0") ?? 0
+            let anim = Animaciones(idx: 0, path: imgPath, ticks: ticks,
+                                   anchoFrame: frameAncho, altoFrame: frameAlto,
+                                   offsetX: offsetX, offsetY: offsetY)
+            animaciones.append(anim)
+
+        default: break
+        }
+    }
+
+    func parser(_ parser: XMLParser, didEndElement name: String, namespaceURI: String?,
+                qualifiedName: String?) {
+        if name == "sprite", enSprites {
+            if spriteIdx < sprites.count {
+                let spr = Sprite()
+                spr.reservarSlots(animaciones.count)
+                for (i, anim) in animaciones.enumerated() {
+                    spr.agregarAnimacion(i, anim)
+                }
+                sprites[spriteIdx] = spr
+                spriteIdx += 1
+            }
+        }
+        if name == "sprites" { enSprites = false }
+    }
+}
+
+// MARK: - Parser de <anims> de res.xml
+
+private class AnimsXMLParser: NSObject, XMLParserDelegate {
+
+    var animaciones: [Animaciones?] = Array(repeating: nil, count: Res.ANIM_COUNT)
+
+    private var enAnims = false
+    private var animIdx = 0
+
+    func parser(_ parser: XMLParser, didStartElement name: String, namespaceURI: String?,
+                qualifiedName: String?, attributes: [String: String]) {
+        if name == "anims" { enAnims = true; animIdx = 0 }
+
+        if name == "animacion", enAnims {
+            let imgPath    = Utilidades.obtenerPath(attributes["imagepath"] ?? "") ?? ""
+            let frameAncho = Int(attributes["framewidth"]  ?? "0") ?? 0
+            let frameAlto  = Int(attributes["frameheight"] ?? "0") ?? 0
+            let ticks      = Int(attributes["frameticks"]  ?? "0") ?? 0
+            let offsetX    = Int(attributes["offsetX"]     ?? "0") ?? 0
+            let offsetY    = Int(attributes["offsetY"]     ?? "0") ?? 0
+
+            if animIdx < animaciones.count {
+                animaciones[animIdx] = Animaciones(idx: 0, path: imgPath, ticks: ticks,
+                                                   anchoFrame: frameAncho, altoFrame: frameAlto,
+                                                   offsetX: offsetX, offsetY: offsetY)
+                animIdx += 1
+            }
+        }
+    }
+
+    func parser(_ parser: XMLParser, didEndElement name: String, namespaceURI: String?,
+                qualifiedName: String?) {
+        if name == "anims" { enAnims = false }
     }
 }

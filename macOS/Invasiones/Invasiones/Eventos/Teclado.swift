@@ -56,4 +56,8 @@ class Teclado {
     func soltarTecla(_ keyCode: Int) {
         TeclasApretadas.removeAll { $0 == keyCode }
     }
+
+    func limpiarTeclas() {
+        TeclasApretadas.removeAll()
+    }
 }
