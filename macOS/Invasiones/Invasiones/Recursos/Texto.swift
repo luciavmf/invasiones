@@ -66,7 +66,9 @@ class Texto: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, didEndElement elementName: String,
                 namespaceURI: String?, qualifiedName qName: String?) {
         if m_enElemento && m_indice < Res.STR_COUNT {
-            m_stringsLeidos[m_indice] = m_textoActual.trimmingCharacters(in: .whitespacesAndNewlines)
+            let trimmed = m_textoActual.trimmingCharacters(in: .whitespacesAndNewlines)
+            // strings.xml usa la secuencia literal "\n"; convertirla a salto de línea real.
+            m_stringsLeidos[m_indice] = trimmed.replacingOccurrences(of: "\\n", with: "\n")
             m_indice += 1
             m_enElemento = false
         }

@@ -18,6 +18,13 @@ enum Utilidades {
         // Normalizar separadores Windows → Unix
         let normalizado = nombre.replacingOccurrences(of: "\\", with: "/")
 
+        // Si ya es un path absoluto que existe, devolverlo directamente.
+        if normalizado.hasPrefix("/") {
+            if FileManager.default.fileExists(atPath: normalizado) { return normalizado }
+            Log.Instancia.advertir("ObtenerPath: no existe el archivo \"\(normalizado)\"")
+            return nil
+        }
+
         // Búsqueda en el resourcePath del bundle (la forma más fiable con folder references)
         if let resourcePath = Bundle.main.resourcePath {
             // 1. Directo bajo el bundle

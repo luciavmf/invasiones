@@ -119,16 +119,26 @@ class Video {
         if (ancla & Superficie.V_CENTRO) != 0 { py += Video.Alto  / 2 }
 
         let label = SKLabelNode()
-        label.text = text
+        let nsFont: NSFont
         if let font = fuenteActual?.nsFont {
             label.fontName = font.fontName
             label.fontSize = font.pointSize
+            nsFont = font
         } else {
             label.fontSize = 14
+            nsFont = NSFont.systemFont(ofSize: 14)
         }
-        label.fontColor               = colorFuenteActual
+        let paraStyle = NSMutableParagraphStyle()
+        paraStyle.alignment = .center
+        let attrs: [NSAttributedString.Key: Any] = [
+            .font:            nsFont,
+            .foregroundColor: colorFuenteActual,
+            .paragraphStyle:  paraStyle
+        ]
+        label.attributedText          = NSAttributedString(string: text, attributes: attrs)
         label.horizontalAlignmentMode = .center
-        label.verticalAlignmentMode   = .center
+        label.verticalAlignmentMode   = (ancla & Superficie.V_CENTRO) != 0 ? .center : .top
+        label.numberOfLines           = 0      // permite saltos de línea con \n
         label.position  = CGPoint(x: px, y: Video.Alto - py)
         label.zPosition = zPos; zPos += 1
         canvasNode.addChild(label)

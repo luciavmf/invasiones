@@ -60,6 +60,8 @@ class Animaciones {
         self.loop                = copia.loop
         self.offsets             = copia.offsets
         self.animacionActual     = -1
+        self.m_animacionLeida    = copia.m_animacionLeida
+        self.m_animacionCargada  = copia.m_animacionCargada
 
         // Cada copia necesita su propia Superficie para tener su propio texturaActual.
         self.m_imagen = AdministradorDeRecursos.Instancia.obtenerCopiaImagen(m_pathImagen)

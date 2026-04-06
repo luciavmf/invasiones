@@ -15,6 +15,9 @@ class GameScene: SKScene {
         // Tamaño fijo de la pantalla original
         size = CGSize(width: Programa.ANCHO_DE_LA_PANTALLA, height: Programa.ALTO_DE_LA_PANTALLA)
         scaleMode = .aspectFit
+        // Origen en la esquina inferior-izquierda — todo el código de Video asume (0,0) = bottom-left.
+        anchorPoint = CGPoint(x: 0, y: 0)
+        backgroundColor = .black
 
         // El original corría a 20 FPS con SDL_Delay; SpriteKit también acepta mouseMoved.
         view.preferredFramesPerSecond = Programa.FPS_POR_DEFECTO
