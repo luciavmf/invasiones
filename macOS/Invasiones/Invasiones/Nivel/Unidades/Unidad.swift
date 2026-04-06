@@ -161,7 +161,7 @@ class Unidad: Objeto {
         case .MOVIENDO:
             movioEnMapa = actualizarEstadoMoviendo()
         case .PATRULLANDO:
-            movioEnMapa = actualizarEstadoMoviendo()
+            movioEnMapa = actualizarEstadoPatrullando()
         case .PERSIGUIENDO_UNIDAD:
             actualizarEstadoPersiguiendoUnidad()
         case .ATACANDO:
@@ -349,7 +349,13 @@ class Unidad: Objeto {
 
     // MARK: - Selección por arrastre de mouse (rectangle)
     func seleccionarSiEstaEnRectangulo(_ x: Int, _ y: Int, _ w: Int, _ h: Int) -> Bool {
-        let dentro = m_x >= x && m_x <= x + w && m_y >= y && m_y <= y + h
+        let fw = m_sprite?.frameAncho ?? (m_frameAncho > 0 ? m_frameAncho : 20)
+        let fh = m_sprite?.frameAlto  ?? (m_frameAlto  > 0 ? m_frameAlto  : 30)
+        // Bounding-box overlap: rect must contain the unit sprite (matches original C# check).
+        let dentro = x <= m_x
+                  && y <= m_y + fh / 2
+                  && x + w > m_x + fw
+                  && y + h > m_y + fh
         if dentro { m_seleccionado = true }
         return dentro
     }
@@ -377,9 +383,9 @@ class Unidad: Objeto {
 
     private func primerAnimacion() -> Int {
         switch m_estado {
-        case .OCIO, .PATRULLANDO, .SANANDO:
+        case .OCIO, .SANANDO:
             return m_tipo == 0 ? Res.SPR_ANIM_PATRICIO_QUIETO_N : Res.SPR_ANIM_INGLES_QUIETO_N
-        case .MOVIENDO, .PERSIGUIENDO_UNIDAD:
+        case .MOVIENDO, .PERSIGUIENDO_UNIDAD, .PATRULLANDO:
             return m_tipo == 0 ? Res.SPR_ANIM_PATRICIO_CAMINA_N : Res.SPR_ANIM_INGLES_CAMINA_N
         case .MURIENDO, .MUERTO:
             return m_tipo == 0 ? Res.SPR_ANIM_PATRICIO_MUERE_N : Res.SPR_ANIM_INGLES_MUERE_N
@@ -391,6 +397,13 @@ class Unidad: Objeto {
     // MARK: - Movement
 
     private func actualizarEstadoMoviendo() -> Bool {
+        return moverse()
+    }
+
+    private func actualizarEstadoPatrullando() -> Bool {
+        if m_caminoASeguir == nil {
+            m_caminoASeguir = encontrarCaminoParaPatrullarAlAzar(m_posEnTileFisico.x, m_posEnTileFisico.y)
+        }
         return moverse()
     }
 

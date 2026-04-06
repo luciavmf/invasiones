@@ -356,7 +356,6 @@ class BandoArgentino: Jugador {
     private func crearGrupos() {
         guard !m_unidadesSeleccionadas.isEmpty else { return }
         guard m_grupoSeleccionado == nil && m_unidadSeleccionada == nil else { return }
-        guard !Mouse.Instancia.arrastrando() else { return }
 
         if m_unidadesSeleccionadas.count > 1 {
             if m_grupos == nil { m_grupos = [] }
@@ -461,9 +460,11 @@ class BandoArgentino: Jugador {
     // MARK: - Private helpers
 
     private func seleccionarUnidadesEnRectanguloArrastre() {
+        // Fire on the frame the drag ends (matches original C# TerminoDeArrastrar() check).
+        guard Mouse.Instancia.terminoDeArrastrar() else { return }
+
         let arr = Mouse.Instancia.RectanguloArrastrado
-        guard Mouse.Instancia.arrastrando()
-              && Int(arr.width) >= 4 && Int(arr.height) >= 4 else { return }
+        guard Int(arr.width) >= 4 && Int(arr.height) >= 4 else { return }
 
         guard m_unidadSeleccionada == nil && m_grupoSeleccionado == nil else { return }
 

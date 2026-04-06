@@ -70,9 +70,12 @@ class Mouse {
     /// Updates the drag state. Call once per frame from GameFrame.actualizar().
     func actualizar() {
         if BotonesApretados.contains(Mouse.BOTON_IZQ) {
+            m_terminoDeArrastrar = false
             if !m_arrastrando {
+                // New drag starts: reset rectangle and record the anchor point.
                 m_arrastrando = true
                 m_posicionInicioArrastre = CGPoint(x: m_x, y: m_y)
+                m_rectanguloArrastrado = .zero
             } else {
                 let originX = min(m_x, m_posicionInicioArrastre.x)
                 let originY = min(m_y, m_posicionInicioArrastre.y)
@@ -81,11 +84,11 @@ class Mouse {
                 m_rectanguloArrastrado = CGRect(x: originX, y: originY, width: ancho, height: alto)
             }
         } else {
+            // LMB released: signal that drag just finished, preserve last rectangle.
             m_terminoDeArrastrar = m_arrastrando
             m_arrastrando = false
-            if !m_arrastrando {
-                m_rectanguloArrastrado = .zero
-            }
+            // m_rectanguloArrastrado is intentionally preserved so units can read it
+            // on the same frame terminoDeArrastrar() is true, matching original C# behaviour.
         }
     }
 
