@@ -282,6 +282,54 @@ class Mapa {
         return id == Res.TLS_PASTO || id == Res.TLS_TIERRA
     }
 
+    /// Walks from (x1,y1) toward (x2,y2) along the Bresenham-style parametric line and
+    /// returns the first walkable tile it encounters (port of C# ObtenerPosicionEnLineaDeVision).
+    /// Returns (-1,-1) if no walkable tile is found.
+    func obtenerPosicionEnLineaDeVision(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> (x: Int, y: Int) {
+        var columna = Float(x1)
+        var fila    = Float(y1)
+
+        let decliveFila    = obtenerDecliveFila(x1, x2, y1, y2)
+        let decliveColumna = obtenerDecliveColumna(x1, x2, y1, y2)
+
+        if abs(decliveFila) == 1.0 {
+            while Int(fila.rounded(.down)) != y2 {
+                let ci = Int(columna.rounded(.down))
+                let fi = Int(fila.rounded(.down))
+                if esPosicionCaminable(ci, fi) { return (ci, fi) }
+                fila    += decliveFila
+                columna += decliveColumna
+            }
+        } else {
+            while Int(columna.rounded(.down)) != x2 {
+                let ci = Int(columna.rounded(.down))
+                let fi = Int(fila.rounded(.down))
+                if esPosicionCaminable(ci, fi) { return (ci, fi) }
+                fila    += decliveFila
+                columna += decliveColumna
+            }
+        }
+        return (-1, -1)
+    }
+
+    private func obtenerDecliveFila(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> Float {
+        if abs(y2 - y1) > abs(x2 - x1) {
+            return y2 > y1 ? 1 : -1
+        } else {
+            let d = Float(abs(y2 - y1)) / Float(abs(x2 - x1))
+            return d * (y2 > y1 ? 1 : -1)
+        }
+    }
+
+    private func obtenerDecliveColumna(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> Float {
+        if abs(x2 - x1) > abs(y2 - y1) {
+            return x2 > x1 ? 1 : -1
+        } else {
+            let d = Float(abs(x2 - x1)) / Float(abs(y2 - y1))
+            return d * (x2 > x1 ? 1 : -1)
+        }
+    }
+
     func invalidarTile(_ x: Int, _ y: Int) {
         guard x >= 0, y >= 0,
               x + 1 < m_anchoEnTiles * 2,

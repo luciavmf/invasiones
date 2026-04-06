@@ -73,14 +73,15 @@ class Sonido {
     func parar(_ id: Int) {
         guard id >= -1, id < Res.SND_COUNT + Res.SFX_COUNT else { return }
         if id == -1 {
-            m_sfxPlayers.compactMap { $0 }.forEach { $0.stop() }
-            m_musicPlayer?.stop(); m_musicActual = -1
+            m_sfxPlayers.compactMap { $0 }.forEach { $0.stop(); $0.currentTime = 0 }
+            m_musicPlayer?.stop(); m_musicPlayer?.currentTime = 0; m_musicActual = -1
             return
         }
         if id >= Res.SND_COUNT {
-            m_sfxPlayers[id - Res.SND_COUNT]?.stop()
+            let p = m_sfxPlayers[id - Res.SND_COUNT]
+            p?.stop(); p?.currentTime = 0
         } else {
-            m_musicPlayer?.stop(); m_musicActual = -1
+            m_musicPlayer?.stop(); m_musicPlayer?.currentTime = 0; m_musicActual = -1
         }
     }
 

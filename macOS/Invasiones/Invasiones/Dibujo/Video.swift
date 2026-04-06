@@ -147,6 +147,7 @@ class Video {
         label.horizontalAlignmentMode = .center
         label.verticalAlignmentMode   = (ancla & Superficie.V_CENTRO) != 0 ? .center : .top
         label.numberOfLines           = 0      // allows line breaks with \n
+        label.preferredMaxLayoutWidth = CGFloat(Video.Ancho - 80)  // enables word-wrap and avoids clipping
         label.position  = CGPoint(x: px, y: Video.Alto - py)
         label.zPosition = zPos; zPos += 1
         canvasNode.addChild(label)

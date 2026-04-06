@@ -58,6 +58,12 @@ Battle lifecycle: `CARGANDO → MOSTRAR_INTRODUCCION → JUGANDO → GANO/PERDIO
 
 `Grupo` wraps a squad of units. `Orden` is a single command. `Objetivo` is a stack of orders.
 
+**Combat notes:**
+- Damage is always `m_puntosDeAtaque` — no accuracy roll. `m_punteria` is loaded from CSV but was never used in the original C# attack logic.
+- Enemy units without a group (`IA`) are set to `PATRULLANDO` state on load and wander randomly between `RANDOM_PATRULLA_MIN=8` and `RANDOM_PATRULLA_MAX=16` tiles from their base position.
+- `ContraAtacar` (counter-attack): when a unit enters `ATACANDO`, it notifies the target to counter-attack if idle. Not yet ported to Swift.
+- `EstadoLogo.iniciar()` is never called — the first state is set directly via `setearEstado()`, bypassing `iniciar()`. Sound and init code must go in `GameFrame.iniciarJuego()`.
+
 ### Rendering (`Video`)
 
 `Video` wraps SpriteKit, presenting an SDL-compatible API to the rest of the game. It owns a `SKNode` canvas that is fully redrawn each frame. Coordinate origin is bottom-left `(0,0)` at 1024×768.

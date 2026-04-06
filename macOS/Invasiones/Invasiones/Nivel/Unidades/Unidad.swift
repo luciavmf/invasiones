@@ -265,7 +265,7 @@ class Unidad: Objeto {
 
     // MARK: - Queries
 
-    func estaMuerto() -> Bool { m_estado == .MUERTO }
+    func estaMuerto() -> Bool { m_estado == .MUERTO || m_estado == .MURIENDO }
 
     func seEstaMoviendo() -> Bool {
         return m_estado == .MOVIENDO || m_estado == .PATRULLANDO || m_estado == .PERSIGUIENDO_UNIDAD
@@ -312,11 +312,98 @@ class Unidad: Objeto {
 
     func calcularCaminoADistancia(_ caminoComandante: [(i: Int, j: Int)],
                                   _ offsetX: Int, _ offsetY: Int) {
-        // Simplified: compute direct path to the commander's destination + offset
-        guard let ultimo = caminoComandante.first else { return }
-        let destI = ultimo.i + offsetX
-        let destJ = ultimo.j + offsetY
-        mover(destI, destJ)
+        guard let mapa = Objeto.mapa else { return }
+
+        setearEstado(.MOVIENDO)
+        m_proximoEstado = .OCIO
+
+        // Build offset copy of commander's path.
+        // caminoComandante: [0]=destination, [last]=first step (Swift format).
+        // Iterate reversed so listaCopiar[0]=first step, ..., [last]=destination (same order as C# Stack).
+        let listaCopiar: [(i: Int, j: Int)] = caminoComandante.reversed().map { (i: $0.i + offsetX, j: $0.j + offsetY) }
+
+        var listaCamino: [(i: Int, j: Int)] = []
+        var idx = 0
+
+        while idx < listaCopiar.count {
+            let punto = listaCopiar[idx]
+            if !mapa.esPosicionCaminable(punto.i, punto.j) {
+                if idx > 0 {
+                    let anterior = idx - 1
+                    guard let idxSiguienteValido = encontrarProximaPosicionValida(listaCopiar, desde: idx) else {
+                        // No more valid points ahead — stop here
+                        idx = listaCopiar.count
+                        continue
+                    }
+                    idx = idxSiguienteValido
+
+                    var caminoNuevo = PathFinder.Instancia.encontrarCaminoMasCorto(
+                        listaCopiar[anterior].i, listaCopiar[anterior].j,
+                        listaCopiar[idx].i,      listaCopiar[idx].j)
+
+                    if caminoNuevo == nil {
+                        guard let idxAnteriorValido = encontrarPosicionValidaAnterior(listaCopiar, desde: idxSiguienteValido) else {
+                            Log.Instancia.debug("El camino no es valido por ningun lado.")
+                            m_caminoASeguir = []
+                            return
+                        }
+                        idx = idxAnteriorValido
+                        caminoNuevo = PathFinder.Instancia.encontrarCaminoMasCorto(
+                            listaCopiar[anterior].i, listaCopiar[anterior].j,
+                            listaCopiar[idx].i,      listaCopiar[idx].j)
+                    }
+
+                    guard let segmento = caminoNuevo else {
+                        m_caminoASeguir = []
+                        return
+                    }
+                    // segmento: [0]=destination, [last]=origin — append in Pop order (reversed)
+                    listaCamino.append(contentsOf: segmento.reversed())
+                } else {
+                    idx += 1
+                }
+            } else {
+                listaCamino.append(punto)
+                idx += 1
+            }
+        }
+
+        // listaCamino is first-step→destination; store as Swift path array ([0]=destination, [last]=first-step)
+        m_caminoASeguir = listaCamino.reversed()
+        m_subestado = .INCREMENTAR_PASO
+    }
+
+    private func encontrarProximaPosicionValida(_ lista: [(i: Int, j: Int)], desde inicio: Int) -> Int? {
+        guard let mapa = Objeto.mapa else { return nil }
+        var idx = inicio
+        while idx < lista.count, !mapa.esPosicionCaminable(lista[idx].i, lista[idx].j) {
+            idx += 1
+        }
+        if idx >= lista.count { return nil }
+        // Skip up to two extra steps, same as C# logic
+        if idx < lista.count - 1 {
+            let siguiente = lista[idx + 1]
+            if mapa.esPosicionCaminable(siguiente.i, siguiente.j) {
+                idx += 1
+                if idx < lista.count - 1 {
+                    let siguiente2 = lista[idx + 1]
+                    if mapa.esPosicionCaminable(siguiente2.i, siguiente2.j) {
+                        idx += 1
+                    }
+                }
+            }
+        }
+        return idx
+    }
+
+    private func encontrarPosicionValidaAnterior(_ lista: [(i: Int, j: Int)], desde inicio: Int) -> Int? {
+        guard let mapa = Objeto.mapa else { return nil }
+        var idx = inicio
+        while idx >= 0, !mapa.esPosicionCaminable(lista[idx].i, lista[idx].j) {
+            idx -= 1
+        }
+        if idx < 0 { return nil }
+        return idx
     }
 
     func chequearSiEstaBajoElMouse() -> Bool {
@@ -330,6 +417,17 @@ class Unidad: Objeto {
 
     func sanar(_ x: Int, _ y: Int) {
         m_orden = Orden(.SANAR, x, y)
+
+        guard let mapa = Objeto.mapa else { return }
+        let p = mapa.obtenerPosicionEnLineaDeVision(x, m_posEnTileFisico.x, y, m_posEnTileFisico.y)
+        if p.x == -1 {
+            Log.Instancia.debug("No se la puede mandar a sanar.")
+            return
+        }
+        setearSanar(p.x, p.y)
+    }
+
+    private func setearSanar(_ x: Int, _ y: Int) {
         setearEstado(.MOVIENDO)
         m_proximoEstado = .SANANDO
 
@@ -351,11 +449,13 @@ class Unidad: Objeto {
     func seleccionarSiEstaEnRectangulo(_ x: Int, _ y: Int, _ w: Int, _ h: Int) -> Bool {
         let fw = m_sprite?.frameAncho ?? (m_frameAncho > 0 ? m_frameAncho : 20)
         let fh = m_sprite?.frameAlto  ?? (m_frameAlto  > 0 ? m_frameAlto  : 30)
-        // Bounding-box overlap: rect must contain the unit sprite (matches original C# check).
-        let dentro = x <= m_x
-                  && y <= m_y + fh / 2
-                  && x + w > m_x + fw
-                  && y + h > m_y + fh
+        // In Swift, m_x = sprite horizontal center, m_y = sprite bottom.
+        // Sprite bounds: left = m_x-fw/2, right = m_x+fw/2, top = m_y-fh, bottom = m_y.
+        // Matches the original C# check (translated from top-left convention to center/bottom).
+        let dentro = x <= m_x - fw / 2
+                  && y <= m_y - fh / 2
+                  && x + w > m_x + fw / 2
+                  && y + h > m_y
         if dentro { m_seleccionado = true }
         return dentro
     }
@@ -367,6 +467,20 @@ class Unidad: Objeto {
         m_cuenta = 0
         if e == .OCIO {
             m_caminoASeguir = nil
+        }
+        if e == .ATACANDO {
+            m_enemigo?.contraAtacar(self)
+        }
+    }
+
+    /// Called when this unit starts being attacked. If idle and in range, counter-attacks.
+    func contraAtacar(_ atacante: Unidad) {
+        guard m_estado == .OCIO else { return }
+        Log.Instancia.debug("Me atacan, contraataco.")
+        m_enemigo = atacante
+        if calcularDistancia(atacante.m_posEnTileFisico.x, atacante.m_posEnTileFisico.y) < Double(m_alcanceDeTiro) {
+            apuntarAUnidad(atacante)
+            setearEstado(.ATACANDO)
         }
     }
 
@@ -428,7 +542,6 @@ class Unidad: Objeto {
         default: break
         }
 
-        m_velocidadActual = (0, 0)
         let dir = obtenerDireccion(m_proximoPaso.x, m_proximoPaso.y)
         if dir != -1 { m_direccion = dir }
 
@@ -449,6 +562,10 @@ class Unidad: Objeto {
         return false
     }
 
+    /// Moves one step toward m_proximoPaso using Euclidean normalization.
+    /// Direction-based per-axis velocity (C# parity) is not used here because in the isometric
+    /// coordinate system adjacent tiles have unequal dx/dy (e.g. SE tile: dx=+16, dy=+8),
+    /// so applying equal vx/vy per direction overshoots the shorter axis and causes visual jitter.
     private func moverseHaciaProximoPaso() -> Bool {
         let spd = m_velocidadPorDefecto.x
 
@@ -458,35 +575,64 @@ class Unidad: Objeto {
 
         if dist <= Double(spd) {
             m_posEnMundoPlano = m_proximoPaso
+            // Keep m_velocidadActual consistent for any callers that read it.
+            m_velocidadActual = (dx, dy)
             return true
         }
 
         let ratio = Double(spd) / dist
-        m_posEnMundoPlano.x += Int(Double(dx) * ratio)
-        m_posEnMundoPlano.y += Int(Double(dy) * ratio)
+        let vx = Int(Double(dx) * ratio)
+        let vy = Int(Double(dy) * ratio)
+        m_velocidadActual = (vx, vy)
+        m_posEnMundoPlano.x += vx
+        m_posEnMundoPlano.y += vy
         return false
     }
 
     private func recalcularProximoPaso() {
-        guard let otra = m_unidadAEsquivar, let mapa = Objeto.mapa else {
-            m_subestado = .INCREMENTAR_PASO
+        // Snap back to the current tile (undo partial movement toward the blocked step).
+        m_posEnMundoPlano = transformarIJEnXY(m_posEnTileFisico.x, m_posEnTileFisico.y)
+        m_unidadAEsquivar = nil
+
+        guard m_caminoASeguir != nil, !m_caminoASeguir!.isEmpty else {
+            cambiarUltimaposicion()
             return
         }
-        // Find an alternative step avoiding the other unit's position
-        let oI = otra.m_posEnTileFisico.x
-        let oJ = otra.m_posEnTileFisico.y
-        let offsets = [(-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
-        for (di, dj) in offsets {
-            let ni = m_posEnTileFisico.x + di
-            let nj = m_posEnTileFisico.y + dj
-            if ni != oI || nj != oJ, mapa.esPosicionCaminable(ni, nj) {
-                m_proximoTile = (ni, nj)
-                m_proximoPaso = transformarIJEnXY(ni, nj)
-                m_unidadAEsquivar = nil
+
+        // Pop the tile we were heading to (now blocked) and find a detour.
+        var proximoTileIJ = m_caminoASeguir!.removeLast()
+
+        var nuevoCamino = PathFinder.Instancia.encontrarCaminoMasCorto(
+            m_posEnTileFisico.x, m_posEnTileFisico.y,
+            proximoTileIJ.i, proximoTileIJ.j)
+
+        // If no path, keep popping further waypoints until one is reachable.
+        while nuevoCamino == nil {
+            guard m_caminoASeguir != nil, !m_caminoASeguir!.isEmpty else {
+                Log.Instancia.debug("RecalcularProximoPaso: sin camino alternativo.")
+                cambiarUltimaposicion()
                 return
             }
+            proximoTileIJ = m_caminoASeguir!.removeLast()
+            nuevoCamino = PathFinder.Instancia.encontrarCaminoMasCorto(
+                m_posEnTileFisico.x, m_posEnTileFisico.y,
+                proximoTileIJ.i, proximoTileIJ.j)
         }
-        m_subestado = .INCREMENTAR_PASO
+
+        // nuevoCamino: [last] = first step toward proximoTileIJ, [0] = proximoTileIJ.
+        var detour = nuevoCamino!
+        let primerPaso = detour.removeLast()          // consume first step
+        m_proximoTile = (primerPaso.i, primerPaso.j)
+        m_proximoPaso = transformarIJEnXY(m_proximoTile.x, m_proximoTile.y)
+
+        // Prepend remaining detour steps before the original remaining path
+        // (equivalent to PathFinder.AdherirCamino in C#).
+        m_caminoASeguir = (m_caminoASeguir ?? []) + detour
+    }
+
+    private func cambiarUltimaposicion() {
+        m_proximoTile = m_posEnTileFisico
+        m_proximoPaso = transformarIJEnXY(m_proximoTile.x, m_proximoTile.y)
     }
 
     private func obtenerDireccion(_ targetX: Int, _ targetY: Int) -> Int {
@@ -508,13 +654,22 @@ class Unidad: Objeto {
     private func encontrarCaminoParaPatrullarAlAzar(_ i: Int, _ j: Int) -> [(i: Int, j: Int)]? {
         guard let mapa = Objeto.mapa else { return nil }
         let range = RANDOM_PATRULLA_MAX - RANDOM_PATRULLA_MIN
-        let offI  = Int.random(in: 0...range) + RANDOM_PATRULLA_MIN
-        let offJ  = Int.random(in: 0...range) + RANDOM_PATRULLA_MIN
-        let signo = Bool.random() ? 1 : -1
-        let destI = i + signo * offI
-        let destJ = j + signo * offJ
-        guard mapa.esPosicionCaminable(destI, destJ) else { return nil }
-        return PathFinder.Instancia.encontrarCaminoMasCorto(i, j, destI, destJ)
+        // Mirror original C#: loop until a valid path is found.
+        // Use the stored patrol base position as the destination origin (not current pos).
+        var camino: [(i: Int, j: Int)]? = nil
+        var intentos = 0
+        while camino == nil && intentos < 20 {
+            intentos += 1
+            let offI  = Int.random(in: 0..<range) + RANDOM_PATRULLA_MIN
+            let offJ  = Int.random(in: 0..<range) + RANDOM_PATRULLA_MIN
+            let signoI = Bool.random() ? 1 : -1
+            let signoJ = Bool.random() ? 1 : -1
+            let destI = m_posicionDePatrulla.x + signoI * offI
+            let destJ = m_posicionDePatrulla.y + signoJ * offJ
+            guard mapa.esPosicionCaminable(destI, destJ) else { continue }
+            camino = PathFinder.Instancia.encontrarCaminoMasCorto(i, j, destI, destJ)
+        }
+        return camino
     }
 
     // MARK: - Pursuit and attack
@@ -596,8 +751,7 @@ class Unidad: Objeto {
     }
 
     private func calcularDanio() -> Int {
-        let acierto = Int.random(in: 0...100)
-        return acierto <= m_punteria ? m_puntosDeAtaque : 0
+        return m_puntosDeAtaque
     }
 
     func recibirDanio(_ danio: Int) {
@@ -618,12 +772,20 @@ class Unidad: Objeto {
     }
 
     private func actualizarEstadoMuriendo() {
-        let anim = primerAnimacion() + m_direccion
-        m_sprite?.setearAnimacion(anim)
-        m_sprite?.reproducir()
-        m_sprite?.actualizar()
+        if m_cuenta == 0 {
+            let anim = primerAnimacion() + m_direccion
+            m_sprite?.setearAnimacion(anim)
+            m_sprite?.loop = false
+            m_sprite?.reproducir()
+        }
+
+        if m_sprite?.terminoDeAnimar() == true {
+            m_sprite?.setearFrame(m_sprite!.cantidadDeFrames - 1)
+            m_sprite?.parar()
+        }
+
         m_cuenta += 1
-        if m_sprite?.terminoDeAnimar() == true || m_cuenta >= CUENTA_FRAME_MUERTO {
+        if m_cuenta >= CUENTA_FRAME_MUERTO {
             setearEstado(.MUERTO)
         }
     }

@@ -126,8 +126,16 @@ class Grupo {
     func sanar(_ x: Int, _ y: Int) {
         m_ordenRecibida = Orden(.SANAR, x, y)
         if m_comandante == nil { setearComandanteAuxiliar() }
-        // Simplified: move to the given point and heal on arrival
-        setearSanar(x, y)
+
+        guard let mapa = Grupo.mapa, let cmd = m_comandante else { return }
+        let p = mapa.obtenerPosicionEnLineaDeVision(
+            x, cmd.posicionEnTileFisico.x,
+            y, cmd.posicionEnTileFisico.y)
+        if p.x == -1 {
+            Log.Instancia.debug("Grupo: No se puede mandar a sanar.")
+            return
+        }
+        setearSanar(p.x, p.y)
     }
 
     func setearInteligencia(_ intel: IA) {
@@ -286,6 +294,9 @@ class Grupo {
 
         cmd.offsetEnFormacion = (0, 0)
 
+        // C# parity: indice only advances when a unit is actually placed OR is the commander.
+        // If the spiral position is non-walkable for a non-commander unit, we advance the spiral
+        // but keep the same unit index so it is retried at the next walkable position.
         while puestos < m_unidades.count && indice < m_unidades.count {
             if m_unidades[indice] !== cmd {
                 if mapa.esPosicionCaminable(x + i, y + j) {
@@ -293,8 +304,9 @@ class Grupo {
                     m_unidades[indice].mover(x + i, y + j)
                     m_unidades[indice].setearOrdenDeObjetivo(m_ordenObjetivo)
                     puestos += 1
+                    indice += 1  // only advance when placed
                 }
-                indice += 1
+                // else: non-walkable, keep same indice and try next spiral position
             } else {
                 cmd.parar()
                 indice += 1
