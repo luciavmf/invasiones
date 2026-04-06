@@ -13,7 +13,6 @@ class EstadoJuego: Estado {
     private var m_batalla:            Episodio?
     private var m_menuDelJuego:       Menu?
     private var m_menuDeConfirmacion: MenuDeConfirmacion?
-    private var m_boton:              Boton?
     private var m_estado:             ESTADO = .INICIO
 
     // MARK: - Estado overrides

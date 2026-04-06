@@ -24,7 +24,7 @@ class BandoEnemigo: Jugador {
     override func cargarUnidades(_ nroNivel: Int) -> Bool {
         guard let tilesetUnidades = m_mapa.tilesets.first(where: {
             $0?.id == Int16(Res.TLS_UNIDADES)
-        }) as? Tileset? else { return true }
+        }) else { return true }
         guard let ts = tilesetUnidades else { return true }
 
         m_unidades = []

@@ -57,6 +57,7 @@ class Nivel {
         let d = NivelXMLDelegate()
         parser.delegate = d
         parser.parse()
+        withExtendedLifetime(d) {}
 
         for (i, batalla) in d.batallas.enumerated() {
             if i < m_batallas.count {

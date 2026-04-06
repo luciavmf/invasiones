@@ -285,6 +285,9 @@ class Unidad: Objeto {
 
     // MARK: - Grupo / formación
 
+    var perteneceAUnGrupo: Bool { m_grupo != nil }
+    var grupoAlQuePertenezco: Grupo? { m_grupo }
+
     func adherirmeAGrupo(_ grupo: Grupo) {
         m_grupo = grupo
     }
@@ -308,6 +311,34 @@ class Unidad: Objeto {
         let destI = ultimo.i + offsetX
         let destJ = ultimo.j + offsetY
         mover(destI, destJ)
+    }
+
+    func chequearSiEstaBajoElMouse() -> Bool {
+        let mx = Int(Mouse.Instancia.X)
+        let my = Int(Mouse.Instancia.Y)
+        let fw = m_sprite?.frameAncho ?? (m_frameAncho > 0 ? m_frameAncho : 20)
+        let fh = m_sprite?.frameAlto  ?? (m_frameAlto  > 0 ? m_frameAlto  : 30)
+        let hw = fw / 2
+        return mx >= m_x - hw && mx <= m_x + hw && my >= m_y - fh && my <= m_y
+    }
+
+    func sanar(_ x: Int, _ y: Int) {
+        m_orden = Orden(.SANAR, x, y)
+        setearEstado(.MOVIENDO)
+        m_proximoEstado = .SANANDO
+
+        let camino = PathFinder.Instancia.encontrarCaminoMasCorto(
+            m_posEnTileFisico.x, m_posEnTileFisico.y, x, y)
+
+        if let c = camino, !c.isEmpty {
+            m_caminoASeguir = Array(c.dropFirst())
+        } else {
+            Log.Instancia.debug("No se encontro el camino para sanar...")
+            setearEstado(.OCIO)
+            m_caminoASeguir = nil
+            return
+        }
+        m_subestado = .INCREMENTAR_PASO
     }
 
     // MARK: - Selección por arrastre de mouse (rectangle)

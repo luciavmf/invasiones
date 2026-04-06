@@ -34,6 +34,7 @@ class IA {
         let d = IAXMLDelegate()
         parser.delegate = d
         parser.parse()
+        withExtendedLifetime(d) {}
 
         for (i, ordenes) in d.batallas.enumerated() {
             if i < m_batallas.count {

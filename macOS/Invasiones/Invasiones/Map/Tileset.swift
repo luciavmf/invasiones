@@ -28,7 +28,9 @@ class Tileset {
         }
         let delegate = TilesetXMLDelegate(tileset: self, basePath: tilesetPath)
         parser.delegate = delegate
-        return parser.parse()
+        let ok = parser.parse()
+        withExtendedLifetime(delegate) {}
+        return ok
     }
 
     // MARK: - Helpers

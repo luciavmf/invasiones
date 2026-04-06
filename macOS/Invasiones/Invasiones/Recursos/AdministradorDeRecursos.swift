@@ -84,10 +84,17 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
 
     // MARK: - Imágenes
 
-    /// Obtiene (y cachea) la imagen por nombre de archivo relativo.
+    /// Obtiene (y cachea) la imagen por nombre de archivo relativo o absoluto.
     func obtenerImagen(_ nombre: String) -> Superficie? {
         if let cached = m_imagenesPorNombre[nombre] { return cached }
-        guard let path = Utilidades.obtenerPath(nombre) else { return nil }
+        // Si ya es un path absoluto que existe, úsalo directamente.
+        let path: String
+        if nombre.hasPrefix("/") && FileManager.default.fileExists(atPath: nombre) {
+            path = nombre
+        } else {
+            guard let resolved = Utilidades.obtenerPath(nombre) else { return nil }
+            path = resolved
+        }
         let sup = Superficie(path: path)
         m_imagenesPorNombre[nombre] = sup
         return sup
@@ -217,7 +224,7 @@ private class ResXMLParser: NSObject, XMLParserDelegate {
         case "anims":     seccion = .anims
         case "musica":    break  // ignorar sección de música (estaba comentada en el original)
         case "res", "escenarios", "sonidos", "sprites", "sprite", "animpak",
-             "animacion", "image", "anims": break
+             "animacion", "image": break
         default:
             // Elemento hoja dentro de una sección conocida
             if seccion == .unidades && name == "unidad" {

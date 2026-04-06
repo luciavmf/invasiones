@@ -13,6 +13,9 @@ class Estado {
     /// Imagen de fondo del estado (cargada en iniciar(), dibujada en dibujar()).
     var m_fondo: Superficie?
 
+    /// Botón genérico reutilizado por varios estados (e.g. "Menú", "Siguiente").
+    var m_boton: Boton?
+
     /// Utilizado para cuentas regresivas.
     var m_cuenta: Int = 0
 

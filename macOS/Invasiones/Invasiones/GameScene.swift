@@ -16,6 +16,10 @@ class GameScene: SKScene {
         size = CGSize(width: Programa.ANCHO_DE_LA_PANTALLA, height: Programa.ALTO_DE_LA_PANTALLA)
         scaleMode = .aspectFit
 
+        // El original corría a 20 FPS con SDL_Delay; SpriteKit también acepta mouseMoved.
+        view.preferredFramesPerSecond = Programa.FPS_POR_DEFECTO
+        view.window?.acceptsMouseMovedEvents = true
+
         gameFrame.iniciarJuego(en: self)
     }
 
@@ -60,6 +64,7 @@ class GameScene: SKScene {
         let pos = event.location(in: self)
         Mouse.Instancia.X = pos.x
         Mouse.Instancia.Y = CGFloat(Programa.ALTO_DE_LA_PANTALLA) - pos.y
+        view?.window?.acceptsMouseMovedEvents = true
     }
 
     override func mouseDragged(with event: NSEvent) {

@@ -7,12 +7,13 @@ internal import CoreGraphics
 class BandoArgentino: Jugador {
 
     // MARK: - Atributos
-    private var m_unidadBajoMouse:     Unidad?
-    private var m_cuenta:              Int = 0
-    private var m_objetoFlecha:        Objeto?
-    private var m_flechaOrientacion:   Animaciones?
-    private var m_posOrdenApuntada:    (x: Int, y: Int) = (0, 0)
-    private var m_indiceUnidadAEncontrar: Int = 0
+    private var m_unidadBajoMouse:            Unidad?
+    private var m_cuenta:                     Int = 0
+    private var m_objetoFlecha:               Objeto?
+    private var m_flechaOrientacion:          Animaciones?
+    private var m_posOrdenApuntada:           (x: Int, y: Int) = (0, 0)
+    private var m_posicionFlechaOrientacion:  (x: Int, y: Int) = (0, 0)
+    private var m_indiceUnidadAEncontrar:     Int = 0
 
     private let CUENTA_MAX_FLECHA = 100
 
@@ -44,6 +45,10 @@ class BandoArgentino: Jugador {
     }
 
     override func cargarUnidades(_ nroNivel: Int) -> Bool {
+        m_objetoFlecha = Objeto(sup: AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_FLECHA),
+                               i: 0, j: 0)
+        m_cuenta = 99999
+
         guard let tilesetUnidades = m_mapa.tilesets.compactMap({ $0 }).first(where: {
             $0.id == Int16(Res.TLS_UNIDADES)
         }) else { return true }
@@ -71,29 +76,61 @@ class BandoArgentino: Jugador {
         return true
     }
 
-    // MARK: - Flecha de orientación (para dibujar en Episodio)
+    // MARK: - Dibujar (llamado desde Episodio)
 
     func dibujarFlechaOrientacion(_ g: Video) {
+        guard m_estado == .JUEGO else { return }
+
+        // Dibujar aro de objetivo, objeto a tomar y fueguitos
         m_aro?.dibujar(g)
-        m_flechaOrientacion?.dibujar(g, m_posOrdenApuntada.x, m_posOrdenApuntada.y, 0)
+        m_objetoATomar?.dibujar(g)
+        m_fueguitos?.forEach { $0.dibujar(g) }
+
+        // Dibujar flecha destino estática si hay orden reciente
+        if m_cuenta < CUENTA_MAX_FLECHA {
+            m_objetoFlecha?.dibujar(g)
+        }
+
+        // Dibujar flecha de orientación sólo si el objetivo está fuera de pantalla
+        guard m_orden != nil, m_flechaOrientacion != nil else { return }
+        guard !objetivoEsVisible() else { return }
+        m_flechaOrientacion?.dibujar(g, m_posicionFlechaOrientacion.x,
+                                     m_posicionFlechaOrientacion.y, 0)
     }
 
     // MARK: - Coordenadas de pintado para el Episodio
 
     func obtenerCoordenadasDePintado() -> (x: Int, y: Int, w: Int, h: Int) {
-        // Devuelve el rectángulo del mapa físico donde dibujar objetos
-        guard let cam = Objeto.camara else { return (0, 0, m_mapa.altoMapaFisico, m_mapa.anchoMapaFisico) }
+        guard let cam = Objeto.camara else {
+            return (0, 0, m_mapa.altoMapaFisico, m_mapa.anchoMapaFisico)
+        }
         let p = calcularPrimerTileAPintar(cam.X, cam.Y)
-        return (p.x, p.y, p.x + m_mapa.altoMapaFisico / 2, p.y + m_mapa.anchoMapaFisico / 2)
+        let tw = m_mapa.tileFisicoAncho > 0 ? m_mapa.tileFisicoAncho : 1
+        let th = m_mapa.tileFisicoAlto  > 0 ? m_mapa.tileFisicoAlto  : 1
+        let w = (cam.ancho - cam.inicioX) / tw + 23
+        let h = ((cam.alto - cam.inicioY) / th) * 2 + 78
+        return (p.x - 15, p.y - 5, w, h)
     }
 
     func seleccionarUnidadSiguiente() {
         guard !m_unidades.isEmpty else { return }
-        m_indiceUnidadAEncontrar = (m_indiceUnidadAEncontrar + 1) % m_unidades.count
+
+        // Centrar cámara en la unidad
+        let u = m_unidades[m_indiceUnidadAEncontrar]
+        m_camara.X = (((u.posicionEnTileFisico.y - u.posicionEnTileFisico.x) *
+                        m_mapa.tileFisicoAncho) >> 1) + Video.Ancho / 2
+        m_camara.Y = ((-(u.posicionEnTileFisico.y + u.posicionEnTileFisico.x) *
+                        m_mapa.tileFisicoAlto) >> 1) + Video.Alto / 2
+
         m_unidadSeleccionada?.esSeleccionada = false
-        m_unidadSeleccionada = m_unidades[m_indiceUnidadAEncontrar]
+        m_grupoSeleccionado?.esSeleccionado  = false
+
+        m_unidadSeleccionada = u
         m_unidadSeleccionada?.esSeleccionada = true
         m_hud.unidadSeleccionada = m_unidadSeleccionada
+
+        m_indiceUnidadAEncontrar += 1
+        if m_indiceUnidadAEncontrar >= m_unidades.count { m_indiceUnidadAEncontrar = 0 }
     }
 
     // MARK: - Privados
@@ -116,106 +153,307 @@ class BandoArgentino: Jugador {
         actualizarGrupos()
         actualizarObjetivos()
         eliminarUnidadesMuertas()
+
+        m_objetoFlecha?.actualizar()
+        m_cuenta += 1
     }
+
+    // MARK: - Flecha de orientación
 
     private func actualizarFlechaOrientacion() {
-        guard m_orden != nil, m_flechaOrientacion != nil else { return }
-        m_flechaOrientacion?.actualizar()
-        m_cuenta += 1
-        if m_cuenta > CUENTA_MAX_FLECHA {
-            m_cuenta = 0
+        guard let ord = m_orden, let flecha = m_flechaOrientacion else { return }
+
+        // Posición en pantalla del tile objetivo
+        m_posOrdenApuntada.x = (((ord.punto.x - ord.punto.y) * m_mapa.tileAncho / 2) >> 1)
+                              + m_camara.inicioX + m_camara.X
+        m_posOrdenApuntada.y = (((ord.punto.x + ord.punto.y) * m_mapa.tileAlto  / 2) >> 1)
+                              + m_camara.inicioY + m_camara.Y
+
+        guard !objetivoEsVisible() else { return }
+
+        let cx = Video.Ancho / 2
+        let cy = Video.Alto  / 2
+        let a  = Double(m_posOrdenApuntada.y - cy)
+        let b  = Double(m_posOrdenApuntada.x - cx)
+
+        var grados = atan(a / b) * 180 / .pi
+        if a < 0 && b > 0  { grados = -grados }
+        if a >= 0 && b < 0 { grados = 180 - grados }
+        if a < 0  && b < 0 { grados = 180 - grados }
+        if a > 0  && b >= 0 { grados = 360 - grados }
+
+        let factor = 360.0 / 8
+        let mitad  = 360.0 / 16
+
+        let dir: Definiciones.DIRECCION
+        if      (grados >= 0 && grados < mitad) || grados > 360 - mitad { dir = .E  }
+        else if grados >= mitad          && grados < mitad + factor      { dir = .NE }
+        else if grados >= mitad + factor && grados < mitad + factor * 2  { dir = .N  }
+        else if grados >= mitad + factor * 2 && grados < mitad + factor * 3 { dir = .NO }
+        else if grados >= mitad + factor * 3 && grados < mitad + factor * 4 { dir = .O  }
+        else if grados >= mitad + factor * 4 && grados < mitad + factor * 5 { dir = .SO }
+        else if grados >= mitad + factor * 5 && grados < mitad + factor * 6 { dir = .S  }
+        else                                                                 { dir = .SE }
+
+        let OFFSET = -20
+        let fw = flecha.frameAncho
+        let fh = flecha.frameAlto
+
+        if m_posOrdenApuntada.x > m_camara.inicioX &&
+           m_posOrdenApuntada.x < m_camara.ancho - fw + OFFSET {
+            m_posicionFlechaOrientacion.x = m_posOrdenApuntada.x
+        } else if m_posOrdenApuntada.x <= m_camara.inicioX {
+            m_posicionFlechaOrientacion.x = -OFFSET
+        } else {
+            m_posicionFlechaOrientacion.x = m_camara.ancho - fw + OFFSET
         }
+
+        if m_posOrdenApuntada.y > m_camara.inicioY &&
+           m_posOrdenApuntada.y < m_camara.alto - fh + OFFSET {
+            m_posicionFlechaOrientacion.y = m_posOrdenApuntada.y
+        } else if m_posOrdenApuntada.y <= m_camara.inicioY {
+            m_posicionFlechaOrientacion.y = -OFFSET
+        } else {
+            m_posicionFlechaOrientacion.y = m_camara.alto - fh + OFFSET
+        }
+
+        flecha.setearAnimacion(dir.rawValue)
     }
 
-    private func obtenerUnidadBajoMouse() -> Unidad? {
-        let mx = Int(Mouse.Instancia.X)
-        let my = Int(Mouse.Instancia.Y)
+    private func objetivoEsVisible() -> Bool {
+        return m_posOrdenApuntada.x > m_camara.inicioX &&
+               m_posOrdenApuntada.x < m_camara.ancho   &&
+               m_posOrdenApuntada.y > m_camara.inicioY  &&
+               m_posOrdenApuntada.y < m_camara.alto
+    }
 
-        for unidad in m_unidades {
-            let hw = (unidad.m_frameAncho > 0 ? unidad.m_frameAncho : 20) / 2
-            let hh = (unidad.m_frameAlto  > 0 ? unidad.m_frameAlto  : 30)
-            let ux = unidad.m_x
-            let uy = unidad.m_y
-            if mx >= ux - hw && mx <= ux + hw && my >= uy - hh && my <= uy {
-                return unidad
+    // MARK: - Unidad bajo el mouse
+
+    private func obtenerUnidadBajoMouse() -> Unidad? {
+        let rect = obtenerCoordenadasDePintado()
+        var XX = rect.x, YY = rect.y
+        let finI = rect.w, finJ = rect.h
+        var tileY = 0, cambio = true
+
+        while tileY <= finJ {
+            var tileX = 0
+            var i = XX, j = YY
+            while tileX <= finI && j >= 0 {
+                if i >= 0 && i < m_mapa.altoMapaFisico && j < m_mapa.anchoMapaFisico {
+                    if let uni = m_objetosAPintar[i][j] as? Unidad,
+                       uni.chequearSiEstaBajoElMouse() {
+                        return uni
+                    }
+                }
+                tileX += 1; i += 1; j -= 1
             }
+            tileY += 1
+            if cambio { XX += 1; cambio = false }
+            else       { YY += 1; cambio = true  }
         }
         return nil
     }
 
-    private func crearGrupos() {
-        guard m_unidadesSeleccionadas.count > 1 else { return }
-        // Grupos ya existen desde la carga; no recree cada frame.
-    }
+    // MARK: - Órdenes
 
     private func chequearOrdenesAUnidades() {
-        // Botón izquierdo: seleccionar por drag o click
-        if Mouse.Instancia.arrastrando() {
-            let rect = Mouse.Instancia.RectanguloArrastrado
-            for unidad in m_unidades {
-                _ = unidad.seleccionarSiEstaEnRectangulo(
-                    Int(rect.minX), Int(rect.minY), Int(rect.width), Int(rect.height))
-            }
-        }
+        // Click izquierdo sobre una unidad argentina: seleccionarla
+        if Mouse.Instancia.BotonesApretados.contains(Mouse.BOTON_IZQ) {
+            if let uBajoMouse = m_unidadBajoMouse, uBajoMouse.bando == .ARGENTINO {
+                let arr = Mouse.Instancia.RectanguloArrastrado
+                let arrastrando = Mouse.Instancia.arrastrando()
+                    && Int(arr.width) >= 4 && Int(arr.height) >= 4
+                if !arrastrando {
+                    borrarUnidadesSeleccionadas()
+                    uBajoMouse.esSeleccionada = true
+                    m_hud.unidadSeleccionada  = uBajoMouse
+                    m_unidadSeleccionada      = uBajoMouse
 
-        // Botón derecho: mover unidades seleccionadas
-        if Mouse.Instancia.BotonesApretados.contains(Mouse.BOTON_DER) {
-            let tile = m_mapa.tileBajoMouse
-
-            if let uBajoMouse = m_unidadBajoMouse, uBajoMouse.bando == .ENEMIGO {
-                // Atacar
-                for unidad in m_unidadesSeleccionadas { unidad.atacar(uBajoMouse) }
-            } else {
-                // Mover
-                if let grupo = m_grupoSeleccionado {
-                    grupo.mover(tile.x, tile.y)
-                } else {
-                    for unidad in m_unidadesSeleccionadas {
-                        unidad.mover(tile.x, tile.y)
+                    if uBajoMouse.perteneceAUnGrupo {
+                        uBajoMouse.grupoAlQuePertenezco?.eliminarUnidad(uBajoMouse)
+                        uBajoMouse.salirDelGrupo()
                     }
+                    Mouse.Instancia.soltarBoton(Mouse.BOTON_IZQ)
                 }
-                m_posOrdenApuntada = (m_mapa.tileBajoMouse.x, m_mapa.tileBajoMouse.y)
-                m_cuenta = 0
             }
-            Mouse.Instancia.soltarBoton(Mouse.BOTON_DER)
         }
 
-        // Click izquierdo: deseleccionar
-        if Mouse.Instancia.BotonesApretados.contains(Mouse.BOTON_IZQ) &&
-           !Mouse.Instancia.arrastrando() {
+        guard m_unidadSeleccionada != nil || m_grupoSeleccionado != nil else { return }
+
+        // Click derecho: mover o atacar
+        if Mouse.Instancia.BotonesApretados.contains(Mouse.BOTON_DER) {
+            Mouse.Instancia.soltarBoton(Mouse.BOTON_DER)
+
+            let tile = m_mapa.tileChicoMouse
+
+            if m_mapa.esPosicionCaminable(tile.x, tile.y) {
+                // Hay unidad enemiga bajo el mouse → atacar
+                if let uBajoMouse = m_unidadBajoMouse,
+                   uBajoMouse.bando == .ENEMIGO,
+                   !uBajoMouse.estaMuerto() {
+                    if let grupo = m_grupoSeleccionado {
+                        grupo.atacar(uBajoMouse)
+                    } else {
+                        m_unidadSeleccionada?.atacar(uBajoMouse)
+                    }
+                } else {
+                    // Mover
+                    if let grupo = m_grupoSeleccionado {
+                        grupo.mover(tile.x, tile.y)
+                    } else {
+                        m_unidadSeleccionada?.mover(tile.x, tile.y)
+                    }
+                    m_cuenta = 0
+                    m_objetoFlecha?.setearPosicionEnTile(tile.x, tile.y)
+                }
+            } else {
+                // Tile no caminable: chequear si es enfermería
+                let tileBajoMouse = m_mapa.tileBajoMouse
+                guard tileBajoMouse.y < m_mapa.alto  && tileBajoMouse.y >= 0 &&
+                      tileBajoMouse.x < m_mapa.ancho && tileBajoMouse.x >= 0 else { return }
+
+                let tileEdif = Int(m_mapa.capaEdificios[tileBajoMouse.x][tileBajoMouse.y])
+                guard tileEdif != 0, let ts = m_mapa.obtenerTileset(tileEdif) else { return }
+
+                let localId = tileEdif - Int(ts.primerGid)
+                guard localId >= 0, localId < ts.tiles.count,
+                      let tileProp = ts.tiles[localId],
+                      ts.id == Int16(Res.TLS_INVALIDADO),
+                      tileProp.id == Int16(Res.TILE_INVALIDADOS_ID_ENFERMERIA) else { return }
+
+                Log.Instancia.debug("Me llevan a sanar.")
+                if let grupo = m_grupoSeleccionado,
+                   grupo.salud < grupo.puntosDeResistencia {
+                    grupo.sanar(tile.x, tile.y)
+                } else if let unidad = m_unidadSeleccionada,
+                          unidad.salud < unidad.puntosDeResistencia {
+                    unidad.sanar(tile.x, tile.y)
+                }
+            }
+        }
+
+        // Click izquierdo sin arrastrar: deseleccionar
+        if Mouse.Instancia.BotonesApretados.contains(Mouse.BOTON_IZQ) {
             m_unidadesSeleccionadas.forEach { $0.esSeleccionada = false }
             borrarUnidadesSeleccionadas()
-            Mouse.Instancia.soltarBoton(Mouse.BOTON_IZQ)
         }
     }
 
-    private func actualizarCursor() {
-        if let uBajoMouse = m_unidadBajoMouse, uBajoMouse.bando == .ENEMIGO {
-            Mouse.Instancia.setearCursor(
-                AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_CURSOR_ESPADA))
+    // MARK: - Creación y gestión de grupos
+
+    private func crearGrupos() {
+        guard !m_unidadesSeleccionadas.isEmpty else { return }
+        guard m_grupoSeleccionado == nil && m_unidadSeleccionada == nil else { return }
+
+        if m_unidadesSeleccionadas.count > 1 {
+            if m_grupos == nil { m_grupos = [] }
+
+            for unidad in m_unidadesSeleccionadas {
+                if unidad.perteneceAUnGrupo {
+                    unidad.grupoAlQuePertenezco?.eliminarUnidad(unidad)
+                    unidad.salirDelGrupo()
+                }
+            }
+
+            m_grupoSeleccionado = Grupo(m_unidadesSeleccionadas)
+            m_grupoSeleccionado?.esSeleccionado = true
+            m_grupos!.append(m_grupoSeleccionado!)
         } else {
-            Mouse.Instancia.setearCursor(
-                AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_CURSOR))
+            m_unidadSeleccionada = m_unidadesSeleccionadas[0]
         }
     }
 
     private func actualizarGrupos() {
-        m_grupos?.forEach { $0.actualizar() }
-    }
+        guard let grupos = m_grupos, !grupos.isEmpty else { return }
 
-    private func actualizarObjetivos() {
-        if m_alguienCumplioLaOrden {
-            setearProximaOrden()
+        var paraEliminar: [Grupo] = []
+
+        for grupo in grupos {
+            grupo.actualizar()
+            if grupo.estadoActual == .ESPERANDO_ORDEN && !grupo.esSeleccionado {
+                paraEliminar.append(grupo)
+            }
+            if grupo.estadoActual == .ELIMINADO {
+                if grupo === m_grupoSeleccionado {
+                    m_grupoSeleccionado = nil
+                    if grupo.cantidadDeSoldados == 1 {
+                        m_unidadSeleccionada = grupo.obtenerUltimaUnidad()
+                    }
+                }
+                paraEliminar.append(grupo)
+            }
+        }
+
+        for grupo in paraEliminar {
+            grupo.eliminarGrupo()
+            m_grupos?.removeAll { $0 === grupo }
         }
     }
 
+    // MARK: - Cursor
+
+    private func actualizarCursor() {
+        Mouse.Instancia.setearCursor(
+            AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_CURSOR))
+
+        guard m_unidadSeleccionada != nil || m_grupoSeleccionado != nil else { return }
+
+        if let uBajoMouse = m_unidadBajoMouse, uBajoMouse.bando == .ENEMIGO {
+            Mouse.Instancia.setearCursor(
+                AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_CURSOR_ESPADA))
+        }
+
+        if let u = m_unidadSeleccionada, u.estaMuerto() {
+            borrarUnidadesSeleccionadas()
+        }
+
+        let tileBajoMouse = m_mapa.tileBajoMouse
+        guard tileBajoMouse.y < m_mapa.alto  && tileBajoMouse.y >= 0 &&
+              tileBajoMouse.x < m_mapa.ancho && tileBajoMouse.x >= 0 else { return }
+
+        let tileEdif = Int(m_mapa.capaEdificios[tileBajoMouse.x][tileBajoMouse.y])
+        guard tileEdif != 0, let ts = m_mapa.obtenerTileset(tileEdif) else { return }
+
+        let localId = tileEdif - Int(ts.primerGid)
+        guard localId >= 0, localId < ts.tiles.count,
+              let tileProp = ts.tiles[localId],
+              ts.id == Int16(Res.TLS_INVALIDADO),
+              tileProp.id == Int16(Res.TILE_INVALIDADOS_ID_ENFERMERIA) else { return }
+
+        let needsHeal = (m_unidadSeleccionada.map { $0.salud < $0.puntosDeResistencia } ?? false)
+                     || (m_grupoSeleccionado.map  { $0.salud < $0.puntosDeResistencia } ?? false)
+        if needsHeal {
+            Mouse.Instancia.setearCursor(
+                AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_CURSOR_ENFERMERIA))
+        }
+    }
+
+    // MARK: - Objetivos
+
+    private func actualizarObjetivos() {
+        guard m_alguienCumplioLaOrden else { return }
+
+        if m_orden?.id == .TOMAR_OBJETO {
+            m_objetoATomar = nil
+        }
+
+        setearProximaOrden()
+
+        if m_orden == nil {
+            m_cumplioObjetivo = true
+            Log.Instancia.debug("Se cumplio con el objetivo deseado!!!!!!!")
+        }
+    }
+
+    // MARK: - Helpers privados
+
     private func calcularPrimerTileAPintar(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
-        let th = m_mapa.tileAlto
-        let tw = m_mapa.tileAncho
-        let a = th > 0 ? -y / th : 0
-        var b = tw > 0 ? x / tw : 0
+        let th = m_mapa.tileAlto > 0 ? m_mapa.tileAlto / 2 : 1
+        let tw = m_mapa.tileAncho > 0 ? m_mapa.tileAncho / 2 : 1
+        let a = -y / th
+        var b =  x / tw
         if x > 0 { b += 1 }
-        return (a - b - 2, a + b - 1)
+        return (a - b - 4, a + b - 2)
     }
 }
 

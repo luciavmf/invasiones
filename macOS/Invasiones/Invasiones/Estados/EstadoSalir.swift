@@ -1,15 +1,34 @@
 // Estados/EstadoSalir.swift
-// Placeholder — puerto de EstadoSalir.cs (confirmación de salida).
+// Puerto de EstadoSalir.cs — confirmación antes de salir del juego.
 
 import Foundation
 
 class EstadoSalir: Estado {
+
+    private var m_menuDeConfirmacion: MenuDeConfirmacion?
+
     override func iniciar() {
-        Log.Instancia.debug("EstadoSalir: iniciar")
-        // Por ahora sale directamente sin confirmación.
-        maquinaDeEstados.setearElProximoEstado(.FIN)
+        m_fondo = AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_SPLASH)
+        m_menuDeConfirmacion = MenuDeConfirmacion(Res.STR_CONFIRMACION_SALIR, Res.STR_NO, Res.STR_SI)
+        m_menuDeConfirmacion?.setearPosicion(0, 0, Superficie.V_CENTRO | Superficie.H_CENTRO)
     }
-    override func actualizar()        {}
-    override func dibujar(_ g: Video) {}
-    override func salir()             { Log.Instancia.debug("EstadoSalir: salir") }
+
+    override func actualizar() {
+        guard let resultado = m_menuDeConfirmacion?.actualizar() else { return }
+        if resultado == MenuDeConfirmacion.SELECCION.DERECHO.rawValue {
+            maquinaDeEstados.setearEstado(.FIN)
+        }
+        if resultado == MenuDeConfirmacion.SELECCION.IZQUIERDO.rawValue {
+            maquinaDeEstados.setearElProximoEstado(.MENU_PRINCIPAL)
+        }
+    }
+
+    override func dibujar(_ g: Video) {
+        g.dibujar(m_fondo, 0, 0, 0)
+        m_menuDeConfirmacion?.dibujar(g)
+    }
+
+    override func salir() {
+        m_menuDeConfirmacion = nil
+    }
 }

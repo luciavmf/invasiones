@@ -26,6 +26,7 @@ class Hud {
     private var m_cantidadArgentinos:Int = 0
     private var m_y:                 Int = 0
     private let m_espaciadoLineas    = 12
+    private var m_tipVentana:        Tips
 
     // MARK: - Properties
     var unidadSeleccionada: Unidad? {
@@ -47,8 +48,13 @@ class Hud {
 
     // MARK: - Constructor
     init() {
-        m_imagen = AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_HUD)
-        m_y      = Video.Alto - (m_imagen?.alto ?? 0)
+        m_imagen     = AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_HUD)
+        m_y          = Video.Alto - (m_imagen?.alto ?? 0)
+        m_tipVentana = Tips()
+        m_tipVentana.setearPosicion(
+            ((Video.Ancho - m_tipVentana.ancho) / 2) + 175,
+            m_y - m_tipVentana.alto - 75,
+            0)
     }
 
     // MARK: - Actualizar
@@ -56,6 +62,7 @@ class Hud {
         if let u = m_unidadAMostrar, u.estaMuerto() {
             m_unidadAMostrar = nil
         }
+        m_tipVentana.actualizar()
     }
 
     // MARK: - Dibujar
@@ -64,6 +71,7 @@ class Hud {
             // V_FONDO = dibuja en la parte inferior
             g.dibujar(img, 0, m_y, 0)
         }
+        m_tipVentana.dibujar(g)
 
         g.setearFuente(AdministradorDeRecursos.Instancia.fuentes[Definiciones.FNT.SANS12.rawValue],
                        Definiciones.COLOR_NEGRO)

@@ -337,16 +337,28 @@ class Mapa {
     private func leerTilesets(_ mapPath: String, paths: [String?]) -> Bool {
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: mapPath)) else { return false }
         let base = (mapPath as NSString).deletingLastPathComponent
-        let d = TilesetRefDelegate(base: base, paths: paths, mapa: self)
+        let d = TilesetRefDelegate(base: base)
         parser.delegate = d
-        return parser.parse()
+        let ok = parser.parse()
+        withExtendedLifetime(d) {}
+        guard ok else { return false }
+        // Load each TSX *after* the TMX parser has fully finished — avoids reentrant XMLParser.
+        for entry in d.collected {
+            let ts = Tileset()
+            ts.primerGid = entry.gid
+            ts.cargar(entry.path)
+            agregarTileset(ts)
+        }
+        return true
     }
 
     private func leerCapas(_ path: String) -> Bool {
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else { return false }
         let d = LayerDelegate(mapa: self)
         parser.delegate = d
-        return parser.parse()
+        let ok = parser.parse()
+        withExtendedLifetime(d) {}
+        return ok
     }
 
     private func cargarCapaInfo(paths: [String?]) {
@@ -362,9 +374,11 @@ class Mapa {
                                 count: m_anchoEnTiles))
         }
 
-        // Inicializo el mapa físico (resolución doble)
-        capaTilesFisicos = Array(repeating: Array(repeating: 0, count: m_altoEnTiles * 2),
-                                 count: m_anchoEnTiles * 2)
+        // Inicializo el mapa físico y el mapa de visibilidad (resolución doble)
+        capaTilesFisicos  = Array(repeating: Array(repeating: 0, count: m_altoEnTiles * 2),
+                                  count: m_anchoEnTiles * 2)
+        capaTilesVisibles = Array(repeating: Array(repeating: 0, count: m_altoEnTiles * 2),
+                                  count: m_anchoEnTiles * 2)
 
         for capa in 0..<m_numeroMaximoDeCapas {
             for i in 0..<m_anchoEnTiles {
@@ -384,7 +398,7 @@ class Mapa {
                 }
             }
         }
-        PathFinder.Instancia.cargarMapa(self)
+        _ = PathFinder.Instancia.cargarMapa(self)
     }
 
     // MARK: - Helpers llamados desde los delegates
@@ -459,29 +473,27 @@ private class MapInfoDelegate: NSObject, XMLParserDelegate {
 
 private class TilesetRefDelegate: NSObject, XMLParserDelegate {
     private let base: String
-    private let paths: [String?]
-    private weak var mapa: Mapa?
+    /// Collected during parsing; tilesets are loaded after parse() returns to avoid reentrance.
+    var collected: [(gid: Int16, path: String)] = []
 
-    init(base: String, paths: [String?], mapa: Mapa) {
-        self.base = base; self.paths = paths; self.mapa = mapa
+    init(base: String) {
+        self.base = base
     }
 
     func parser(_ parser: XMLParser, didStartElement name: String,
                 namespaceURI: String?, qualifiedName: String?,
                 attributes a: [String: String]) {
-        guard name == "tileset", let m = mapa else { return }
-        let ts = Tileset()
-        if let gid = a["firstgid"] { ts.primerGid = Int16(gid) ?? 0 }
-        if let src = a["source"] {
-            let candidate1 = (base as NSString).appendingPathComponent(src)
-            let candidate2 = (Programa.PATH_ESCENARIOS as NSString).appendingPathComponent(src)
-            let resolved = Utilidades.obtenerPath(candidate1)
-                        ?? Utilidades.obtenerPath(candidate2)
-                        ?? Utilidades.obtenerPath(src)
-            if let p = resolved { ts.cargar(p) }
-            else { Log.Instancia.error("Mapa: no se encuentra tileset \(src)") }
+        guard name == "tileset", let src = a["source"] else { return }
+        let gid = Int16(a["firstgid"] ?? "0") ?? 0
+        let candidate1 = (base as NSString).appendingPathComponent(src)
+        let candidate2 = (Programa.PATH_ESCENARIOS as NSString).appendingPathComponent(src)
+        if let p = Utilidades.obtenerPath(candidate1)
+                ?? Utilidades.obtenerPath(candidate2)
+                ?? Utilidades.obtenerPath(src) {
+            collected.append((gid: gid, path: p))
+        } else {
+            Log.Instancia.error("Mapa: no se encuentra tileset \(src)")
         }
-        m.agregarTileset(ts)
     }
 }
 
