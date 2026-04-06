@@ -1,13 +1,19 @@
-// GameFrame.swift
-// Puerto de GameFrame.cs — coordinador principal del juego.
-// En el original contenía el loop bloqueante con SDL_Delay; aquí el loop lo provee
-// SpriteKit a través de GameScene.update(). GameFrame sólo contiene lógica de estado.
+//
+//  GameFrame.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of GameFrame.cs — main game coordinator.
+//  The original had a blocking loop with SDL_Delay; here the loop is provided by
+//  SpriteKit via GameScene.update(). GameFrame only contains state logic.
+//
 
 import SpriteKit
 
 class GameFrame {
 
-    // MARK: - Enum de estados (equivalente a GameFrame.ESTADO en C#)
+    // MARK: - State enum (equivalent to GameFrame.ESTADO in C#)
     enum ESTADO {
         case INVALIDO
         case FIN
@@ -21,18 +27,18 @@ class GameFrame {
         case SALIR
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private(set) var maquinaDeEstados: MaquinaDeEstados!
     private var video: Video?
 
     static var FPS: Double = 0
     static var UPS: Double = 0
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init() {}
 
-    // MARK: - Inicio del juego
-    /// Llamado una vez desde GameScene.didMove(to:).
+    // MARK: - Game start
+    /// Called once from GameScene.didMove(to:).
     func iniciarJuego(en escena: SKScene) {
         video = Video(escena: escena)
 
@@ -58,10 +64,10 @@ class GameFrame {
         maquinaDeEstados.agregarEstado(.SALIR,          EstadoSalir(maquinaDeEstados))
 
         maquinaDeEstados.setearEstado(.LOGO)
-        maquinaDeEstados.actualizar() // dispara iniciar() del primer estado
+        maquinaDeEstados.actualizar() // triggers iniciar() on the first state
     }
 
-    // MARK: - Loop (llamado por GameScene.update cada frame)
+    // MARK: - Loop (called by GameScene.update every frame)
     func actualizar() {
         guard maquinaDeEstados.estadoActual != .FIN else {
             salirDeLaAplicacion()
@@ -78,7 +84,7 @@ class GameFrame {
         Mouse.Instancia.dibujarCursor(en: v)
     }
 
-    // MARK: - Salida
+    // MARK: - Exit
     private func salirDeLaAplicacion() {
         liberarTodosLosRecursos()
         NSApplication.shared.terminate(nil)

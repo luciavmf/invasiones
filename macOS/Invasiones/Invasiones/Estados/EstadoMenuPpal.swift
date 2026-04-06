@@ -1,35 +1,41 @@
-// Estados/EstadoMenuPpal.swift
-// Puerto de EstadoMenuPpal.cs — menú principal con animación de entrada.
+//
+//  EstadoMenuPpal.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of EstadoMenuPpal.cs — main menu with entry animation.
+//
 
 import Foundation
 
 class EstadoMenuPpal: Estado {
 
-    // MARK: - Constantes
+    // MARK: - Constants
     private let CUENTA_HASTA_MOSTRAR_MENU = 20
     private let INCREMENTO_MENU_Y         = 5
 
-    // MARK: - Items del menú
+    // MARK: - Menu items
     private enum ITEM: Int {
         case NUEVO_JUEGO = 0
         case AYUDA       = 1
         case SALIR       = 2
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_itemSeleccionado:      Int = -1
     private var m_menu:                  Menu?
     private var m_menuPosicionDeseadaY:  Int = 0
     private var m_posicionY:             Int = 0
     private var m_primeraVezConstruido:  Bool = true
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     override init(_ sm: MaquinaDeEstados) {
         super.init(sm)
         m_primeraVezConstruido = true
     }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     override func iniciar() {
         m_fondo = AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_SPLASH)

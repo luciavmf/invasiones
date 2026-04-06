@@ -1,37 +1,43 @@
-// Dibujo/Superficie.swift
-// Puerto de Superficie.cs — envoltorio sobre SDL_Surface.
-// En SpriteKit usamos SKTexture para imágenes y SKSpriteNode para dibujar.
-// Esta clase actúa como adaptador entre la API original y SpriteKit.
+//
+//  Superficie.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Superficie.cs — wrapper over SDL_Surface.
+//  In SpriteKit we use SKTexture for images and SKSpriteNode for drawing.
+//  Acts as an adapter between the original API and SpriteKit.
+//
 
 import SpriteKit
 
 class Superficie {
 
-    // MARK: - Constantes de ancla (equivalentes a los flags de SDL)
+    // MARK: - Anchor constants (equivalent to SDL flags)
     static let H_CENTRO: Int = 1
     static let V_CENTRO: Int = 2
 
-    // MARK: - Declaraciones
-    /// La textura completa (sprite sheet o imagen completa).
+    // MARK: - Declarations
+    /// The full texture (sprite sheet or complete image).
     private(set) var textura: SKTexture?
 
-    /// La sub-textura activa tras SetearClip (nil = usar textura completa).
+    /// The active sub-texture after SetearClip (nil = use full texture).
     private(set) var texturaActual: SKTexture?
 
-    /// Alpha actual (0.0–1.0).
+    /// Current alpha (0.0–1.0).
     var alphaActual: CGFloat = 1.0
 
-    /// Tamaño de la textura COMPLETA (no del clip).
+    /// Size of the FULL texture (not the clip).
     var ancho: Int { Int(textura?.size().width  ?? 0) }
     var alto:  Int { Int(textura?.size().height ?? 0) }
 
-    /// Tamaño del clip activo (o de la textura completa si no hay clip).
+    /// Size of the active clip (or the full texture if no clip is set).
     var anchoClip: Int { Int(texturaActual?.size().width  ?? textura?.size().width  ?? 0) }
     var altoClip:  Int { Int(texturaActual?.size().height ?? textura?.size().height ?? 0) }
 
-    // MARK: - Constructores
+    // MARK: - Initializers
 
-    /// Carga una imagen desde un path absoluto.
+    /// Loads an image from an absolute path.
     init(path: String, conAlpha: Bool = false) {
         let url = URL(fileURLWithPath: path)
         if let imagen = NSImage(contentsOf: url) {
@@ -42,20 +48,20 @@ class Superficie {
         }
     }
 
-    /// Copia constructor — comparte la misma textura (las texturas son inmutables en SpriteKit).
+    /// Copy constructor — shares the same texture (textures are immutable in SpriteKit).
     init(copia: Superficie) {
         self.textura = copia.textura
     }
 
-    /// Constructor para superficie en blanco (usada como render target — no soportada directamente).
+    /// Blank surface constructor (used as a render target — not directly supported).
     init(ancho: Int, alto: Int) {
-        // Las superficies de render se manejarán con SKView.texture(from:) cuando sea necesario.
+        // Render surfaces will be handled with SKView.texture(from:) when needed.
         textura = nil
     }
 
-    // MARK: - Metodos
+    // MARK: - Methods
 
-    /// Crea un SKSpriteNode listo para agregar a la escena con esta textura.
+    /// Creates an SKSpriteNode ready to add to the scene with this texture.
     func crearNodo() -> SKSpriteNode {
         if let tex = textura {
             return SKSpriteNode(texture: tex)
@@ -63,14 +69,14 @@ class Superficie {
         return SKSpriteNode()
     }
 
-    /// Almacena el nivel de alpha (0–255); se aplica al nodo al dibujar.
+    /// Stores the alpha level (0–255); applied to the node when drawing.
     func setearAlpha(_ alpha: Int) {
         alphaActual = CGFloat(max(0, min(alpha, 255))) / 255.0
     }
 
-    /// Devuelve el color del pixel en (x, y) como Int RGB.
-    /// Usado para la detección isométrica de tile bajo el mouse.
-    /// Requiere acceso a los datos raw de la imagen — stub por ahora.
+    /// Returns the pixel colour at (x, y) as an RGB Int.
+    /// Used for isometric tile detection under the mouse.
+    /// Requires access to raw image data — stub for now.
     func colorPixel(_ x: Int, _ y: Int) -> Int {
         guard let imagen = NSImage(named: "") else { return 0 }
         _ = imagen  // suprime warning
@@ -78,16 +84,16 @@ class Superficie {
         return 0
     }
 
-    /// Establece la sub-textura activa (equivalente a SDL_SetClipRect sobre la superficie).
-    /// x, y: origen del clip en píxeles de la textura completa (top-left).
-    /// w, h: tamaño del clip en píxeles.
+    /// Sets the active sub-texture (equivalent to SDL_SetClipRect on the surface).
+    /// x, y: clip origin in pixels of the full texture (top-left).
+    /// w, h: clip size in pixels.
     func setearClip(_ x: Int, _ y: Int, _ w: Int, _ h: Int) {
         guard let tex = textura else { return }
         let texW = tex.size().width
         let texH = tex.size().height
         guard texW > 0, texH > 0, w > 0, h > 0 else { return }
 
-        // SpriteKit usa coordenadas normalizadas con Y desde la base (invertido respecto al C#).
+        // SpriteKit uses normalised coordinates with Y from the bottom (inverted relative to C#).
         let nx = CGFloat(x) / texW
         let ny = 1.0 - CGFloat(y + h) / texH
         let nw = CGFloat(w) / texW

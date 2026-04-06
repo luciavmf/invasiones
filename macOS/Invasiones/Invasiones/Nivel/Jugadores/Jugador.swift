@@ -1,5 +1,11 @@
-// Nivel/Jugadores/Jugador.swift
-// Puerto de Jugador.cs — clase base abstracta para los bandos del juego.
+//
+//  Jugador.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Jugador.cs — abstract base class for both game factions.
+//
 
 import Foundation
 
@@ -8,7 +14,7 @@ class Jugador {
     // MARK: - Enums
     enum ESTADO { case INICIO, CARGANDO, JUEGO }
 
-    // MARK: - Atributos protegidos
+    // MARK: - Protected attributes
     var m_cumplioObjetivo:         Bool = false
     var m_bando:                   Episodio.BANDO = .ARGENTINO
     var m_alguienCumplioLaOrden:   Bool = false
@@ -34,7 +40,7 @@ class Jugador {
 
     var cantidadDeUnidades: Int { m_unidades.count }
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(mapa: Mapa, camara: Camara, objetosAPintar: TablaObjetos, hud: Hud) {
         m_mapa          = mapa
         m_camara        = camara
@@ -42,14 +48,14 @@ class Jugador {
         m_hud           = hud
     }
 
-    // MARK: - Métodos abstractos (deben ser sobreescritos)
+    // MARK: - Abstract methods (deben ser sobreescritos)
     func actualizar() { fatalError("actualizar() must be overridden") }
     func cargarUnidades(_ nroNivel: Int) -> Bool { fatalError("cargarUnidades must be overridden") }
 
-    // MARK: - CumplioObjetivo
+    // MARK: - Objective completion
     func cumplioObjetivo() -> Bool { m_cumplioObjetivo }
 
-    // MARK: - Setear objetivo
+    // MARK: - Set objective
     func setearObjetivo(_ objetivo: Objetivo?) {
         m_objetivo        = objetivo
         m_cumplioObjetivo = false
@@ -77,7 +83,7 @@ class Jugador {
         if m_orden == nil {
             m_cumplioObjetivo = true
         } else {
-            // Procesar TRIGGERs automáticamente
+            // Automatically process TRIGGERs
             while let ord = m_orden, ord.id == .TRIGGER {
                 if m_fueguitos == nil { m_fueguitos = [] }
                 if let anim = ord.animacion {
@@ -107,7 +113,7 @@ class Jugador {
         m_unidades.forEach { $0.setearOrdenDeObjetivo(m_orden) }
     }
 
-    // MARK: - Actualización de unidades (compartida)
+    // MARK: - Unit update (shared)
 
     func actualizarUnidades() {
         m_unidadesMuertas = nil
@@ -143,7 +149,7 @@ class Jugador {
             if unidad.cumplioOrden { m_alguienCumplioLaOrden = true }
         }
 
-        // Chequear orden MATAR
+        // Check MATAR order
         if let ord = m_orden, ord.id == .MATAR {
             m_alguienCumplioLaOrden = true
             let iStart = ord.punto.x - ord.ancho
@@ -175,7 +181,7 @@ class Jugador {
         }
     }
 
-    // MARK: - Privados
+    // MARK: - Private
 
     private func actualizarYMoverUnidadDelMapaDeObjetos(_ unidad: Unidad) {
         let movio = unidad.actualizar()
@@ -271,7 +277,7 @@ class Jugador {
 
         var grupo:   [Unidad] = []
         var i = 0, j = 0, inc = 2
-        var dir = 1  // ARR
+        var dir = 1  // UP
         var puestos = 0
 
         while puestos < cant {

@@ -1,22 +1,28 @@
-// GUI/Boton.swift
-// Puerto de Boton.cs — botón con imagen de fondo y texto centrado.
+//
+//  Boton.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Boton.cs — button with background image and centered text.
+//
 
 import Foundation
 
 class Boton: CajaGUI {
 
-    // MARK: - Constantes
+    // MARK: - Constants
     static let OFFSET_LIMITE_PANTALLA = 15
     static let ALTO                   = 25
     static let ANCHO                  = 100
     static let ANCHO_MINIMO           = 10
     static let ALTO_MINIMO            = 10
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_imagenSel:       Superficie?
     private(set) var debajoDelPuntero = false
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(leyenda: Int, fuente: Fuente?) {
         super.init()
 
@@ -31,7 +37,7 @@ class Boton: CajaGUI {
         m_leyenda   = leyenda
     }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     override func setearPosicion(_ x: Int, _ y: Int, _ ancla: Int) {
         m_x = x

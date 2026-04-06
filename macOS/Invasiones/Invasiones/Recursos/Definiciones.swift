@@ -1,5 +1,11 @@
-// Recursos/Definiciones.swift
-// Puerto de Definiciones.cs — constantes globales del juego.
+//
+//  Definiciones.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Definiciones.cs — global game constants.
+//
 
 import Foundation
 
@@ -8,7 +14,7 @@ enum Definiciones {
     // MARK: - Cheats
     static let CHEATS_HABILITADOS = true
 
-    // MARK: - Colores (RGB hex)
+    // MARK: - Colors (RGB hex)
     static let COLOR_GRIS        = 0xC8C8C8
     static let COLOR_ROJO        = 0xFF0000
     static let COLOR_NEGRO       = 0x000000
@@ -37,7 +43,7 @@ enum Definiciones {
     static let TEXTO_AYUDA_Y                  = 200
     static let TEXTO_AYUDA_ITEM_Y             = 150
 
-    /// Posición Y de todos los títulos.
+    /// Y position for all titles.
     static let TITULO_Y          = 30
     static let JUEGO_PAUSADO_Y   = -200
 
@@ -60,7 +66,7 @@ enum Definiciones {
     static let PAGINAS_POR_INTRO         = 3
     static let TOTAL_TICKS_HASTA_OBJETIVO = 50
 
-    // MARK: - Fuentes
+    // MARK: - Fonts
     enum FNT: Int {
         case SANS12 = 0
         case SANS14
@@ -89,7 +95,7 @@ enum Definiciones {
     static let COLOR_FUENTE_OBJETIVOS = COLOR_BLANCO
     static let COLOR_TEXTO_GANO       = COLOR_BLANCO
 
-    // MARK: - Direcciones de sprite (8 direcciones)
+    // MARK: - Sprite directions (8 directions)
     enum DIRECCION: Int {
         case N = 0, NE, E, SE, S, SO, O, NO
         static let CANTIDAD_DIRECCIONES = 8

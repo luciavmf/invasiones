@@ -1,11 +1,17 @@
-// Map/Tileset.swift
-// Puerto de Tileset.cs — carga y consulta de un tileset TSX (formato Tiled).
+//
+//  Tileset.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Tileset.cs — loads and queries a TSX tileset (Tiled format).
+//
 
 import Foundation
 
 class Tileset {
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     var primerGid:    Int16 = 0
     private var m_nombre:    String = ""
     private(set) var id:     Int16  = 0
@@ -14,12 +20,12 @@ class Tileset {
     private(set) var imagen: Superficie?
     var tiles:  [Tile?] = []
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init() {}
 
-    // MARK: - Carga
+    // MARK: - Loading
 
-    /// Carga el tileset desde el path TSX dado.
+    /// Loads the tileset from the given TSX path.
     @discardableResult
     func cargar(_ tilesetPath: String) -> Bool {
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: tilesetPath)) else {
@@ -35,7 +41,7 @@ class Tileset {
 
     // MARK: - Helpers
 
-    /// Devuelve el rectángulo (x, y, w, h) dentro de la imagen del tileset para el tile dado.
+    /// Returns the (x, y, w, h) rectangle within the tileset image for the given tile.
     func obtenerRectanguloDelTile(_ tileId: Int) -> (x: Int, y: Int, w: Int, h: Int) {
         guard let img = imagen, anchoDelTile > 0, altoDelTile > 0 else { return (0, 0, 0, 0) }
         let cols = img.ancho / Int(anchoDelTile)
@@ -45,7 +51,7 @@ class Tileset {
                 Int(anchoDelTile), Int(altoDelTile))
     }
 
-    /// Asigna el nombre e infiere el ID numérico.
+    /// Sets the name and infers the numeric ID.
     func setearNombre(_ nombre: String) {
         m_nombre = nombre
         switch nombre.lowercased() {
@@ -77,7 +83,7 @@ class Tileset {
     }
 }
 
-// MARK: - Parser XML interno
+// MARK: - Internal XML parser
 
 private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
 

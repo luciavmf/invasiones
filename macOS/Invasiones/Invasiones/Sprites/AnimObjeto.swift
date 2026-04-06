@@ -1,14 +1,20 @@
-// Sprites/AnimObjeto.swift
-// Puerto de AnimObjeto.cs — objeto animado posicionado en un tile del mapa (fuego, etc.).
+//
+//  AnimObjeto.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of AnimObjeto.cs — animated object positioned on a map tile (fire, etc.).
+//
 
 import Foundation
 
 class AnimObjeto: Objeto {
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private(set) var animacion: Animaciones
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(_ anim: Animaciones, _ i: Int, _ j: Int) {
         animacion = anim
         super.init()
@@ -42,7 +48,7 @@ class AnimObjeto: Objeto {
         animacion.dibujar(g, m_x + mapa.tileAncho / 2, m_y + mapa.tileAlto / 2, 0)
     }
 
-    // MARK: - Métodos propios
+    // MARK: - Own methods
 
     func setearAnimacion(_ anim: Int) {
         animacion.setearAnimacion(anim)

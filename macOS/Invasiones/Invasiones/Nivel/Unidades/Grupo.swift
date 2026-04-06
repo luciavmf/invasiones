@@ -1,14 +1,20 @@
-// Nivel/Unidades/Grupo.swift
-// Puerto de Grupo.cs — colección de unidades que comparten una estrategia de movimiento.
+//
+//  Grupo.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Grupo.cs — collection of units sharing a movement strategy.
+//
 
 import Foundation
 
 class Grupo {
 
-    // MARK: - Constantes
+    // MARK: - Constants
     static let SEPARACION_ENTRE_UNIDADES = 2
     static let MAXIMA_DISTANCIA = 99999
-    private static var s_random: Bool = true  // inicializado una vez
+    private static var s_random: Bool = true  // initialized once
 
     enum ESTADO {
         case ESPERANDO_ORDEN, AGRUPANDO, MOVIENDO, SANANDO, ATANCANDO, ELIMINADO, PERSIGUIENDO_ENEMIGO
@@ -17,7 +23,7 @@ class Grupo {
     // MARK: - Statics
     static var mapa: Mapa?
 
-    // MARK: - Atributos
+    // MARK: - Attributes
     var m_inteligencia:         IA?
     private var m_proximoEstado:     ESTADO = .ESPERANDO_ORDEN
     private var m_ordenObjetivo:     Orden?
@@ -33,7 +39,7 @@ class Grupo {
     private var m_promedioPuntosDeResistencia: Int = 0
     private let m_idGrupo:           Int
 
-    // MARK: - Propiedades
+    // MARK: - Properties
     var salud:              Int { m_promedioSalud }
     var puntosDeResistencia:Int { m_promedioPuntosDeResistencia }
     var estadoActual:       ESTADO { m_estado }
@@ -56,7 +62,7 @@ class Grupo {
         }
     }
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(_ unidades: [Unidad]) {
         m_idGrupo  = Int.random(in: 0...99999)
         m_unidades = unidades
@@ -75,7 +81,7 @@ class Grupo {
         }
     }
 
-    // MARK: - Actualización
+    // MARK: - Update
 
     func actualizar() {
         switch m_estado {
@@ -100,7 +106,7 @@ class Grupo {
         }
     }
 
-    // MARK: - Órdenes públicas
+    // MARK: - Public orders
 
     func mover(_ x: Int, _ y: Int) {
         m_ordenRecibida = Orden(.MOVER, x, y)
@@ -120,7 +126,7 @@ class Grupo {
     func sanar(_ x: Int, _ y: Int) {
         m_ordenRecibida = Orden(.SANAR, x, y)
         if m_comandante == nil { setearComandanteAuxiliar() }
-        // Simplificado: mover al punto dado y sanar al llegar
+        // Simplified: move to the given point and heal on arrival
         setearSanar(x, y)
     }
 
@@ -147,7 +153,7 @@ class Grupo {
         m_unidades.count == 1 ? m_unidades[0] : nil
     }
 
-    // MARK: - Privados
+    // MARK: - Private
 
     private func setearEstado(_ estado: ESTADO) {
         m_estado = estado
@@ -274,7 +280,7 @@ class Grupo {
         guard let mapa = Grupo.mapa else { return }
 
         var i = 0, j = 0, inc = 2
-        var dir = 1  // ARR
+        var dir = 1  // UP
         var puestos = 1
         var indice  = 0
 
@@ -294,15 +300,15 @@ class Grupo {
                 indice += 1
             }
 
-            // espiral
+            // spiral
             switch dir {
-            case 1:  // ARR
+            case 1:  // UP
                 i += 2; if i == inc { dir = 2 }
-            case 2:  // DER
+            case 2:  // RIGHT
                 j += 2; if j == inc { dir = 3 }
-            case 3:  // ABJ
+            case 3:  // DOWN
                 i -= 2; if i == -inc { dir = 0 }
-            case 0:  // IZQ
+            case 0:  // LEFT
                 j -= 2; if j == -inc { dir = 1; inc += 2 }
             default: break
             }

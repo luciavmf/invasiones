@@ -1,38 +1,44 @@
-// Recursos/Utilidades.swift
-// Puerto de Utilidades.cs — resolución de paths dentro del bundle de la aplicación.
-// En macOS/iOS los assets se incluyen en el bundle; Bundle.main reemplaza las rutas relativas de Windows.
+//
+//  Utilidades.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Utilidades.cs — resolves asset paths within the application bundle.
+//  Bundle.main replaces the Windows relative paths from the original.
+//
 
 import Foundation
 
 enum Utilidades {
 
-    /// Devuelve el path completo del recurso dado su nombre relativo.
-    /// Normaliza separadores de Windows (\) a Unix (/) antes de buscar.
-    /// Busca primero en el bundle directo, luego bajo el subdirectorio "data/".
+    /// Returns the full path for a resource given its relative name.
+    /// Normalizes Windows path separators (\) to Unix (/) before searching.
+    /// Searches first directly in the bundle, then under the "data/" subdirectory.
     static func obtenerPath(_ nombre: String) -> String? {
         guard !nombre.isEmpty else {
             Log.Instancia.advertir("ObtenerPath: nombre de archivo no válido")
             return nil
         }
 
-        // Normalizar separadores Windows → Unix
+        // Normalize Windows → Unix separators
         let normalizado = nombre.replacingOccurrences(of: "\\", with: "/")
 
-        // Si ya es un path absoluto que existe, devolverlo directamente.
+        // If it's already an absolute path that exists, return it directly.
         if normalizado.hasPrefix("/") {
             if FileManager.default.fileExists(atPath: normalizado) { return normalizado }
             Log.Instancia.advertir("ObtenerPath: no existe el archivo \"\(normalizado)\"")
             return nil
         }
 
-        // Búsqueda en el resourcePath del bundle (la forma más fiable con folder references)
+        // Search in the bundle's resourcePath (the most reliable approach with folder references)
         if let resourcePath = Bundle.main.resourcePath {
-            // 1. Directo bajo el bundle
+            // 1. Directly under the bundle
             let fullPath = (resourcePath as NSString).appendingPathComponent(normalizado)
             if FileManager.default.fileExists(atPath: fullPath) {
                 return fullPath
             }
-            // 2. Bajo data/
+            // 2. Under data/
             let fullPathData = (resourcePath as NSString).appendingPathComponent("data/" + normalizado)
             if FileManager.default.fileExists(atPath: fullPathData) {
                 return fullPathData
@@ -43,7 +49,7 @@ enum Utilidades {
         return nil
     }
 
-    /// Crea un path en el directorio temporal — para archivos generados en runtime (ej: output.log).
+    /// Creates a path in the temporary directory — for runtime-generated files (e.g. output.log).
     static func crearPath(_ nombre: String) -> String {
         return (NSTemporaryDirectory() as NSString).appendingPathComponent(nombre)
     }

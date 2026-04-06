@@ -1,11 +1,17 @@
-// GUI/Hud.swift
-// Puerto de Hud.cs — cabecera de información (HUD) del juego.
+//
+//  Hud.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Hud.cs — in-game HUD info header.
+//
 
 import Foundation
 
 class Hud {
 
-    // MARK: - Constantes de posición
+    // MARK: - Position constants
     static let AVATAR_X         = 61
     static let AVATAR_Y         = 11
     static let AVATAR_NOMBRE_X  = 126
@@ -19,7 +25,7 @@ class Hud {
     static let ATRIBUTOS_CANT_INGL_X = 705
     static let ATRIBUTOS_CANT_ARG_X  = 570
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_imagen:            Superficie?
     private var m_unidadAMostrar:    Unidad?
     private var m_cantidadEnemigos:  Int = 0
@@ -46,7 +52,7 @@ class Hud {
 
     var alto: Int { m_imagen?.alto ?? 0 }
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init() {
         m_imagen     = AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_HUD)
         m_y          = Video.Alto - (m_imagen?.alto ?? 0)
@@ -57,7 +63,7 @@ class Hud {
             0)
     }
 
-    // MARK: - Actualizar
+    // MARK: - Update
     func actualizar() {
         if let u = m_unidadAMostrar, u.estaMuerto() {
             m_unidadAMostrar = nil
@@ -65,10 +71,10 @@ class Hud {
         m_tipVentana.actualizar()
     }
 
-    // MARK: - Dibujar
+    // MARK: - Draw
     func dibujar(_ g: Video) {
         if let img = m_imagen {
-            // V_FONDO = dibuja en la parte inferior
+            // V_FONDO = draws at the bottom
             g.dibujar(img, 0, m_y, 0)
         }
         m_tipVentana.dibujar(g)

@@ -1,22 +1,28 @@
-// GUI/Tips.swift
-// Puerto de Tips.cs — ventana flotante con consejos de juego aleatorios.
+//
+//  Tips.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Tips.cs — floating window with random gameplay tips.
+//
 
 import Foundation
 
 class Tips: CajaGUI {
 
-    // MARK: - Constantes
+    // MARK: - Constants
     private static let INITIAL_TIP_TIME = 250
     private static let MAX_TITILA       = 40
     private static let MIN_TITILA       = 20
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_botonTip:               Boton
     private var m_correspondeMostrarTip:  Bool = false
     private var m_cuentaTip:              Int  = 0
     private var m_cuentaTitila:           Int  = 0
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     override init() {
         m_botonTip = Boton(leyenda: Res.STR_TIP_00, fuente: nil)
         super.init()
@@ -90,7 +96,7 @@ class Tips: CajaGUI {
         }
     }
 
-    // MARK: - Privado
+    // MARK: - Private
 
     private func generarTipRandom() {
         m_leyenda = Int.random(in: Res.STR_TIP_01..<Res.STR_TIP_23)

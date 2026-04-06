@@ -1,5 +1,11 @@
-// GUI/MenuDeConfirmacion.swift
-// Puerto de MenuDeConfirmacion.cs — cuadro de diálogo con dos botones.
+//
+//  MenuDeConfirmacion.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of MenuDeConfirmacion.cs — dialog box with two buttons.
+//
 
 import Foundation
 
@@ -12,11 +18,11 @@ class MenuDeConfirmacion: CajaGUI {
         case DERECHO   =  1
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_botonIzq: Boton
     private var m_botonDer: Boton
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(_ leyenda: Int, _ boton1: Int, _ boton2: Int) {
         m_botonIzq = Boton(leyenda: boton1, fuente: nil)
         m_botonIzq.setearPosicion(0, 0, 0)

@@ -1,11 +1,17 @@
-// Map/PathFinder/PathFinder.swift
-// Puerto de PathFinder.cs — algoritmo A* para pathfinding en el mapa isométrico.
+//
+//  PathFinder.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of PathFinder.cs — A* pathfinding algorithm for the isometric map.
+//
 
 import Foundation
 
 class PathFinder {
 
-    // MARK: - Nodo interno
+    // MARK: - Internal node
 
     private class Nodo: Equatable {
         var padre: Nodo?
@@ -20,7 +26,7 @@ class PathFinder {
         static func == (a: Nodo, b: Nodo) -> Bool { a.i == b.i && a.j == b.j }
     }
 
-    // MARK: - Constantes
+    // MARK: - Constants
     private let COSTO_DIAGONAL:  Int = 14
     private let COSTO_DERECHO:   Int = 10
     private let COSTO_IMPOSIBLE: Int = 99999
@@ -34,13 +40,13 @@ class PathFinder {
         return m_instancia!
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_mapaTilesFisicos: [[Int16]] = []
     private weak var m_mapa: Mapa?
 
     private init() {}
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     func cargarMapa(_ mapa: Mapa) -> Bool {
         guard !mapa.capaTilesFisicos.isEmpty else { return false }
@@ -49,7 +55,7 @@ class PathFinder {
         return true
     }
 
-    /// Devuelve el camino más corto (pila de puntos i,j) o nil si no existe.
+    /// Returns the shortest path (stack of (i,j) points) or nil if none exists.
     func encontrarCaminoMasCorto(_ inicioI: Int, _ inicioJ: Int,
                                   _ objetivoI: Int, _ objetivoJ: Int) -> [(i: Int, j: Int)]? {
         guard let mapa = m_mapa, !m_mapaTilesFisicos.isEmpty else {
@@ -90,7 +96,7 @@ class PathFinder {
         return nil
     }
 
-    // MARK: - Helpers privados
+    // MARK: - Private helpers
 
     private func agregarHijos(_ padre: Nodo, a abiertos: inout [Nodo],
                                cerrados: [Nodo], objetivo: Nodo, mapa: Mapa) {
@@ -131,6 +137,6 @@ class PathFinder {
             camino.append((n.i, n.j))
             actual = n.padre
         }
-        return camino // primer elemento = destino, último = origen
+        return camino // first element = destination, last = origin
     }
 }

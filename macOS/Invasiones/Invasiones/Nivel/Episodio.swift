@@ -1,6 +1,12 @@
-// Nivel/Episodio.swift
-// Puerto de Episodio.cs + Episodio.EstadoCargando.cs + Episodio.EstadoJugando.cs
-// + Episodio.EstadoMostrarIntroduccion.cs — sesión de juego activa.
+//
+//  Episodio.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Episodio.cs + Episodio.EstadoCargando.cs + Episodio.EstadoJugando.cs
+//  + Episodio.EstadoMostrarIntroduccion.cs — active game session.
+//
 
 import Foundation
 internal import CoreGraphics
@@ -14,13 +20,13 @@ class Episodio {
         case FIN = -1, CARGANDO, JUGANDO, MOSTRAR_INTRODUCCION, MOSTRAR_OBJETIVOS, GANO, PERDIO
     }
 
-    // MARK: - Constantes
+    // MARK: - Constants
     private static let CUENTA_HASTA_PREGUNTAR_REINICIAR = 50
     private static let CAJA_OBJETIVOS_ANCHO             = 600
     private static let CAJA_OBJETIVOS_ALTO              = 270
     private static let CAJA_OBJETIVOS_OFFSET_BOTON_Y    = 70
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_boton:        Boton?
     private var m_botonAceptar: Boton?
     private var m_obstaculos:   [Obstaculo] = []
@@ -46,10 +52,10 @@ class Episodio {
     private var m_cheatPerderIndice:  Int = 0
     private var m_cheatObjetivoIndice:Int = 0
 
-    // MARK: - Propiedades
+    // MARK: - Properties
     var estado: ESTADO { m_estado }
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init() {
         m_menuDeGameOver = MenuDeConfirmacion(Res.STR_CONTINUARJUEGO, Res.STR_NO, Res.STR_SI)
         m_menuDeGameOver.setearPosicion(0, 0, Superficie.V_CENTRO | Superficie.H_CENTRO)
@@ -61,7 +67,7 @@ class Episodio {
         m_mapa = nil
     }
 
-    // MARK: - Control público
+    // MARK: - Public control
 
     func iniciar() {
         setearEstado(.CARGANDO)
@@ -71,7 +77,7 @@ class Episodio {
 
     func salir() {}
 
-    // MARK: - Actualizar
+    // MARK: - Update
 
     @discardableResult
     func actualizar() -> Bool {
@@ -87,7 +93,7 @@ class Episodio {
         return false
     }
 
-    // MARK: - Dibujar
+    // MARK: - Draw
 
     func dibujar(_ g: Video) {
         switch m_estado {
@@ -102,7 +108,7 @@ class Episodio {
         g.setearColor(Definiciones.COLOR_BLANCO)
     }
 
-    // MARK: - Estado CARGANDO
+    // MARK: - LOADING state
 
     private func actualizarEstadoCargado() {
         if cargarNivel(0) {
@@ -206,7 +212,7 @@ class Episodio {
         return false
     }
 
-    // MARK: - Estado MOSTRAR_INTRODUCCION
+    // MARK: - SHOW INTRODUCTION state
 
     private func actualizarEstadoMostrarIntroduccion() {
         if m_cuenta == 0 {
@@ -266,7 +272,7 @@ class Episodio {
         m_boton?.dibujar(g)
     }
 
-    // MARK: - Estado MOSTRAR_OBJETIVOS
+    // MARK: - SHOW OBJECTIVES state
 
     private func actualizarEstadoMostrarObjetivo() {
         if m_cuenta == 0 {
@@ -309,7 +315,7 @@ class Episodio {
         m_botonAceptar?.dibujar(g)
     }
 
-    // MARK: - Estado JUGANDO
+    // MARK: - PLAYING state
 
     private func actualizarEstadoJugando() {
         if m_mostrarPopupObjetivo { m_cuentaMostrarObjetivo += 1 }
@@ -318,7 +324,7 @@ class Episodio {
 
         m_mapa?.actualizar()
 
-        // Reiniciar capa de visibilidad
+        // Reset visibility layer
         if let mapa = m_mapa {
             mapa.capaTilesVisibles = Array(repeating: Array(repeating: 0, count: mapa.anchoMapaFisico),
                                            count: mapa.altoMapaFisico)
@@ -457,12 +463,12 @@ class Episodio {
         }
 
         // Fueguitos del jugador se dibujan encima (delegado a BandoArgentino via Jugador)
-        // m_jugador.Dibujar(g) — en el original dibujaba fueguitos; se delega si se necesita
+        // m_jugador.Dibujar(g) — in the original it drew fire effects; delegated if needed
 
         g.setearClip(oldClip.x, oldClip.y, oldClip.w, oldClip.h)
     }
 
-    // MARK: - Estado GANO
+    // MARK: - WON state
 
     private func actualizarEstadoGano() {
         if m_boton?.actualizar() != 0 {
@@ -478,7 +484,7 @@ class Episodio {
         g.escribir(Res.STR_GANASTE, 0, 0, Superficie.H_CENTRO | Superficie.V_CENTRO)
     }
 
-    // MARK: - Estado PERDIO
+    // MARK: - LOST state
 
     private func actualizarEstadoPerdio() {
         m_cuenta += 1
@@ -548,7 +554,7 @@ class Episodio {
         Teclado.Instancia.limpiarTeclas()
     }
 
-    // MARK: - Privado
+    // MARK: - Private
 
     private func setearEstado(_ estado: ESTADO) {
         m_cuenta       = 0

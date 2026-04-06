@@ -1,15 +1,21 @@
-// Nivel/Obstaculo.swift
-// Puerto de Obstaculo.cs — representación de un obstáculo estático en el mapa (árbol, edificio, roca).
+//
+//  Obstaculo.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Obstaculo.cs — static obstacle on the map (tree, building, rock).
+//
 
 import Foundation
 
 class Obstaculo: Objeto {
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_indice:    Int  = 0
     private var m_esEdificio: Bool = false
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(indice: Int, i: Int, j: Int, tileset: Tileset) {
         super.init()
         m_indice = indice

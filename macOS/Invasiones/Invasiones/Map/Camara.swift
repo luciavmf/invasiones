@@ -1,11 +1,17 @@
-// Map/Camara.swift
-// Puerto de Camara.cs — representa la porción visible del mapa (viewport).
+//
+//  Camara.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Camara.cs — represents the visible portion of the map (viewport).
+//
 
 import Foundation
 
 class Camara {
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     var X: Int
     var Y: Int
 
@@ -24,14 +30,14 @@ class Camara {
     var borde:     Int { m_borde }
     var velocidad: Int { m_velocidad }
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(x: Int, y: Int, alto: Int) {
         X = x
         Y = y
         m_alto = alto
     }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     func setearCoordenadasDeLaPantalla(_ x: Int, _ y: Int, _ w: Int, _ h: Int) {
         m_inicioX = max(0, x)

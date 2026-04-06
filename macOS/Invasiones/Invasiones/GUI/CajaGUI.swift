@@ -1,11 +1,17 @@
-// GUI/CajaGUI.swift
-// Puerto de CajaGUI.cs — clase base abstracta de todos los componentes GUI.
+//
+//  CajaGUI.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of CajaGUI.cs — abstract base class for all GUI components.
+//
 
 import Foundation
 
 class CajaGUI {
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     var m_y:       Int = 0
     var m_x:       Int = 0
     var m_fuente:  Fuente?
@@ -18,10 +24,10 @@ class CajaGUI {
     var alto:  Int { m_alto  }
     var ancho: Int { m_ancho }
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init() {}
 
-    // MARK: - Métodos abstractos
+    // MARK: - Abstract methods
     func setearPosicion(_ x: Int, _ y: Int, _ ancla: Int) {
         fatalError("\(type(of: self)).setearPosicion must be overridden")
     }

@@ -1,6 +1,12 @@
-// Debug/Log.swift
-// Puerto de Log.cs — singleton de logging con niveles Debug/Info/Warn/Error.
-// En DEBUG escribe a consola y a output.log; en Release no hace nada.
+//
+//  Log.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Log.cs — logging singleton with Debug/Info/Warn/Error levels.
+//  In DEBUG writes to console and output.log; in Release does nothing.
+//
 
 import Foundation
 
@@ -16,7 +22,7 @@ class Log {
         return s_instancia!
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private static var s_habilitado = true
 
 #if DEBUG
@@ -24,7 +30,7 @@ class Log {
     private var m_archivoEscritor: FileHandle?
 #endif
 
-    // MARK: - Constructor (privado — singleton)
+    // MARK: - Initializer (private — singleton)
     private init() {
 #if DEBUG
         let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(m_nombreDeArchivo)
@@ -46,7 +52,7 @@ class Log {
         Log.s_instancia = nil
     }
 
-    // MARK: - Metodos
+    // MARK: - Methods
     private func loguear(_ nivel: String, _ mensaje: String) {
         guard Log.s_habilitado else { return }
 #if DEBUG

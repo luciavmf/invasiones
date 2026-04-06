@@ -1,5 +1,11 @@
-// Nivel/Orden.swift
-// Puerto de Orden.cs — representa una orden que una unidad o grupo debe cumplir.
+//
+//  Orden.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Orden.cs — represents an order a unit or group must carry out.
+//
 
 import Foundation
 
@@ -16,14 +22,14 @@ class Orden {
         case MATAR
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private(set) var id:        TIPO
     private(set) var punto:     (x: Int, y: Int)
     private(set) var imagen:    Superficie?
     private(set) var animacion: AnimObjeto?
     private(set) var ancho:     Int = 0
 
-    // MARK: - Constructores
+    // MARK: - Initializeres
 
     init(_ tipo: TIPO, _ x: Int, _ y: Int) {
         id    = tipo

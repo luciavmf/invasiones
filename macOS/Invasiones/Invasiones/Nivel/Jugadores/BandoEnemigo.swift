@@ -1,11 +1,17 @@
-// Nivel/Jugadores/BandoEnemigo.swift
-// Puerto de BandoEnemigo.cs — bando controlado por la IA.
+//
+//  BandoEnemigo.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of BandoEnemigo.cs — AI-controlled faction.
+//
 
 import Foundation
 
 class BandoEnemigo: Jugador {
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     override init(mapa: Mapa, camara: Camara, objetosAPintar: TablaObjetos, hud: Hud) {
         super.init(mapa: mapa, camara: camara, objetosAPintar: objetosAPintar, hud: hud)
         m_bando = .ENEMIGO
@@ -56,7 +62,7 @@ class BandoEnemigo: Jugador {
         return true
     }
 
-    // MARK: - Privados
+    // MARK: - Private
 
     private func actualizarEstadoJuego() {
         m_unidadesSeleccionadas = []

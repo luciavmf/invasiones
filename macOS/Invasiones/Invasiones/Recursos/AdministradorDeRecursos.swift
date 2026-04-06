@@ -1,6 +1,12 @@
-// Recursos/AdministradorDeRecursos.swift
-// Puerto de AdministradorDeRecursos.cs — singleton que carga y cachea todos los recursos del juego.
-// SDL_Surface → SKTexture, SDL_ttf → NSFont, SDL_mixer paths → strings para AVAudioEngine.
+//
+//  AdministradorDeRecursos.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of AdministradorDeRecursos.cs — singleton that loads and caches all game resources.
+//  SDL_Surface → SKTexture, SDL_ttf → NSFont, SDL_mixer paths → strings for AVAudioEngine.
+//
 
 import SpriteKit
 
@@ -14,31 +20,31 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
         return s_instancia!
     }
 
-    // MARK: - Declaraciones
-    /// Caché de imágenes indexadas por id (Int) o nombre (String).
+    // MARK: - Declarations
+    /// Image cache indexed by id (Int) or name (String).
     private var m_imagenesPorId:     [Int: Superficie]    = [:]
     private var m_imagenesPorNombre: [String: Superficie] = [:]
 
-    /// Paths resueltos (absolutos) leídos desde res.xml.
+    /// Resolved (absolute) paths read from res.xml.
     private(set) var pathsFuentes:    [String?] = []
     private(set) var pathsImagenes:   [String?] = []
     private(set) var pathsEscenarios: [String?] = []
     private(set) var pathsSonidos:    [String?] = []
     private(set) var pathsUnidades:   [String?] = []
 
-    /// Fuentes cargadas (una por cada variante de Definiciones.FNT).
+    /// Loaded fonts (one per Definiciones.FNT variant).
     private(set) var fuentes: [Fuente?] = []
 
-    /// Sprites cargados (Res.SPR_COUNT = 2).
+    /// Loaded sprites (Res.SPR_COUNT = 2).
     private(set) var sprites: [Sprite?] = []
 
-    /// Animaciones cargadas (Res.ANIM_COUNT = 13).
+    /// Loaded animations (Res.ANIM_COUNT = 13).
     private(set) var animaciones: [Animaciones?] = []
 
-    /// Tipos de unidades template (Res.UNIDAD_COUNT = 2).
+    /// Unit type templates (Res.UNIDAD_COUNT = 2).
     private(set) var tipoDeUnidades: [Unidad?] = []
 
-    // MARK: - Constructor (privado)
+    // MARK: - Initializer (privado)
     private override init() {}
 
     deinit { dispose() }
@@ -51,7 +57,7 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
         AdministradorDeRecursos.s_instancia = nil
     }
 
-    // MARK: - Carga de paths desde res.xml
+    // MARK: - Load paths from res.xml
 
     @discardableResult
     func cargarPathsRecursos() -> Bool {
@@ -82,12 +88,12 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
         return !hayErrores
     }
 
-    // MARK: - Imágenes
+    // MARK: - Images
 
-    /// Obtiene (y cachea) la imagen por nombre de archivo relativo o absoluto.
+    /// Gets (and caches) the image by relative or absolute file name.
     func obtenerImagen(_ nombre: String) -> Superficie? {
         if let cached = m_imagenesPorNombre[nombre] { return cached }
-        // Si ya es un path absoluto que existe, úsalo directamente.
+        // If it's already an absolute path that exists, use it directly.
         let path: String
         if nombre.hasPrefix("/") && FileManager.default.fileExists(atPath: nombre) {
             path = nombre
@@ -100,7 +106,7 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
         return sup
     }
 
-    /// Obtiene (y cachea) la imagen por ID (índice en pathsImagenes).
+    /// Gets (and caches) the image by ID (index into pathsImagenes).
     func obtenerImagen(_ id: Int) -> Superficie? {
         if let cached = m_imagenesPorId[id] { return cached }
         guard id < pathsImagenes.count, let path = pathsImagenes[id] else { return nil }
@@ -109,8 +115,8 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
         return sup
     }
 
-    /// Igual que obtenerImagen(id) — en el original cargaba con canal alpha explícito;
-    /// en SpriteKit todas las texturas PNG soportan alpha automáticamente.
+    /// Same as obtenerImagen(id) — in the original it loaded with an explicit alpha channel;
+    /// in SpriteKit all PNG textures support alpha automatically.
     func obtenerImagenAlpha(_ id: Int) -> Superficie? {
         return obtenerImagen(id)
     }
@@ -120,7 +126,7 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
         return Superficie(copia: orig)
     }
 
-    // MARK: - Fuentes
+    // MARK: - Fonts
 
     @discardableResult
     func cargarFuentes() -> Bool {
@@ -143,7 +149,7 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
         return fuentes[Definiciones.FNT.SANS12.rawValue] != nil
     }
 
-    // MARK: - Tipo de Unidades
+    // MARK: - Unit types
 
     func cargarTipoDeUnidades() {
         tipoDeUnidades = Array(repeating: nil, count: Res.UNIDAD_COUNT)
@@ -154,7 +160,7 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
         }
     }
 
-    // MARK: - Sprites (lee sección <sprites> de res.xml)
+    // MARK: - Sprites (reads <sprites> section of res.xml)
 
     @discardableResult
     func leerInfoSprites() -> Bool {
@@ -169,7 +175,7 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
         return true
     }
 
-    // MARK: - Animaciones (lee sección <anims> de res.xml)
+    // MARK: - Animations (reads <anims> section of res.xml)
 
     @discardableResult
     func leerInfoAnimaciones() -> Bool {
@@ -185,9 +191,9 @@ class AdministradorDeRecursos: NSObject, XMLParserDelegate {
     }
 }
 
-// MARK: - Parser interno de res.xml
+// MARK: - Internal res.xml parser
 
-/// Parsea res.xml y extrae los paths resueltos de cada sección.
+/// Parses res.xml and extracts the resolved paths for each section.
 private class ResXMLParser: NSObject, XMLParserDelegate {
 
     var fuentes:    [String?] = Array(repeating: nil, count: Res.FNT_COUNT)
@@ -196,20 +202,20 @@ private class ResXMLParser: NSObject, XMLParserDelegate {
     var sonidos:    [String?] = Array(repeating: nil, count: Res.SND_COUNT + Res.SFX_COUNT)
     var unidades:   [String?] = Array(repeating: nil, count: Res.UNIDAD_COUNT)
 
-    // Estado del parser
+    // Parser state
     private enum Seccion { case ninguna, fuentes, imagenes, tilesets, mapas, sfx, unidades, anims }
     private var seccion: Seccion = .ninguna
     private var textoActual = ""
     private var enElementoHoja = false
 
-    // Contadores por sección
+    // Per-section counters
     private var iFuentes    = 0
     private var iImagenes   = 0
     private var iEscenarios = 0
     private var iSonidos    = 0
     private var iUnidades   = 0
 
-    // Para unidades (atributo file="...")
+    // For units (file="..." attribute)
     private var atributoFile: String?
 
     func parser(_ parser: XMLParser, didStartElement name: String, namespaceURI: String?,
@@ -222,11 +228,11 @@ private class ResXMLParser: NSObject, XMLParserDelegate {
         case "sfx":       seccion = .sfx
         case "unidades":  seccion = .unidades
         case "anims":     seccion = .anims
-        case "musica":    break  // ignorar sección de música (estaba comentada en el original)
+        case "musica":    break  // ignore music section (was commented out in the original)
         case "res", "escenarios", "sonidos", "sprites", "sprite", "animpak",
              "animacion", "image": break
         default:
-            // Elemento hoja dentro de una sección conocida
+            // Leaf element within a known section
             if seccion == .unidades && name == "unidad" {
                 atributoFile = attributes["file"]
                 guardarUnidad()
@@ -284,7 +290,7 @@ private class ResXMLParser: NSObject, XMLParserDelegate {
     }
 }
 
-// MARK: - Parser de <sprites> de res.xml
+// MARK: - <sprites> parser for res.xml
 
 private class SpritesXMLParser: NSObject, XMLParserDelegate {
 
@@ -294,7 +300,7 @@ private class SpritesXMLParser: NSObject, XMLParserDelegate {
     private var spriteIdx   = 0
     private var animaciones: [Animaciones] = []
 
-    // Atributos corrientes del <image>
+    // Current attributes of the <image> element
     private var imgPath    = ""
     private var frameAncho = 0
     private var frameAlto  = 0
@@ -344,7 +350,7 @@ private class SpritesXMLParser: NSObject, XMLParserDelegate {
     }
 }
 
-// MARK: - Parser de <anims> de res.xml
+// MARK: - <anims> parser for res.xml
 
 private class AnimsXMLParser: NSObject, XMLParserDelegate {
 

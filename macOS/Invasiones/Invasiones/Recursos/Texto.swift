@@ -1,6 +1,12 @@
-// Recursos/Texto.swift
-// Puerto de Texto.cs — carga y caché de strings localizados desde strings.xml.
-// Usa XMLParser (SAX) en lugar de XmlTextReader de .NET.
+//
+//  Texto.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Texto.cs — loads and caches localised strings from strings.xml.
+//  Uses XMLParser (SAX) instead of .NET's XmlTextReader.
+//
 
 import Foundation
 
@@ -9,7 +15,7 @@ class Texto: NSObject, XMLParserDelegate {
     // MARK: - Static storage
     private static var s_strings: [String]?
 
-    /// Carga los strings desde strings.xml en el bundle.
+    /// Loads the strings from strings.xml in the bundle.
     @discardableResult
     static func cargar() -> Bool {
         s_strings = Array(repeating: "", count: Res.STR_COUNT)
@@ -33,7 +39,7 @@ class Texto: NSObject, XMLParserDelegate {
         return true
     }
 
-    /// Devuelve el array de strings (carga lazy si aún no fue cargado).
+    /// Returns the strings array (lazy-loads if not yet loaded).
     static var Strings: [String] {
         if s_strings == nil {
             cargar()
@@ -41,7 +47,7 @@ class Texto: NSObject, XMLParserDelegate {
         return s_strings ?? []
     }
 
-    // MARK: - XMLParserDelegate (instancia temporal usada solo durante el parseo)
+    // MARK: - XMLParserDelegate (temporary instance used only during parsing)
     private var m_stringsLeidos: [String] = Array(repeating: "", count: Res.STR_COUNT)
     private var m_indice = 0
     private var m_textoActual = ""
@@ -50,7 +56,7 @@ class Texto: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, didStartElement elementName: String,
                 namespaceURI: String?, qualifiedName qName: String?,
                 attributes attributeDict: [String: String] = [:]) {
-        // Saltar el elemento raíz (<strings>)
+        // Skip the root element (<strings>)
         if elementName.lowercased() != "strings" {
             m_textoActual = ""
             m_enElemento = true
@@ -67,7 +73,7 @@ class Texto: NSObject, XMLParserDelegate {
                 namespaceURI: String?, qualifiedName qName: String?) {
         if m_enElemento && m_indice < Res.STR_COUNT {
             let trimmed = m_textoActual.trimmingCharacters(in: .whitespacesAndNewlines)
-            // strings.xml usa la secuencia literal "\n"; convertirla a salto de línea real.
+            // strings.xml uses the literal sequence "\n"; convert it to a real newline.
             m_stringsLeidos[m_indice] = trimmed.replacingOccurrences(of: "\\n", with: "\n")
             m_indice += 1
             m_enElemento = false

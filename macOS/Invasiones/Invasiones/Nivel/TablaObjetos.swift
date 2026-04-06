@@ -1,8 +1,14 @@
-// Nivel/TablaObjetos.swift
-// Envoltorio de referencia sobre la cuadrícula de objetos del mapa.
-// En C# los arrays son tipos de referencia; en Swift son tipos de valor.
-// Al compartir esta clase entre Episodio, BandoArgentino y BandoEnemigo,
-// todos leen y escriben sobre el mismo arreglo subyacente.
+//
+//  TablaObjetos.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Reference wrapper over the map object grid.
+//  In C# arrays are reference types; in Swift they are value types.
+//  Shared between Episodio, BandoArgentino, and BandoEnemigo so all read and write
+//  to the same underlying array.
+//
 
 final class TablaObjetos {
     var tabla: [[Objeto?]]

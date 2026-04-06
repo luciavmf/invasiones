@@ -1,15 +1,21 @@
-// Nivel/Objetivo.swift
-// Puerto de Objetivo.cs — representa un objetivo a cumplir (pila de órdenes).
+//
+//  Objetivo.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Objetivo.cs — represents an objective to fulfill (stack of orders).
+//
 
 import Foundation
 
 class Objetivo {
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_ordenes:    [Orden] = []  // used as stack (LIFO via popLast)
     private let m_pathImagen: String?
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(pathImagen: String?) {
         m_pathImagen = pathImagen
     }
@@ -20,9 +26,9 @@ class Objetivo {
         set { m_ordenes = newValue }
     }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
-    /// Devuelve y elimina la próxima orden (LIFO).
+    /// Returns and removes the next order (LIFO).
     func proximaOrden() -> Orden? {
         guard !m_ordenes.isEmpty else { return nil }
         return m_ordenes.removeLast()

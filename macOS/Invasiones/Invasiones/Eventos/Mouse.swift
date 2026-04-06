@@ -1,12 +1,18 @@
-// Eventos/Mouse.swift
-// Puerto de Mouse.cs — singleton que rastrea posición, botones y arrastre del mouse.
-// SDL reemplazado por NSEvent; el cursor personalizado se dibuja como Superficie via Video.
+//
+//  Mouse.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Mouse.cs — singleton tracking mouse position, buttons, and drag rectangle.
+//  SDL replaced by NSEvent; the custom cursor is drawn as a Superficie via Video.
+//
 
 import AppKit
 
 class Mouse {
 
-    // MARK: - Constantes de botones (equivalentes SDL_BUTTON_*)
+    // MARK: - Button constants (equivalent to SDL_BUTTON_*)
     static let BOTON_IZQ = 0
     static let BOTON_CNT = 2
     static let BOTON_DER = 1
@@ -19,7 +25,7 @@ class Mouse {
         return s_instancia!
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_x: CGFloat = 0
     private var m_y: CGFloat = 0
     private var m_arrastrando = false
@@ -28,13 +34,13 @@ class Mouse {
     private var m_posicionInicioArrastre: CGPoint = .zero
     private(set) var m_rectanguloArrastrado: CGRect = .zero
 
-    /// Superficie del cursor personalizado (se asigna desde el estado/nivel).
+    /// Custom cursor surface (assigned from the state/level).
     private var m_cursorSup: Superficie?
 
-    /// Lista de botones actualmente presionados (índices BOTON_IZQ/DER/CNT).
+    /// List of currently pressed buttons (indices BOTON_IZQ/DER/CNT).
     private(set) var BotonesApretados: [Int] = []
 
-    // MARK: - Constructor (privado — singleton)
+    // MARK: - Initializer (private — singleton)
     private init() {}
 
     // MARK: - Properties
@@ -50,7 +56,7 @@ class Mouse {
 
     var RectanguloArrastrado: CGRect { m_rectanguloArrastrado }
 
-    // MARK: - Metodos de botones (llamados desde GameScene)
+    // MARK: - Button methods (called from GameScene)
     func presionarBoton(_ boton: Int) {
         if !BotonesApretados.contains(boton) {
             BotonesApretados.append(boton)
@@ -61,7 +67,7 @@ class Mouse {
         BotonesApretados.removeAll { $0 == boton }
     }
 
-    /// Actualiza el estado de arrastre. Llamar una vez por frame desde GameFrame.actualizar().
+    /// Updates the drag state. Call once per frame from GameFrame.actualizar().
     func actualizar() {
         if BotonesApretados.contains(Mouse.BOTON_IZQ) {
             if !m_arrastrando {
@@ -105,7 +111,7 @@ class Mouse {
         m_y = max(0, min(y, CGFloat(Programa.ALTO_DE_LA_PANTALLA)))
     }
 
-    /// Dibuja el cursor personalizado en la posición actual usando el contexto Video.
+    /// Draws the custom cursor at the current position using the Video context.
     func dibujarCursor(en g: Video) {
         guard !m_cursorOculto, let sup = m_cursorSup else { return }
         g.dibujar(sup, Int(m_x), Int(m_y), 255, 0)

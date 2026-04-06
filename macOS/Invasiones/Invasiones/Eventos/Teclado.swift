@@ -1,12 +1,18 @@
-// Eventos/Teclado.swift
-// Puerto de Teclado.cs — singleton que rastrea teclas presionadas.
-// SDL keycodes reemplazados por los keyCode de NSEvent (Carbon virtual key codes).
+//
+//  Teclado.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Teclado.cs — singleton tracking pressed keys.
+//  SDL keycodes replaced by NSEvent keyCode (Carbon virtual key codes).
+//
 
 import AppKit
 
 class Teclado {
 
-    // MARK: - Constantes de teclas (Carbon virtual key codes en macOS)
+    // MARK: - Key constants (Carbon virtual key codes on macOS)
     static let INTERVALO_ENTRE_REPETICIONES = 15
 
     static let TECLA_ARR      = 126   // kVK_UpArrow
@@ -39,14 +45,14 @@ class Teclado {
         return s_instancia!
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     /// Teclas actualmente presionadas (keyCode de NSEvent).
     private(set) var TeclasApretadas: [Int] = []
 
-    // MARK: - Constructor (privado — singleton)
+    // MARK: - Initializer (privado — singleton)
     private init() {}
 
-    // MARK: - Metodos (llamados desde GameScene)
+    // MARK: - Methods (llamados desde GameScene)
     func presionarTecla(_ keyCode: Int) {
         if !TeclasApretadas.contains(keyCode) {
             TeclasApretadas.append(keyCode)

@@ -1,23 +1,29 @@
-// Estados/EstadoAyuda.swift
-// Puerto de EstadoAyuda.cs — pantallas de ayuda/tutorial con animaciones.
+//
+//  EstadoAyuda.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of EstadoAyuda.cs — help/tutorial screens with animations.
+//
 
 import Foundation
 
 class EstadoAyuda: Estado {
 
-    // MARK: - Sub-estados
+    // MARK: - Sub-states
     private enum SUBESTADO: Int {
         case SELECCIONAR = 0, MOVER, ATACAR, OBJETIVO, SCROLL, HUD, SANAR, TIPS, GANAR
         static let TOTAL = 9
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_subestado:        SUBESTADO = .SELECCIONAR
     private var m_botonAtras:       Boton?
     private var m_botonSig:         Boton?
     private var m_screenshotActual: Animaciones?
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     override func iniciar() {
         m_fondo = AdministradorDeRecursos.Instancia.obtenerImagen(Res.IMG_FONDO)
@@ -96,7 +102,7 @@ class EstadoAyuda: Estado {
 
     override func salir() {}
 
-    // MARK: - Privado
+    // MARK: - Private
 
     private func cargarScreenshot(_ sub: SUBESTADO) {
         let animIdx = Res.ANIM_AYUDA_SELECCION + sub.rawValue

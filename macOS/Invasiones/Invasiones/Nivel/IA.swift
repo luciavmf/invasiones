@@ -1,26 +1,32 @@
-// Nivel/IA.swift
-// Puerto de IA.cs — inteligencia artificial de los grupos enemigos.
+//
+//  IA.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of IA.cs — artificial intelligence for enemy groups.
+//
 
 import Foundation
 
 class IA {
 
-    // MARK: - Clase privada
+    // MARK: - Private class
     private class Batalla {
         var m_ordenes: [Orden] = []  // LIFO via popLast
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_batallas:           [Batalla]
     private var m_cantidadDeBatallas: Int = 0
     private var m_nroBatallaActual:   Int = 0
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init() {
         m_batallas = Array(repeating: Batalla(), count: Nivel.MAXIMA_CANTIDAD_BATALLAS)
     }
 
-    // MARK: - Carga
+    // MARK: - Loading
 
     func cargar(_ x: Int, _ y: Int, _ nroNivel: Int) {
         let pathStr = Programa.PATH_NIVEL + "/orden_nv\(nroNivel)_\(x)_\(y).xml"
@@ -45,7 +51,7 @@ class IA {
         m_nroBatallaActual = 0
     }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     func proximaOrden() -> Orden? {
         guard m_nroBatallaActual < m_cantidadDeBatallas else {
@@ -66,7 +72,7 @@ class IA {
     }
 }
 
-// MARK: - Parser XML
+// MARK: - XML parser
 
 private class IAXMLDelegate: NSObject, XMLParserDelegate {
     var batallas:   [[Orden]] = []

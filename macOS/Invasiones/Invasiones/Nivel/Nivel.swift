@@ -1,27 +1,33 @@
-// Nivel/Nivel.swift
-// Puerto de Nivel.cs — gestión de batallas y objetivos de un nivel.
+//
+//  Nivel.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Nivel.cs — manages battles and objectives for a level.
+//
 
 import Foundation
 
 class Nivel {
 
-    // MARK: - Constantes
+    // MARK: - Constants
     static let MAXIMA_CANTIDAD_BATALLAS = 5
 
-    // MARK: - Clase privada
+    // MARK: - Private class
     private class Batalla {
         var m_objetivos:          [Objetivo] = []  // LIFO: popLast
         var cantidadDeObjetivos:  Int = 0
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_batallas:      [Batalla?]
     private var m_nroBatallaActual:       Int = 0
     private var m_cantidadDeBatallas:     Int = 0
     private var m_nroObjetivoActual:      Int = 0
     private var m_cantidadDeObjetivosCumplidos: Int = -1
 
-    // MARK: - Propiedades
+    // MARK: - Properties
     var nroObjetivoActual:            Int { m_nroObjetivoActual }
     var nroBatallaActual:             Int { m_nroBatallaActual }
     var cantidadDeBatallas:           Int { m_cantidadDeBatallas }
@@ -33,7 +39,7 @@ class Nivel {
         return b.cantidadDeObjetivos
     }
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init() {
         m_batallas = Array(repeating: nil, count: Nivel.MAXIMA_CANTIDAD_BATALLAS)
         m_nroBatallaActual  = 0
@@ -41,7 +47,7 @@ class Nivel {
         m_cantidadDeObjetivosCumplidos = -1
     }
 
-    // MARK: - Carga
+    // MARK: - Loading
 
     func cargar(_ nroNivel: Int) {
         let pathStr = Programa.PATH_NIVEL + "/nivel_\(nroNivel).xml"
@@ -70,9 +76,9 @@ class Nivel {
         }
     }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
-    /// Devuelve el próximo objetivo a cumplir, o nil si se ganó.
+    /// Returns the next objective to complete, or nil if the level has been won.
     func proximoObjetivo() -> Objetivo? {
         m_nroObjetivoActual += 1
         m_cantidadDeObjetivosCumplidos += 1
@@ -98,7 +104,7 @@ class Nivel {
     }
 }
 
-// MARK: - Parser XML
+// MARK: - XML parser
 
 private class NivelXMLDelegate: NSObject, XMLParserDelegate {
 

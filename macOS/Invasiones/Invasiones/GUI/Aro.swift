@@ -1,14 +1,20 @@
-// GUI/Aro.swift
-// Puerto de Aro.cs — aro animado que indica el objetivo actual en el mapa.
+//
+//  Aro.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Aro.cs — animated ring indicating the current objective on the map.
+//
 
 import Foundation
 
 class Aro: Objeto {
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private let m_animacion: Animaciones
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(_ anim: Animaciones, _ i: Int, _ j: Int) {
         m_animacion = anim
         super.init()
@@ -41,7 +47,7 @@ class Aro: Objeto {
         m_animacion.dibujar(g, m_x + mapa.tileAncho / 2, m_y + mapa.tileAlto / 2, 0)
     }
 
-    // MARK: - Métodos propios
+    // MARK: - Own methods
 
     func setearPosicion(_ i: Int, _ j: Int) {
         m_posEnTileFisico = (i, j)

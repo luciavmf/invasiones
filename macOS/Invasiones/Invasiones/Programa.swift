@@ -1,6 +1,12 @@
-// Programa.swift
-// Puerto de Programa.cs — constantes globales de la aplicación.
-// El punto de entrada es AppDelegate/GameScene en macOS; aquí sólo las constantes.
+//
+//  Programa.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Programa.cs — global application constants.
+//  Entry point is AppDelegate/GameScene on macOS; only constants here.
+//
 
 import Foundation
 

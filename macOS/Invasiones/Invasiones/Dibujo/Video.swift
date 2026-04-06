@@ -1,55 +1,61 @@
-// Dibujo/Video.swift
-// Puerto de Video.cs — contexto de dibujo de pantalla.
-// En SDL era una SDL_Surface con primitivas de blitting. En SpriteKit mantenemos un
-// nodo-canvas al que añadimos hijos cada frame y limpiamos al inicio del siguiente.
+//
+//  Video.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Video.cs — screen drawing context.
+//  In SDL it was an SDL_Surface with blit primitives. In SpriteKit we maintain a
+//  canvas node, adding children each frame and clearing at the start of the next.
+//
 
 import SpriteKit
 
 class Video {
 
-    // MARK: - Constantes de pantalla (equivalente a los statics de Video en C#)
+    // MARK: - Screen constants (equivalent to the static fields of Video in C#)
     static let Ancho: Int = Programa.ANCHO_DE_LA_PANTALLA
     static let Alto:  Int = Programa.ALTO_DE_LA_PANTALLA
 
     // MARK: - Nodo canvas
     private let canvasNode: SKNode
 
-    // MARK: - Estado de dibujo
+    // MARK: - Drawing state
     private var colorActual:       SKColor = .black
     private var fuenteActual:      Fuente?
     private var colorFuenteActual: SKColor = .white
     private var zPos:              CGFloat = 0
 
-    // Clip rect en coordenadas C# (top-left origin). Sólo se persiste el estado;
-    // la restricción visual real la hace el propio renderizador del mapa.
+    // Clip rect in C# coordinates (top-left origin). Only the state is persisted;
+    // actual visual clipping is handled by the map renderer itself.
     private var clipX: Int = 0
     private var clipY: Int = 0
     private var clipW: Int = Programa.ANCHO_DE_LA_PANTALLA
     private var clipH: Int = Programa.ALTO_DE_LA_PANTALLA
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(escena: SKScene) {
         canvasNode = SKNode()
         escena.addChild(canvasNode)
     }
 
-    // MARK: - Gestión del frame
+    // MARK: - Frame management
 
-    /// Elimina todos los nodos del frame anterior y reinicia el orden Z.
+    /// Removes all nodes from the previous frame and resets the Z order.
     func limpiar() {
         canvasNode.removeAllChildren()
         zPos = 0
     }
 
-    // MARK: - Dibujar superficies
+    // MARK: - Draw surfaces
 
-    /// Dibuja una superficie (o su clip activo) en coordenadas C# (x, y) con ancla.
+    /// Draws a surface (or its active clip) at C# coordinates (x, y) with an anchor.
     func dibujar(_ superficie: Superficie?, _ x: Int, _ y: Int, _ ancla: Int) {
         let alpha = Int((superficie?.alphaActual ?? 1.0) * 255.0)
         dibujar(superficie, x, y, alpha, ancla)
     }
 
-    /// Dibuja una superficie con transparencia explícita (alpha 0-255).
+    /// Draws a surface with an explicit transparency value (alpha 0-255).
     func dibujar(_ superficie: Superficie?, _ x: Int, _ y: Int, _ alpha: Int, _ ancla: Int) {
         guard let sup = superficie,
               let tex = sup.texturaActual ?? sup.textura else { return }
@@ -62,14 +68,14 @@ class Video {
         if (ancla & Superficie.V_CENTRO) != 0 { py += Video.Alto  / 2 - fh / 2 }
 
         let node = SKSpriteNode(texture: tex)
-        node.anchorPoint = CGPoint(x: 0, y: 1)          // ancla top-left
+        node.anchorPoint = CGPoint(x: 0, y: 1)          // top-left anchor
         node.position    = CGPoint(x: px, y: Video.Alto - py)
         node.alpha       = CGFloat(max(0, min(alpha, 255))) / 255.0
         node.zPosition   = zPos; zPos += 1
         canvasNode.addChild(node)
     }
 
-    /// Dibuja una sub-región de una superficie en una posición destino (blit de tile).
+    /// Draws a sub-region of a surface at a destination position (tile blit).
     func dibujar(_ superficie: Superficie?, _ srcX: Int, _ srcY: Int, _ srcW: Int, _ srcH: Int,
                  _ destX: Int, _ destY: Int) {
         guard let sup = superficie, let tex = sup.textura else { return }
@@ -101,16 +107,16 @@ class Video {
         clipX = x; clipY = y; clipW = w; clipH = h
     }
 
-    // MARK: - Escribir texto
+    // MARK: - Write text
 
-    /// Escribe el string identificado por su ID (índice en Texto.Strings) con ancla.
+    /// Writes the string identified by its ID (index in Texto.Strings) with an anchor.
     func escribir(_ stringId: Int, _ x: Int, _ y: Int, _ ancla: Int) {
         let strings = Texto.Strings
         guard stringId >= 0, stringId < strings.count else { return }
         escribirTexto(strings[stringId], x, y, ancla)
     }
 
-    /// Escribe un string literal (para debug y texto dinámico).
+    /// Writes a string literal (for debug output and dynamic text).
     func escribir(_ texto: String, _ x: Int, _ y: Int, _ ancla: Int) {
         escribirTexto(texto, x, y, ancla)
     }
@@ -140,15 +146,15 @@ class Video {
         label.attributedText          = NSAttributedString(string: text, attributes: attrs)
         label.horizontalAlignmentMode = .center
         label.verticalAlignmentMode   = (ancla & Superficie.V_CENTRO) != 0 ? .center : .top
-        label.numberOfLines           = 0      // permite saltos de línea con \n
+        label.numberOfLines           = 0      // allows line breaks with \n
         label.position  = CGPoint(x: px, y: Video.Alto - py)
         label.zPosition = zPos; zPos += 1
         canvasNode.addChild(label)
     }
 
-    // MARK: - Primitivas de relleno
+    // MARK: - Fill primitives
 
-    /// Rellena un rectángulo con el color actual, alpha y ancla opcionales.
+    /// Fills a rectangle with the current colour, optional alpha and anchor.
     func llenarRectangulo(_ x: Int, _ y: Int, _ w: Int, _ h: Int,
                           _ alpha: Int = 255, _ ancla: Int = 0) {
         var px = x, py = y
@@ -163,13 +169,13 @@ class Video {
         canvasNode.addChild(node)
     }
 
-    /// Rellena toda la pantalla con un color sólido (sobrecarga sin coordenadas).
+    /// Fills the entire screen with a solid colour (overload without coordinates).
     func llenarRectangulo(_ color: Int) {
         setearColor(color)
         llenarRectangulo(0, 0, Video.Ancho, Video.Alto)
     }
 
-    // MARK: - Estado de dibujo
+    // MARK: - Drawing state
 
     func setearColor(_ color: Int) {
         colorActual = skColor(color)
@@ -180,7 +186,7 @@ class Video {
         colorFuenteActual = skColor(color)
     }
 
-    /// Dibuja el contorno de un rectángulo (sin relleno) con el color actual.
+    /// Draws the outline of a rectangle (no fill) with the current colour.
     func dibujarRectangulo(_ x: Int, _ y: Int, _ w: Int, _ h: Int, _ ancla: Int) {
         var px = x, py = y
         if (ancla & Superficie.H_CENTRO) != 0 { px += Video.Ancho / 2 - w / 2 }
@@ -194,7 +200,7 @@ class Video {
         canvasNode.addChild(shape)
     }
 
-    /// No-op: SpriteKit gestiona el doble buffer automáticamente.
+    /// No-op: SpriteKit manages double-buffering automatically.
     func refrescar() {}
 
     // MARK: - Helpers

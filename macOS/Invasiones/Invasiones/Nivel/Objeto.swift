@@ -1,15 +1,21 @@
-// Nivel/Objeto.swift
-// Puerto de Objeto.cs — clase base de los objetos del mapa (obstáculos, unidades, animaciones).
+//
+//  Objeto.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Objeto.cs — base class for all map objects (obstacles, units, animations).
+//
 
 import Foundation
 
 class Objeto {
 
-    // MARK: - Statics compartidos (equivalente a campos static en C#)
+    // MARK: - Shared statics (equivalent to static fields in C#)
     static var camara: Camara?
     static var mapa:   Mapa?
 
-    // MARK: - Atributos
+    // MARK: - Attributes
     var m_imagen:            Superficie?
     var m_posEnMundoPlano:   (x: Int, y: Int) = (0, 0)
     var m_posEnTileFisico:   (x: Int, y: Int) = (0, 0)
@@ -19,7 +25,7 @@ class Objeto {
     var m_x:                 Int = 0
     var m_y:                 Int = 0
 
-    // MARK: - Properties públicas
+    // MARK: - Public properties
     var posicionEnTileFisico: (x: Int, y: Int) {
         get { m_posEnTileFisico }
         set { m_posEnTileFisico = newValue }
@@ -32,7 +38,7 @@ class Objeto {
 
     var posEnMundoPlano: (x: Int, y: Int) { m_posEnMundoPlano }
 
-    // MARK: - Constructores
+    // MARK: - Initializeres
 
     init() {}
 
@@ -47,7 +53,7 @@ class Objeto {
         m_posEnMundoPlano = p
     }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     @discardableResult
     func actualizar() -> Bool {
@@ -69,7 +75,7 @@ class Objeto {
                   0)
     }
 
-    /// Transforma tile (i, j) en posición (x, y) en el mundo plano.
+    /// Transforms tile (i, j) into (x, y) position in the flat world.
     func transformarIJEnXY(_ i: Int, _ j: Int) -> (x: Int, y: Int) {
         guard let mapa = Objeto.mapa else { return (0, 0) }
         let x = ((i - j) * mapa.tileAncho / 2) >> 1
@@ -84,7 +90,7 @@ class Objeto {
         actualizarPosicionXY()
     }
 
-    // Inicializa m_x, m_y a partir de la posición actual del tile (llamado al crear la unidad).
+    // Initializes m_x, m_y from the current tile position (called when creating the unit).
     func inicializarXY() {
         let p = transformarIJEnXY(m_posEnTileFisico.x, m_posEnTileFisico.y)
         m_posEnMundoPlano = p

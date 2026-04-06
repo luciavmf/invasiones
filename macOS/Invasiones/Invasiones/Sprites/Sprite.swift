@@ -1,20 +1,26 @@
-// Sprites/Sprite.swift
-// Puerto de Sprite.cs — contenedor de animaciones para un sprite del juego.
-// Gestiona un array indexado de Animaciones y delega en la animación activa.
+//
+//  Sprite.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Sprite.cs — container of animations for a game sprite.
+//  Manages an indexed array of Animaciones and delegates to the active animation.
+//
 
 import Foundation
 
 class Sprite {
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     var m_animaciones: [Animaciones?] = []
     private var m_animacionActual:   Animaciones?
     private var m_idAnimacionActual: Int = -1
 
-    // MARK: - Constructores
+    // MARK: - Initializeres
     init() {}
 
-    /// Constructor de copia: clona todas las animaciones del sprite original.
+    /// Copy initializer: clones all animations from the original sprite.
     init(copia: Sprite) {
         m_animaciones    = copia.m_animaciones.map { $0.map { Animaciones(copia: $0) } }
         m_animacionActual = m_animaciones.compactMap { $0 }.first
@@ -34,7 +40,7 @@ class Sprite {
     var frameActual:      Int          { m_animacionActual?.frameActual         ?? 0    }
     var animacionActual:  Int          { m_animacionActual?.animacionActual     ?? 0    }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     func actualizar() {
         m_animacionActual?.actualizar()
@@ -75,7 +81,7 @@ class Sprite {
         return true
     }
 
-    /// Pre-reserva N slots de animación (equivalente a `new Animaciones[N]` en C#).
+    /// Pre-allocates N animation slots (equivalent to `new Animaciones[N]` in C#).
     func reservarSlots(_ count: Int) {
         m_animaciones = Array(repeating: nil, count: count)
     }

@@ -1,5 +1,11 @@
-// Estados/EstadoSalir.swift
-// Puerto de EstadoSalir.cs — confirmación antes de salir del juego.
+//
+//  EstadoSalir.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of EstadoSalir.cs — exit confirmation dialog.
+//
 
 import Foundation
 

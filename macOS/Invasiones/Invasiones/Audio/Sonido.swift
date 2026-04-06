@@ -1,6 +1,12 @@
-// Audio/Sonido.swift
-// Puerto de Sonido.cs — reproducción de efectos especiales y música de fondo.
-// SDL_mixer reemplazado por AVFoundation.
+//
+//  Sonido.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Sonido.cs — playback of sound effects and background music.
+//  SDL_mixer replaced by AVFoundation.
+//
 
 import AVFoundation
 import Foundation
@@ -15,24 +21,24 @@ class Sonido {
         return s_instancia!
     }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_sfxPlayers: [AVAudioPlayer?] = Array(repeating: nil, count: Res.SFX_COUNT)
     private var m_musicPlayer: AVAudioPlayer?
     private var m_musicActual: Int = -1
 
     private init() {}
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     func inicializar() {
-        // AVFoundation no requiere inicialización explícita.
+        // AVFoundation does not require explicit initialization.
     }
 
     func cargarTodosLosSonidos() {
         let paths = AdministradorDeRecursos.Instancia.pathsSonidos
 
-        // Primeros Res.SND_COUNT son música de fondo (= 0 en este juego).
-        // Siguientes Res.SFX_COUNT son efectos especiales.
+        // First Res.SND_COUNT entries are background music (= 0 in this game).
+        // Next Res.SFX_COUNT entries are sound effects.
         for i in 0..<Res.SFX_COUNT {
             let pathIdx = Res.SND_COUNT + i
             guard pathIdx < paths.count, let path = paths[pathIdx] else { continue }
@@ -60,7 +66,7 @@ class Sonido {
             player.numberOfLoops = loop < -1 ? 0 : loop
             player.play()
         }
-        // Sin música de fondo (SND_COUNT = 0).
+        // No background music (SND_COUNT = 0).
         return true
     }
 

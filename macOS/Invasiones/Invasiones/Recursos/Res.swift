@@ -1,5 +1,11 @@
-// Recursos/Res.swift
-// Puerto de Res.cs — IDs de recursos autogenerados (strings, fuentes, imágenes, sonidos, sprites, anims).
+//
+//  Res.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Res.cs — auto-generated resource IDs (strings, fonts, images, sounds, sprites, anims).
+//
 
 import Foundation
 

@@ -1,12 +1,18 @@
-// Sprites/Animaciones.swift
-// Puerto de Animaciones.cs — controlador de frames de animación sobre un sprite sheet.
-// El sprite sheet tiene frames dispuestos en columnas (eje X) y animaciones en filas (eje Y).
+//
+//  Animaciones.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Animaciones.cs — animation frame controller over a sprite sheet.
+//  Frames are arranged in columns (X axis) and animations in rows (Y axis).
+//
 
 import Foundation
 
 class Animaciones {
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private(set) var animacionActual:     Int
     private      var m_pathImagen:        String
     private(set) var frameAncho:          Int
@@ -26,7 +32,7 @@ class Animaciones {
     private(set) var m_animacionTerminada = false
     private(set) var offsets:             (x: Int, y: Int) = (0, 0)
 
-    // MARK: - Constructor principal (sin alto de frame explícito; se infiere al cargar)
+    // MARK: - Initializer principal (sin alto de frame explícito; se infiere al cargar)
     init(id: Int, path: String, frameAncho: Int, ticks: Int, offsetX: Int = 0, offsetY: Int = 0) {
         self.animacionActual = id
         self.m_pathImagen    = path
@@ -37,7 +43,7 @@ class Animaciones {
         self.m_animacionLeida = (id >= 0 && id <= Res.ANIM_COUNT)
     }
 
-    /// Constructor con alto de frame explícito.
+    /// Initializer with explicit frame height.
     init(idx: Int, path: String, ticks: Int, anchoFrame: Int, altoFrame: Int,
          offsetX: Int = 0, offsetY: Int = 0) {
         self.animacionActual  = idx
@@ -49,7 +55,7 @@ class Animaciones {
         self.m_animacionLeida = true
     }
 
-    /// Constructor de copia — comparte el sprite sheet base pero tiene su propio estado de clip.
+    /// Copy initializer — shares the base sprite sheet but has its own clip state.
     init(copia: Animaciones) {
         self.m_pathImagen        = copia.m_pathImagen
         self.m_ticks             = copia.m_ticks
@@ -63,12 +69,12 @@ class Animaciones {
         self.m_animacionLeida    = copia.m_animacionLeida
         self.m_animacionCargada  = copia.m_animacionCargada
 
-        // Cada copia necesita su propia Superficie para tener su propio texturaActual.
+        // Each copy needs its own Superficie to have its own current texture.
         self.m_imagen = AdministradorDeRecursos.Instancia.obtenerCopiaImagen(m_pathImagen)
         setearAnimacion(0)
     }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     @discardableResult
     func cargar() -> Bool {
@@ -123,7 +129,7 @@ class Animaciones {
         return true
     }
 
-    // MARK: - Métodos virtuales
+    // MARK: - Virtual methods
 
     func actualizar() {
         guard m_reproduciendo else { return }

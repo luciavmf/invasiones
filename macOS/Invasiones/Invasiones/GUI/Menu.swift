@@ -1,18 +1,24 @@
-// GUI/Menu.swift
-// Puerto de Menu.cs — menú vertical con ítems seleccionables por mouse.
+//
+//  Menu.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Menu.cs — vertical menu with mouse-selectable items.
+//
 
 import Foundation
 
 class Menu: CajaGUI {
 
-    // MARK: - Constantes
+    // MARK: - Constants
     static let MAX_CANTIDAD_ITEMS    = 15
     static let ITEM_VISIBLE          = 1 << 1
     static let ITEM_ESCONDIDO        = 1 << 2
     static let ITEM_DEBAJO_DEL_MOUSE = 1 << 3
     static let ITEM_SELECCIONADO     = 1 << 4
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_items:              [Int]
     private var m_cantidadDeItems:    Int = 0
     private var m_botonAncho:         Int = 160
@@ -22,7 +28,7 @@ class Menu: CajaGUI {
     private var m_posicionOriginalX:  Int
     private var m_ancla:              Int
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(imagen: Superficie?, cantItem: Int, x: Int, y: Int, ancla: Int) {
         m_items             = Array(repeating: 0, count: Menu.MAX_CANTIDAD_ITEMS)
         m_posicionOriginalX = x
@@ -38,7 +44,7 @@ class Menu: CajaGUI {
         }
     }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     override func dibujar(_ g: Video) {
         if let img = m_imagen {

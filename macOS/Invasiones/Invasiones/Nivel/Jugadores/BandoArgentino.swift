@@ -1,12 +1,18 @@
-// Nivel/Jugadores/BandoArgentino.swift
-// Puerto de BandoArgentino.cs — bando controlado por el jugador.
+//
+//  BandoArgentino.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of BandoArgentino.cs — player-controlled faction.
+//
 
 import Foundation
 internal import CoreGraphics
 
 class BandoArgentino: Jugador {
 
-    // MARK: - Atributos
+    // MARK: - Attributes
     private var m_unidadBajoMouse:            Unidad?
     private var m_cuenta:                     Int = 0
     private var m_objetoFlecha:               Objeto?
@@ -17,7 +23,7 @@ class BandoArgentino: Jugador {
 
     private let CUENTA_MAX_FLECHA = 100
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     override init(mapa: Mapa, camara: Camara, objetosAPintar: TablaObjetos, hud: Hud) {
         super.init(mapa: mapa, camara: camara, objetosAPintar: objetosAPintar, hud: hud)
         m_bando = .ARGENTINO
@@ -76,29 +82,29 @@ class BandoArgentino: Jugador {
         return true
     }
 
-    // MARK: - Dibujar (llamado desde Episodio)
+    // MARK: - Draw (llamado desde Episodio)
 
     func dibujarFlechaOrientacion(_ g: Video) {
         guard m_estado == .JUEGO else { return }
 
-        // Dibujar aro de objetivo, objeto a tomar y fueguitos
+        // Draw objective ring, object to grab, and fire effects
         m_aro?.dibujar(g)
         m_objetoATomar?.dibujar(g)
         m_fueguitos?.forEach { $0.dibujar(g) }
 
-        // Dibujar flecha destino estática si hay orden reciente
+        // Draw static destination arrow if there's a recent order
         if m_cuenta < CUENTA_MAX_FLECHA {
             m_objetoFlecha?.dibujar(g)
         }
 
-        // Dibujar flecha de orientación sólo si el objetivo está fuera de pantalla
+        // Draw orientation arrow only if objective is off-screen
         guard m_orden != nil, m_flechaOrientacion != nil else { return }
         guard !objetivoEsVisible() else { return }
         m_flechaOrientacion?.dibujar(g, m_posicionFlechaOrientacion.x,
                                      m_posicionFlechaOrientacion.y, 0)
     }
 
-    // MARK: - Coordenadas de pintado para el Episodio
+    // MARK: - Rendering coordinates for Episodio
 
     func obtenerCoordenadasDePintado() -> (x: Int, y: Int, w: Int, h: Int) {
         guard let cam = Objeto.camara else {
@@ -115,7 +121,7 @@ class BandoArgentino: Jugador {
     func seleccionarUnidadSiguiente() {
         guard !m_unidades.isEmpty else { return }
 
-        // Centrar cámara en la unidad
+        // Center camera on the unit
         let u = m_unidades[m_indiceUnidadAEncontrar]
         m_camara.X = (((u.posicionEnTileFisico.y - u.posicionEnTileFisico.x) *
                         m_mapa.tileFisicoAncho) >> 1) + Video.Ancho / 2
@@ -133,7 +139,7 @@ class BandoArgentino: Jugador {
         if m_indiceUnidadAEncontrar >= m_unidades.count { m_indiceUnidadAEncontrar = 0 }
     }
 
-    // MARK: - Privados
+    // MARK: - Private
 
     private func actualizarEstadoJuego() {
         actualizarFlechaOrientacion()
@@ -159,12 +165,12 @@ class BandoArgentino: Jugador {
         m_cuenta += 1
     }
 
-    // MARK: - Flecha de orientación
+    // MARK: - Orientation arrow
 
     private func actualizarFlechaOrientacion() {
         guard let ord = m_orden, let flecha = m_flechaOrientacion else { return }
 
-        // Posición en pantalla del tile objetivo
+        // Screen position of the target tile
         m_posOrdenApuntada.x = (((ord.punto.x - ord.punto.y) * m_mapa.tileAncho / 2) >> 1)
                               + m_camara.inicioX + m_camara.X
         m_posOrdenApuntada.y = (((ord.punto.x + ord.punto.y) * m_mapa.tileAlto  / 2) >> 1)
@@ -228,7 +234,7 @@ class BandoArgentino: Jugador {
                m_posOrdenApuntada.y < m_camara.alto
     }
 
-    // MARK: - Unidad bajo el mouse
+    // MARK: - Unit under mouse
 
     private func obtenerUnidadBajoMouse() -> Unidad? {
         let rect = obtenerCoordenadasDePintado()
@@ -255,10 +261,10 @@ class BandoArgentino: Jugador {
         return nil
     }
 
-    // MARK: - Órdenes
+    // MARK: - Orders
 
     private func chequearOrdenesAUnidades() {
-        // Click izquierdo sobre una unidad argentina: seleccionarla
+        // Left click on an Argentine unit: select it
         if Mouse.Instancia.BotonesApretados.contains(Mouse.BOTON_IZQ) {
             if let uBajoMouse = m_unidadBajoMouse, uBajoMouse.bando == .ARGENTINO {
                 let arr = Mouse.Instancia.RectanguloArrastrado
@@ -281,14 +287,14 @@ class BandoArgentino: Jugador {
 
         guard m_unidadSeleccionada != nil || m_grupoSeleccionado != nil else { return }
 
-        // Click derecho: mover o atacar
+        // Right click: move or attack
         if Mouse.Instancia.BotonesApretados.contains(Mouse.BOTON_DER) {
             Mouse.Instancia.soltarBoton(Mouse.BOTON_DER)
 
             let tile = m_mapa.tileChicoMouse
 
             if m_mapa.esPosicionCaminable(tile.x, tile.y) {
-                // Hay unidad enemiga bajo el mouse → atacar
+                // There is an enemy unit under the mouse → attack
                 if let uBajoMouse = m_unidadBajoMouse,
                    uBajoMouse.bando == .ENEMIGO,
                    !uBajoMouse.estaMuerto() {
@@ -308,7 +314,7 @@ class BandoArgentino: Jugador {
                     m_objetoFlecha?.setearPosicionEnTile(tile.x, tile.y)
                 }
             } else {
-                // Tile no caminable: chequear si es enfermería
+                // Non-walkable tile: check if it's the infirmary
                 let tileBajoMouse = m_mapa.tileBajoMouse
                 guard tileBajoMouse.y < m_mapa.alto  && tileBajoMouse.y >= 0 &&
                       tileBajoMouse.x < m_mapa.ancho && tileBajoMouse.x >= 0 else { return }
@@ -333,7 +339,7 @@ class BandoArgentino: Jugador {
             }
         }
 
-        // Click izquierdo sin arrastrar: deseleccionar
+        // Left click without dragging: deselect
         if Mouse.Instancia.BotonesApretados.contains(Mouse.BOTON_IZQ) {
             let arr = Mouse.Instancia.RectanguloArrastrado
             let arrastrando = Mouse.Instancia.arrastrando()
@@ -345,7 +351,7 @@ class BandoArgentino: Jugador {
         }
     }
 
-    // MARK: - Creación y gestión de grupos
+    // MARK: - Group creation and management
 
     private func crearGrupos() {
         guard !m_unidadesSeleccionadas.isEmpty else { return }
@@ -452,7 +458,7 @@ class BandoArgentino: Jugador {
         }
     }
 
-    // MARK: - Helpers privados
+    // MARK: - Private helpers
 
     private func seleccionarUnidadesEnRectanguloArrastre() {
         let arr = Mouse.Instancia.RectanguloArrastrado

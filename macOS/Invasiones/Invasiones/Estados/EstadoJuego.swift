@@ -1,5 +1,11 @@
-// Estados/EstadoJuego.swift
-// Puerto de EstadoJuego.cs — estado del juego activo con Episodio.
+//
+//  EstadoJuego.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of EstadoJuego.cs — active game state containing the Episodio.
+//
 
 import Foundation
 
@@ -9,7 +15,7 @@ class EstadoJuego: Estado {
     private enum ESTADO { case INICIO, GANO, PERDIO, MENU, JUGANDO, CONFIRMACION }
     private enum MENU_ITEM: Int { case CONTINUAR = 0, SALIR = 1 }
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_batalla:            Episodio?
     private var m_menuDelJuego:       Menu?
     private var m_menuDeConfirmacion: MenuDeConfirmacion?
@@ -111,7 +117,7 @@ class EstadoJuego: Estado {
 
     override func salir() {}
 
-    // MARK: - Privado
+    // MARK: - Private
 
     private func setearEstado(_ estado: ESTADO) {
         m_estado = estado

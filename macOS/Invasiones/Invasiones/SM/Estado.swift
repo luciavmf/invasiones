@@ -1,30 +1,36 @@
-// SM/Estado.swift
-// Puerto de Estado.cs — clase base abstracta de todos los estados del juego.
-// En Swift se usan fatalError() para simular métodos abstractos.
+//
+//  Estado.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Estado.cs — abstract base class for all game states.
+//  Swift uses fatalError() to simulate abstract methods.
+//
 
 import Foundation
 
 class Estado {
 
-    // MARK: - Declaraciones
-    /// Máquina de estados padre — necesaria para cambiar de estado desde dentro.
+    // MARK: - Declarations
+    /// Parent state machine — needed to transition to another state from within.
     var maquinaDeEstados: MaquinaDeEstados
 
-    /// Imagen de fondo del estado (cargada en iniciar(), dibujada en dibujar()).
+    /// Background image for this state (loaded in iniciar(), drawn in dibujar()).
     var m_fondo: Superficie?
 
-    /// Botón genérico reutilizado por varios estados (e.g. "Menú", "Siguiente").
+    /// Generic button reused by several states (e.g. "Menu", "Next").
     var m_boton: Boton?
 
-    /// Utilizado para cuentas regresivas.
+    /// Used for countdowns.
     var m_cuenta: Int = 0
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(_ sm: MaquinaDeEstados) {
         self.maquinaDeEstados = sm
     }
 
-    // MARK: - Métodos abstractos (deben ser sobreescritos por subclases)
+    // MARK: - Abstract methods (must be overridden by subclasses)
     func dibujar(_ g: Video) {
         fatalError("\(type(of: self)).dibujar(_:) must be overridden")
     }

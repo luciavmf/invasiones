@@ -1,16 +1,22 @@
-// Map/Mapa.swift
-// Puerto de Mapa.cs — carga y renderiza un mapa isométrico en formato TMX (Tiled).
-// Soporta múltiples capas, tilesets y scroll de cámara por mouse.
+//
+//  Mapa.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Mapa.cs — loads and renders an isometric map in TMX format (Tiled).
+//  Supports multiple layers, tilesets, and mouse-driven camera scroll.
+//
 
 import Foundation
 
 class Mapa {
 
-    // MARK: - Constantes
+    // MARK: - Constants
     private let NRO_MAXIMO_DE_CAPAS = 8
     private let CAPA_INFO           = 8
 
-    // MARK: - Índices de capas (leídos del XML)
+    // MARK: - Layer indices (read from XML)
     private(set) var CAPA_TERRENO:               Int = 0
     private var CAPA_OBSTACULOS:                 Int = 0
     private var CAPA_UNIDADES_JUGADOR:           Int = 0
@@ -20,7 +26,7 @@ class Mapa {
 
     // MARK: - Datos del mapa
     /// `m_mapa[capa][i][j]` = tile ID (Int16).
-    private var m_mapa: [[[Int16]]] = []           // [capa][col][fila]
+    private var m_mapa: [[[Int16]]] = []           // [layer][col][row]
     private var m_nombresCapas: [String: Int] = [:]
     private var m_mapaCargado  = false
     private var m_numeroMaximoDeCapas = 0
@@ -40,21 +46,21 @@ class Mapa {
 
     private static var m_tilesetDebug: Tileset?
 
-    // MARK: - Mouse en tile
+    // MARK: - Mouse on tile
     private var m_tileMouse:      (x: Int, y: Int) = (0, 0)
     private var m_tileChicoMouse: (x: Int, y: Int) = (0, 0)
 
-    // MARK: - Mapa físico (tiles pequeños, x2 de resolución)
-    private(set) var capaTilesFisicos:  [[Int16]] = []  // [col * 2][fila * 2]
+    // MARK: - Physical map (small tiles, ×2 resolution)
+    private(set) var capaTilesFisicos:  [[Int16]] = []  // [col * 2][row * 2]
     var capaTilesVisibles: [[Int16]] = []
 
-    // MARK: - Imagen de tile gris (debug / selección semitransparente)
+    // MARK: - Grey tile image (debug / semi-transparent selection)
     private var m_imagenTileGris: Superficie?
 
-    // MARK: - Cámara
+    // MARK: - Camera
     private let m_camara: Camara
 
-    // MARK: - Properties públicas
+    // MARK: - Public properties
     var alto:      Int { m_altoEnTiles }
     var ancho:     Int { m_anchoEnTiles }
     var altoMapaFisico:  Int { m_altoEnTilesMapaFisico }
@@ -81,12 +87,12 @@ class Mapa {
     }
     var tilesets: [Tileset?] { m_tilesets }
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     init(camara: Camara) {
         m_camara = camara
     }
 
-    // MARK: - Carga
+    // MARK: - Loading
 
     @discardableResult
     func cargar(_ mapId: Int) -> Bool {
@@ -114,9 +120,9 @@ class Mapa {
         return true
     }
 
-    // MARK: - Dibujo
+    // MARK: - Drawing
 
-    /// Dibuja la capa `layer` en el Video dado usando la cámara actual.
+    /// Draws layer `layer` onto the given Video using the current camera.
     @discardableResult
     func dibujarCapa(_ g: Video, _ layer: Int) -> Bool {
         guard layer < m_numeroMaximoDeCapas, layer >= 0 else { return false }
@@ -163,8 +169,8 @@ class Mapa {
 
     // MARK: - Tile Chico (fog-of-war)
 
-    /// Dibuja un tile pequeño (mapa físico) en la posición isométrica correspondiente.
-    /// Si `semiTransparente` es true dibuja el tile gris semitransparente (fog-of-war).
+    /// Draws a small tile (physical map) at the corresponding isometric position.
+    /// If `semiTransparente` is true, draws the semi-transparent grey tile (fog-of-war).
     func dibujarTileChico(_ g: Video, _ i: Int, _ j: Int, _ semiTransparente: Bool) {
         guard i >= 0, j >= 0, i < m_altoEnTilesMapaFisico, j < m_anchoEnTilesMapaFisico else { return }
 
@@ -179,7 +185,7 @@ class Mapa {
         }
     }
 
-    // MARK: - Actualización (scroll de cámara)
+    // MARK: - Update (camera scroll)
 
     func actualizar() {
         guard m_mapaCargado else { return }
@@ -255,7 +261,7 @@ class Mapa {
         actualizarCoordenadasDelMouse()
     }
 
-    // MARK: - Consultas públicas
+    // MARK: - Public queries
 
     func obtenerTileset(_ tileId: Int) -> Tileset? {
         var resultado: Tileset? = nil
@@ -287,7 +293,7 @@ class Mapa {
         capaTilesFisicos[x][y + 1]     = v
     }
 
-    // MARK: - Privados
+    // MARK: - Private
 
     private func calcularPrimerTileAPintar(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
         let a = tileAlto > 0 ? -y / tileAlto : 0
@@ -324,7 +330,7 @@ class Mapa {
         return (a + b, a - b)
     }
 
-    // MARK: - Carga interna del TMX
+    // MARK: - Internal TMX loading
 
     private func leerInfoMapa(_ path: String) -> Bool {
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else { return false }
@@ -377,13 +383,13 @@ class Mapa {
             Mapa.m_tilesetDebug = ts
         }
 
-        // Expando el mapa a la capa INFO (CAPA_INFO = 8)
+        // Expand the map to the INFO layer (CAPA_INFO = 8)
         while m_mapa.count <= CAPA_INFO {
             m_mapa.append(Array(repeating: Array(repeating: 0, count: m_altoEnTiles),
                                 count: m_anchoEnTiles))
         }
 
-        // Inicializo el mapa físico y el mapa de visibilidad (resolución doble)
+        // Initialize the physical map and visibility map (double resolution)
         capaTilesFisicos  = Array(repeating: Array(repeating: 0, count: m_altoEnTiles * 2),
                                   count: m_anchoEnTiles * 2)
         capaTilesVisibles = Array(repeating: Array(repeating: 0, count: m_altoEnTiles * 2),
@@ -410,7 +416,7 @@ class Mapa {
         _ = PathFinder.Instancia.cargarMapa(self)
     }
 
-    // MARK: - Helpers llamados desde los delegates
+    // MARK: - Helpers called from delegates
 
     fileprivate func agregarNombreCapa(_ nombre: String, _ index: Int) {
         m_nombresCapas[nombre] = index
@@ -443,7 +449,7 @@ class Mapa {
     fileprivate var altoEnTilesInt: Int { m_altoEnTiles }
 }
 
-// MARK: - Delegates XML privados
+// MARK: - Private XML delegates
 
 private class MapInfoDelegate: NSObject, XMLParserDelegate {
     var orientacion = ""; var ancho = 0; var alto = 0
@@ -546,17 +552,17 @@ private class LayerDelegate: NSObject, XMLParserDelegate {
                                       count: m.anchoEnTiles)
                     let bytes = [UInt8](decoded)
                     var idx = 0
-                    // TMX almacena los tiles fila por fila (row-major): primero todas las columnas
-                    // de la fila 0, luego las de la fila 1, etc.
+                    // TMX stores tiles row by row (row-major): first all columns
+                    // of row 0, then those of row 1, etc.
                     for j in 0..<m.altoEnTilesInt {
                         for i in 0..<m.anchoEnTiles {
                             if idx + 3 < bytes.count {
-                                // ID de 32 bits little-endian
+                                // 32-bit little-endian tile ID
                                 let id = UInt32(bytes[idx])
                                     | UInt32(bytes[idx+1]) << 8
                                     | UInt32(bytes[idx+2]) << 16
                                     | UInt32(bytes[idx+3]) << 24
-                                datos[i][j] = Int16(id & 0x1FFF) // máscara de flip bits (bits 29-31)
+                                datos[i][j] = Int16(id & 0x1FFF) // flip bit mask (bits 29-31)
                             }
                             idx += 4
                         }

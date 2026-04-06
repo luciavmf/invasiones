@@ -1,11 +1,17 @@
-// Nivel/Unidades/Unidad.swift
-// Puerto de Unidad.cs (varios archivos parciales fusionados) — representa una unidad en el juego.
+//
+//  Unidad.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of Unidad.cs (multiple partial files merged) — represents a unit in the game.
+//
 
 import Foundation
 
 class Unidad: Objeto {
 
-    // MARK: - Constantes
+    // MARK: - Constants
     static let MAXIMA_VISIBILIDAD            = 15
     static let DISTANCIA_A_CHEQUEAR_COLISION = 4
 
@@ -25,7 +31,7 @@ class Unidad: Objeto {
         case INCREMENTAR_PASO, ESQUIVAR_UNIDAD, ALCANZAR_PASO, TERMINO_DE_DAR_PASO
     }
 
-    // MARK: - Atributos
+    // MARK: - Attributes
     private var m_tipo:                   Int = 0
     private var m_subestado:              SUBESTADO = .INCREMENTAR_PASO
     private var m_bando:                  Episodio.BANDO = .ENEMIGO
@@ -66,11 +72,11 @@ class Unidad: Objeto {
     private var m_grupo:                 Grupo?
     private var m_cumplioConLaOrdenDeObjetivo: Bool = false
 
-    // Posición continua en mundo para movimiento suave
+    // Continuous world position for smooth movement
     private var m_posXActual:   Double = 0
     private var m_posYActual:   Double = 0
 
-    // MARK: - Properties públicas
+    // MARK: - Public properties
 
     var bando: Episodio.BANDO {
         get { m_bando }
@@ -104,13 +110,13 @@ class Unidad: Objeto {
     var unidadAEsquivar: Unidad? { m_unidadAEsquivar }
     var caminoASeguir: [(i: Int, j: Int)]? { m_caminoASeguir }
 
-    // MARK: - Constructores
+    // MARK: - Initializeres
 
     override init() {
         super.init()
     }
 
-    /// Constructor de copia de template (id = índice en tipoDeUnidades).
+    /// Template copy initializer (id = index in tipoDeUnidades).
     init(_ id: Int) {
         super.init()
         let tipos = AdministradorDeRecursos.Instancia.tipoDeUnidades
@@ -139,9 +145,9 @@ class Unidad: Objeto {
         }
     }
 
-    // MARK: - Update principal
+    // MARK: - Main update
 
-    /// Actualiza la unidad. Devuelve true si cambió su posición en el mapa físico.
+    /// Updates the unit. Returns true if it moved on the physical map.
     @discardableResult
     override func actualizar() -> Bool {
         guard m_estado != .MUERTO else { return false }
@@ -168,7 +174,7 @@ class Unidad: Objeto {
             actualizarEstadoSanando()
         }
 
-        // Chequear si cumplió la orden de objetivo
+        // Check if the objective order was fulfilled
         chequearSiCumplioOrden()
 
         super.actualizar()
@@ -177,7 +183,7 @@ class Unidad: Objeto {
     }
 
     override func dibujar(_ g: Video) {
-        // La selección (barra de salud) se dibuja aquí
+        // Selection (health bar) is drawn here
         if m_seleccionado {
             let healthFraction = Double(m_salud) / Double(max(m_puntosDeResistencia, 1))
             let barAncho = Int(Double(SELECCION_ANCHO) * healthFraction)
@@ -194,7 +200,7 @@ class Unidad: Objeto {
                            m_y - (m_sprite?.frameAlto ?? 0))
     }
 
-    // MARK: - Órdenes públicas
+    // MARK: - Public orders
 
     func mover(_ x: Int, _ y: Int) {
         m_orden = Orden(.MOVER, x, y)
@@ -205,7 +211,7 @@ class Unidad: Objeto {
             m_posEnTileFisico.x, m_posEnTileFisico.y, x, y)
 
         if let c = camino, !c.isEmpty {
-            // El primer elemento es destino, último es origen. Usamos como pila (popLast = próximo paso).
+            // First element is destination, last is origin. Used as a stack (popLast = next step).
             m_caminoASeguir = Array(c.dropLast())   // quita el nodo inicio (último = origen)
         } else {
             setearEstado(.OCIO)
@@ -244,7 +250,7 @@ class Unidad: Objeto {
         setearEstado(.SANANDO)
     }
 
-    // MARK: - Colisión y evasión
+    // MARK: - Collision and evasion
 
     func hayColision(_ otra: Unidad) -> Bool {
         let dx = abs(m_posEnTileFisico.x - otra.m_posEnTileFisico.x)
@@ -257,7 +263,7 @@ class Unidad: Objeto {
         m_subestado       = .ESQUIVAR_UNIDAD
     }
 
-    // MARK: - Consultas
+    // MARK: - Queries
 
     func estaMuerto() -> Bool { m_estado == .MUERTO }
 
@@ -283,7 +289,7 @@ class Unidad: Objeto {
         return dist <= Double(CANTIDAD_MINIMA_TILES_ORD_MOVER)
     }
 
-    // MARK: - Grupo / formación
+    // MARK: - Group / formation
 
     var perteneceAUnGrupo: Bool { m_grupo != nil }
     var grupoAlQuePertenezco: Grupo? { m_grupo }
@@ -306,7 +312,7 @@ class Unidad: Objeto {
 
     func calcularCaminoADistancia(_ caminoComandante: [(i: Int, j: Int)],
                                   _ offsetX: Int, _ offsetY: Int) {
-        // Simplificado: calculamos nuestro camino directo al destino del comandante + offset
+        // Simplified: compute direct path to the commander's destination + offset
         guard let ultimo = caminoComandante.first else { return }
         let destI = ultimo.i + offsetX
         let destJ = ultimo.j + offsetY
@@ -348,7 +354,7 @@ class Unidad: Objeto {
         return dentro
     }
 
-    // MARK: - Privados
+    // MARK: - Private
 
     private func setearEstado(_ e: ESTADO) {
         m_estado = e
@@ -382,7 +388,7 @@ class Unidad: Objeto {
         }
     }
 
-    // MARK: - Movimiento
+    // MARK: - Movement
 
     private func actualizarEstadoMoviendo() -> Bool {
         return moverse()
@@ -413,7 +419,7 @@ class Unidad: Objeto {
         let dir = obtenerDireccion(m_proximoPaso.x, m_proximoPaso.y)
         if dir != -1 { m_direccion = dir }
 
-        // Actualiza animación de caminar
+        // Update walking animation
         let anim = primerAnimacion() + m_direccion
         m_sprite?.setearAnimacion(anim)
         m_sprite?.reproducir()
@@ -453,7 +459,7 @@ class Unidad: Objeto {
             m_subestado = .INCREMENTAR_PASO
             return
         }
-        // Buscar un paso alternativo evitando la posición de la otra unidad
+        // Find an alternative step avoiding the other unit's position
         let oI = otra.m_posEnTileFisico.x
         let oJ = otra.m_posEnTileFisico.y
         let offsets = [(-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (1, 1), (-1, 1), (1, -1)]
@@ -484,7 +490,7 @@ class Unidad: Objeto {
         return mapping[index]
     }
 
-    // MARK: - Patrullaje
+    // MARK: - Patrolling
 
     private func encontrarCaminoParaPatrullarAlAzar(_ i: Int, _ j: Int) -> [(i: Int, j: Int)]? {
         guard let mapa = Objeto.mapa else { return nil }
@@ -498,7 +504,7 @@ class Unidad: Objeto {
         return PathFinder.Instancia.encontrarCaminoMasCorto(i, j, destI, destJ)
     }
 
-    // MARK: - Persecución y ataque
+    // MARK: - Pursuit and attack
 
     private func actualizarEstadoPersiguiendoUnidad() {
         guard let enemigo = m_enemigo else {
@@ -514,11 +520,11 @@ class Unidad: Objeto {
         let dist = calcularDistancia(enemigo.m_posEnTileFisico.x, enemigo.m_posEnTileFisico.y)
 
         if dist <= Double(m_alcanceDeTiro) {
-            // Estamos en rango: atacar
+            // In range: attack
             apuntarAUnidad(enemigo)
             setearEstado(.ATACANDO)
         } else {
-            // Acercarnos
+            // Move closer
             if m_caminoASeguir == nil || m_blanco != enemigo.m_posEnTileFisico {
                 m_blanco = enemigo.m_posEnTileFisico
                 mover(enemigo.m_posEnTileFisico.x, enemigo.m_posEnTileFisico.y)
@@ -557,7 +563,7 @@ class Unidad: Objeto {
             }
         }
 
-        // Volver a perseguir si se alejó
+        // Resume pursuit if it moved away
         let dist = calcularDistancia(enemigo.m_posEnTileFisico.x, enemigo.m_posEnTileFisico.y)
         if dist > Double(m_alcanceDeTiro) {
             setearEstado(.PERSIGUIENDO_UNIDAD)
@@ -611,7 +617,7 @@ class Unidad: Objeto {
         Sonido.Instancia.reproducir(sfx, 0)
     }
 
-    // MARK: - Sanación
+    // MARK: - Healing
 
     private func actualizarEstadoSanando() {
         m_cuentaRecuperacion += 1
@@ -624,9 +630,9 @@ class Unidad: Objeto {
         }
     }
 
-    // MARK: - Cargar desde CSV
+    // MARK: - Loadingr desde CSV
 
-    /// Lee los atributos de la unidad desde el archivo CSV en la ruta indexada por `id`.
+    /// Reads the unit attributes from the CSV file at the path indexed by `id`.
     func leerUnidad(_ id: Int) {
         let paths = AdministradorDeRecursos.Instancia.pathsUnidades
         guard id >= 0, id < paths.count, let path = paths[id],
@@ -683,7 +689,7 @@ class Unidad: Objeto {
         }
     }
 
-    // MARK: - Verificar orden de objetivo
+    // MARK: - Check objective order
 
     private func chequearSiCumplioOrden() {
         guard let ord = m_ordenDeObjetivo else { return }

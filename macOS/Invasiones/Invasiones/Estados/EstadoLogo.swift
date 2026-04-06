@@ -1,25 +1,31 @@
-// Estados/EstadoLogo.swift
-// Puerto de EstadoLogo.cs — pantalla de logo con fade-in antes de pasar al menú.
+//
+//  EstadoLogo.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of EstadoLogo.cs — logo splash screen with fade-in before transitioning to the menu.
+//
 
 import Foundation
 
 class EstadoLogo: Estado {
 
-    // MARK: - Constantes
+    // MARK: - Constants
     private let LOGO_INICIO_CNT = 20
     private let LOGO_TIEMPO_CNT = 70
 
-    // MARK: - Declaraciones
+    // MARK: - Declarations
     private var m_logo:          Superficie?
     private var m_transparencia: Int = 10
 
-    // MARK: - Constructor
+    // MARK: - Initializer
     override init(_ sm: MaquinaDeEstados) {
         super.init(sm)
         m_cuenta = 0
     }
 
-    // MARK: - Métodos
+    // MARK: - Methods
 
     override func iniciar() {}
 

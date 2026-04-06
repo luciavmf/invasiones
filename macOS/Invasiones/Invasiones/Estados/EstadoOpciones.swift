@@ -1,5 +1,11 @@
-// Estados/EstadoOpciones.swift
-// Puerto de EstadoOpciones.cs — pantalla de opciones (actualmente sólo muestra título y vuelve).
+//
+//  EstadoOpciones.swift
+//  Invasiones
+//
+//  Created by Lucia Medina Fretes on 06.04.26.
+//
+//  Port of EstadoOpciones.cs — options screen (currently only shows title and returns).
+//
 
 import Foundation
 
