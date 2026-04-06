@@ -10,6 +10,7 @@
 
 import Foundation
 
+/// Abstract base class from which all game states derive.
 class State {
 
     // MARK: - Declarations
@@ -26,23 +27,29 @@ class State {
     var count: Int = 0
 
     // MARK: - Initializer
+    /// - Parameter sm: The parent state machine, required for triggering state transitions from within the state.
     init(_ sm: StateMachine) {
         self.stateMachine = sm
     }
 
     // MARK: - Abstract methods (must be overridden by subclasses)
+    /// Draws the state onto the given video surface.
+    /// - Parameter g: The screen to draw onto.
     func draw(_ g: Video) {
         fatalError("\(type(of: self)).draw(_:) must be overridden")
     }
 
+    /// Updates the state logic for this frame.
     func update() {
         fatalError("\(type(of: self)).update() must be overridden")
     }
 
+    /// Called each time this state becomes active.
     func start() {
         fatalError("\(type(of: self)).start() must be overridden")
     }
 
+    /// Called each time this state is exited.
     func exit() {
         fatalError("\(type(of: self)).salir() must be overridden")
     }

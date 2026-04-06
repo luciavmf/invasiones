@@ -9,16 +9,22 @@
 
 import Foundation
 
+/// Artificial intelligence controller for enemy groups.
+/// Loads scripted movement orders from an XML file and feeds them to the group one at a time.
 class IA {
 
     // MARK: - Private class
+    /// Contains the ordered stack of commands for a single battle phase.
     private class Batalla {
         var commands: [Command] = []  // LIFO via popLast
     }
 
     // MARK: - Declarations
+    /// All battles this AI has scripted orders for.
     private var battles: [Batalla]
+    /// The total number of battles loaded.
     private var battleCount: Int = 0
+    /// The index of the battle whose commands are currently being issued.
     private var currentBattle: Int = 0
 
     // MARK: - Initializer
@@ -28,6 +34,11 @@ class IA {
 
     // MARK: - Loading
 
+    /// Loads the AI order script for the enemy group placed at tile (x, y) in the given level.
+    /// - Parameters:
+    ///   - x: The tile column where the group is placed.
+    ///   - y: The tile row where the group is placed.
+    ///   - levelIndex: The level number, used to locate the script file.
     func load(_ x: Int, _ y: Int, _ levelIndex: Int) {
         let pathStr = Program.LEVEL_PATH + "/orden_nv\(levelIndex)_\(x)_\(y).xml"
         guard let path = Utils.getPath(pathStr) else {
@@ -53,6 +64,8 @@ class IA {
 
     // MARK: - Methods
 
+    /// Returns the next scripted command to execute, advancing to the next battle when the current one runs out.
+    /// - Returns: The next command, or `nil` if all battles are complete.
     func nextCommand() -> Command? {
         guard currentBattle < battleCount else {
             Log.shared.debug("IA: No hay mas batallas.")

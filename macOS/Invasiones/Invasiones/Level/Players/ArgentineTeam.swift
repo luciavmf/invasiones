@@ -10,6 +10,9 @@
 import Foundation
 internal import CoreGraphics
 
+/// The player-controlled Argentine faction.
+/// Handles mouse-driven unit selection, movement orders, attack orders, group creation,
+/// the orientation arrow, and objective progress.
 class ArgentineTeam: Player {
 
     // MARK: - Attributes
@@ -84,6 +87,7 @@ class ArgentineTeam: Player {
 
     // MARK: - Draw (llamado desde Episode)
 
+    /// Draws the objective ring, the collectible object, fire effects, the destination arrow, and the orientation arrow.
     func drawOrientationArrow(_ g: Video) {
         guard stateValue == .GAME else { return }
 
@@ -106,6 +110,9 @@ class ArgentineTeam: Player {
 
     // MARK: - Rendering coordinates for Episode
 
+    /// Calculates the range of tile coordinates that are visible in the current camera view.
+    /// Used by Episode to determine which objects to draw each frame.
+    /// - Returns: (x, y) of the first tile to draw, (w, h) as the tile count in each dimension.
     func getPaintCoordinates() -> (x: Int, y: Int, w: Int, h: Int) {
         guard let cam = MapObject.camera else {
             return (0, 0, map.physicalMapHeight, map.physicalMapWidth)
@@ -118,6 +125,7 @@ class ArgentineTeam: Player {
         return (p.x - 15, p.y - 5, w, h)
     }
 
+    /// Selects the next Argentine unit in sequence and centers the camera on it.
     func selectNextUnit() {
         guard !units.isEmpty else { return }
 

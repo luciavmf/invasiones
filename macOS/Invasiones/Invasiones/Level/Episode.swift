@@ -11,39 +11,55 @@
 import Foundation
 internal import CoreGraphics
 
+/// The active battle session. Owns the map, both factions, the HUD, obstacles, and the current objective.
+/// Manages the full battle lifecycle: LOADING → SHOW_INTRO → PLAYING → WON / LOST.
 class Episode {
 
     // MARK: - Enums
+    /// The factions a unit can belong to.
     enum BANDO { case ENEMY, ARGENTINE }
 
+    /// The states the battle can be in.
     enum STATE: Int {
         case END = -1, LOADING, PLAYING, SHOW_INTRO, SHOW_OBJECTIVES, WON, LOST
     }
 
     // MARK: - Constants
+    /// Number of frames to wait before showing the restart prompt after losing.
     private static let COUNT_TO_ASK_RESTART = 50
     private static let OBJECTIVES_BOX_WIDTH = 600
     private static let OBJECTIVES_BOX_HEIGHT = 270
     private static let OBJECTIVES_BOX_BUTTON_Y = 70
 
     // MARK: - Declarations
+    /// "Next" button used in the introduction/objectives screens.
     private var button: Button?
+    /// "Accept" button used in the objectives popup.
     private var acceptButton: Button?
+    /// All static obstacles loaded from the map (trees, buildings, rocks).
     private var obstacles: [Obstacle] = []
+    /// The level definition (battles and objectives).
     private var currentLevel: Level?
+    /// The index of the level being played.
     private var levelIndex: Int = 0
+    /// The shared object table indexed by physical tile position.
     private var objectsToDraw = ObjectTable([[]])
     private var camera: Camera?
+    /// The current objective the player must fulfill.
     private var objective: Objective?
     private var enemy: EnemyTeam?
     private var player: ArgentineTeam?
     private var map: Map?
     private var stateValue: STATE = .LOADING
     private var hud: Hud?
+    /// General-purpose frame counter used by multiple states.
     private var count: Int = 0
+    /// Whether to show the full objective popup (new objective acquired).
     private var showObjectivePopup: Bool = false
+    /// Whether to show the small objective reminder overlay during gameplay.
     private var showObjectiveReminder: Bool = false
     private var objectiveShowCount: Int = 0
+    /// The current intro/objective page being displayed.
     private var currentPage: Int = 0
     private var gameOverMenu: ConfirmationMenu
 
@@ -69,12 +85,16 @@ class Episode {
 
     // MARK: - Public control
 
+    /// Starts the battle by entering the loading state.
     func start() {
         setState(.LOADING)
     }
 
+    /// Saves the current battle (stub — not implemented).
+    /// - Returns: Always `false`.
     func save() -> Bool { false }
 
+    /// Called when leaving the battle state (no-op).
     func exit() {}
 
     // MARK: - Update

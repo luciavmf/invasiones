@@ -11,9 +11,13 @@
 
 import SpriteKit
 
+/// Main game coordinator. Provides the game loop and hosts the state machine.
+/// The original C# version contained a blocking loop with SDL_Delay; here the loop
+/// is driven by SpriteKit via GameScene.update(), and GameFrame only handles state logic.
 class GameFrame {
 
     // MARK: - State enum (equivalent to GameFrame.STATE in C#)
+    /// All top-level game screens.
     enum STATE {
         case INVALID
         case END
@@ -31,14 +35,16 @@ class GameFrame {
     private(set) var stateMachine: StateMachine!
     private var video: Video?
 
+    /// The current frames per second (updated each interval).
     static var FPS: Double = 0
+    /// The current updates per second (updated each interval).
     static var UPS: Double = 0
 
     // MARK: - Initializer
     init() {}
 
     // MARK: - Game start
-    /// Called once from GameScene.didMove(to:).
+    /// Initialises the state machine and all game states. Called once from GameScene.didMove(to:).
     func startGame(en escena: SKScene) {
         video = Video(escena: escena)
 
@@ -57,19 +63,20 @@ class GameFrame {
         Sound.shared.loadAllSounds()
 
         stateMachine = StateMachine()
-        stateMachine.addState(.LOGO,           LogoState(stateMachine))
+        stateMachine.addState(.LOGO, LogoState(stateMachine))
         stateMachine.addState(.MAIN_MENU, MainMenuState(stateMachine))
-        stateMachine.addState(.GAME,          GameState(stateMachine))
-        stateMachine.addState(.END,            nil)
-        stateMachine.addState(.HELP,          HelpState(stateMachine))
-        stateMachine.addState(.OPTIONS,       OptionsState(stateMachine))
-        stateMachine.addState(.QUIT,          ExitState(stateMachine))
+        stateMachine.addState(.GAME, GameState(stateMachine))
+        stateMachine.addState(.END, nil)
+        stateMachine.addState(.HELP, HelpState(stateMachine))
+        stateMachine.addState(.OPTIONS, OptionsState(stateMachine))
+        stateMachine.addState(.QUIT, ExitState(stateMachine))
 
         stateMachine.setState(.LOGO)
         stateMachine.update() // triggers start() on the first state
     }
 
     // MARK: - Loop (called by GameScene.update every frame)
+    /// Advances mouse state and ticks the state machine. Exits the app if the END state is reached.
     func update() {
         guard stateMachine.currentState != .END else {
             quitApp()
@@ -79,6 +86,7 @@ class GameFrame {
         stateMachine.update()
     }
 
+    /// Clears the canvas and renders the current state followed by the mouse cursor.
     func draw() {
         guard let v = video else { return }
         v.clear()

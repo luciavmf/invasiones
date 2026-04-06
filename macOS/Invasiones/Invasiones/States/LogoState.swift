@@ -9,14 +9,19 @@
 
 import Foundation
 
+/// Displays the studio logo with a fade-in effect and then transitions to the main menu.
+/// Resources are loaded on the first update tick while the black screen is shown.
 class LogoState: State {
 
     // MARK: - Constants
+    /// Number of ticks before the logo starts fading in.
     private let LOGO_INICIO_CNT = 20
+    /// Number of ticks the logo is displayed (fade-in window).
     private let LOGO_TIEMPO_CNT = 70
 
     // MARK: - Declarations
     private var logo: Surface?
+    /// Current alpha value used for the fade-in (0–255).
     private var alpha: Int = 10
 
     // MARK: - Initializer

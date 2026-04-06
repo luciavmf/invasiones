@@ -9,10 +9,15 @@
 
 import Foundation
 
+/// A collection of units grouped by the player for convenience.
+/// Each unit maintains its unique position relative to the group leader (formation offset).
+/// The group coordinates movement using a spiral formation algorithm and delegates attack/heal orders to individual units.
 class Group {
 
     // MARK: - Constants
+    /// The spacing between units in the formation, in physical tiles.
     static let UNIT_SPACING = 2
+    /// Sentinel value representing an impossibly large distance.
     static let MAX_DISTANCE = 99999
     private static var s_random: Bool = true  // initialized once
 
@@ -21,30 +26,44 @@ class Group {
     }
 
     // MARK: - Statics
+    /// The map shared by all groups (used for pathfinding and walkability checks).
     static var map: Map?
 
     // MARK: - Attributes
+    /// The AI controller that provides scripted orders for enemy groups.
     var ai: IA?
+    /// The next state the group will enter after the current movement completes.
     private var nextStateValue: State = .waitingCommand
+    /// The command passed down to individual units as the group's objective.
     private var objectiveCommand: Command?
+    /// The tile the group leader is heading toward.
     private var targetTile: (x: Int, y: Int) = (0, 0)
+    /// The most recent command the group received.
     private var receivedCommand: Command?
     private var completedOrder: Bool = false
     private var stateValue: State = .waitingCommand
     var units: [Unit] = []
+    /// The maximum movement speed of the group (limited to the slowest unit).
     private var speed: Int = 100
+    /// Whether the group is selected. Setting this propagates selection to all member units.
     var isSelected: Bool = false {
         didSet { units.forEach { $0.isSelected = isSelected } }
     }
+    /// The commander unit whose path determines the group's movement route.
     private var commander: Unit?
+    /// Average health across all units in the group.
     private var avgHealth: Int = 0
+    /// Average resistance points across all units in the group.
     private var avgResistance: Int = 0
     private let groupId: Int
 
     // MARK: - Properties
+    /// Average health of all units in the group.
     var health: Int { avgHealth }
+    /// Average maximum health (resistance points) of all units in the group.
     var resistancePoints: Int { avgResistance }
     var currentState: State { stateValue }
+    /// The number of soldiers currently in the group.
     var soldierCount: Int { units.count }
     var maxSpeed: Int {
         get { speed }
@@ -53,6 +72,8 @@ class Group {
     var id: Int { groupId }
 
     // MARK: - Initializer
+    /// Creates a new group from the provided list of units.
+    /// - Parameter units: The units to include in the group.
     init(_ units: [Unit]) {
         groupId = Int.random(in: 0...99999)
         self.units = units
@@ -98,6 +119,7 @@ class Group {
 
     // MARK: - Public orders
 
+    /// Orders the group to move to tile (x, y), entering the formation-grouping phase first.
     func move(x: Int, y: Int) {
         receivedCommand = Command(.MOVE, x, y)
         setState(.grouping)
@@ -109,10 +131,12 @@ class Group {
         moveUnitsToFormation()
     }
 
+    /// Orders all units in the group to attack the given enemy unit.
     func attack(enemy: Unit) {
         units.forEach { $0.attack(enemy) }
     }
 
+    /// Orders the group to move to the nearest walkable tile near (x, y) and then heal.
     func heal(x: Int, y: Int) {
         receivedCommand = Command(.HEAL, x, y)
         if commander == nil { setAuxCommander() }
@@ -128,15 +152,18 @@ class Group {
         setHealing(x: p.x, y: p.y)
     }
 
+    /// Assigns an AI controller to this group and puts it into the waiting-for-order state.
     func setAI(_ intel: IA) {
         ai = intel
         setState(.waitingCommand)
     }
 
+    /// Dissolves the group, releasing all member units back to individual control.
     func dissolve() {
         units.forEach { $0.leaveGroup() }
     }
 
+    /// Removes a single unit from the group, reassigning the commander if necessary.
     func removeUnit(_ unit: Unit) {
         units.removeAll { $0 === unit }
         if unit === commander {
@@ -147,6 +174,7 @@ class Group {
         if units.count <= 1 { setState(.eliminating) }
     }
 
+    /// Returns the sole remaining unit when the group has been reduced to one member, or `nil` otherwise.
     func getLastUnit() -> Unit? {
         units.count == 1 ? units[0] : nil
     }

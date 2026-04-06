@@ -9,10 +9,14 @@
 
 import Foundation
 
+/// Displays the main menu and directs the player to the option they select.
+/// The menu slides up from the bottom of the screen on first entry.
 class MainMenuState: State {
 
     // MARK: - Constants
+    /// Number of ticks to wait before the menu starts sliding into view.
     private let CUENTA_HASTA_MOSTRAR_MENU = 20
+    /// Pixels the menu moves upward per tick during its entry animation.
     private let INCREMENTO_MENU_Y = 5
 
     // MARK: - Menu items
@@ -25,8 +29,11 @@ class MainMenuState: State {
     // MARK: - Declarations
     private var selectedItem: Int = -1
     private var menu: Menu?
+    /// The final Y position the menu should reach after animating in.
     private var menuTargetY: Int = 0
+    /// The current Y position of the menu during animation.
     private var posY: Int = 0
+    /// `true` on the first entry so the slide-in animation only initialises once.
     private var firstBuild: Bool = true
 
     // MARK: - Initializer

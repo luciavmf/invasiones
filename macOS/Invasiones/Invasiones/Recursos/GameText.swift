@@ -10,12 +10,16 @@
 
 import Foundation
 
+/// Loads and caches all localised strings from strings.xml.
+/// All strings are cached in a static array indexed by the `Res.STR_*` constants.
 class GameText: NSObject, XMLParserDelegate {
 
     // MARK: - Static storage
+    /// Backing store for all loaded strings.
     private static var s_strings: [String]?
 
-    /// Loads the strings from strings.xml in the bundle.
+    /// Loads the basic strings required to run the application from strings.xml.
+    /// - Returns: `true` on success, `false` on any file or parse error.
     @discardableResult
     static func loadStrings() -> Bool {
         s_strings = Array(repeating: "", count: Res.STR_COUNT)
@@ -39,7 +43,7 @@ class GameText: NSObject, XMLParserDelegate {
         return true
     }
 
-    /// Returns the strings array (lazy-loads if not yet loaded).
+    /// Returns the cached strings array, loading it on first access.
     static var Strings: [String] {
         if s_strings == nil {
             GameText.loadStrings()

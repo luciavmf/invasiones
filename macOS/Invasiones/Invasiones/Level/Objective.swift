@@ -9,13 +9,16 @@
 
 import Foundation
 
+/// Represents a level objective: a stack of commands that must be fulfilled in order to advance.
 class Objective {
 
     // MARK: - Declarations
+    /// The ordered list of commands that make up this objective (used as a LIFO stack).
     var commands: [Command] = []  // used as stack (LIFO via popLast)
     private let imagePath: String?
 
     // MARK: - Initializer
+    /// - Parameter pathImagen: Optional path to an image displayed with this objective (e.g. an object to collect).
     init(pathImagen: String?) {
         imagePath = pathImagen
     }
