@@ -26,16 +26,16 @@ class Mouse {
     }
 
     // MARK: - Declarations
-    private var m_x: CGFloat = 0
-    private var m_y: CGFloat = 0
-    private var m_isDragging = false
-    private var m_cursorHidden = false
-    private var m_finishedDragging = false
-    private var m_dragStartPos: CGPoint = .zero
-    private(set) var m_dragRect: CGRect = .zero
+    private var _x: CGFloat = 0
+    private var _y: CGFloat = 0
+    private var dragging = false
+    private var cursorHidden = false
+    private var finishedDragging = false
+    private var dragStartPos: CGPoint = .zero
+    private(set) var dragRectStore: CGRect = .zero
 
     /// Custom cursor surface (assigned from the state/level).
-    private var m_cursorSurface: Surface?
+    private var cursorSurface: Surface?
 
     /// List of currently pressed buttons (indices BUTTON_LEFT/DER/CNT).
     private(set) var pressedButtons: [Int] = []
@@ -45,16 +45,16 @@ class Mouse {
 
     // MARK: - Properties
     var X: CGFloat {
-        get { m_x }
-        set { m_x = max(0, min(newValue, CGFloat(Program.SCREEN_WIDTH))) }
+        get { _x }
+        set { _x = max(0, min(newValue, CGFloat(Program.SCREEN_WIDTH))) }
     }
 
     var Y: CGFloat {
-        get { m_y }
-        set { m_y = max(0, min(newValue, CGFloat(Program.SCREEN_HEIGHT))) }
+        get { _y }
+        set { _y = max(0, min(newValue, CGFloat(Program.SCREEN_HEIGHT))) }
     }
 
-    var dragRect: CGRect { m_dragRect }
+    var dragRect: CGRect { dragRectStore }
 
     // MARK: - Button methods (called from GameScene)
     func pressButton(_ button: Int) {
@@ -70,53 +70,53 @@ class Mouse {
     /// Updates the drag state. Call once per frame from GameFrame.update().
     func update() {
         if pressedButtons.contains(Mouse.BUTTON_LEFT) {
-            m_finishedDragging = false
-            if !m_isDragging {
+            finishedDragging = false
+            if !dragging {
                 // New drag starts: reset rectangle and record the anchor point.
-                m_isDragging = true
-                m_dragStartPos = CGPoint(x: m_x, y: m_y)
-                m_dragRect = .zero
+                dragging = true
+                dragStartPos = CGPoint(x: _x, y: _y)
+                dragRectStore = .zero
             } else {
-                let originX = min(m_x, m_dragStartPos.x)
-                let originY = min(m_y, m_dragStartPos.y)
-                let width   = abs(m_x - m_dragStartPos.x)
-                let height    = abs(m_y - m_dragStartPos.y)
-                m_dragRect = CGRect(x: originX, y: originY, width: width, height: height)
+                let originX = min(_x, dragStartPos.x)
+                let originY = min(_y, dragStartPos.y)
+                let width = abs(_x - dragStartPos.x)
+                let height = abs(_y - dragStartPos.y)
+                dragRectStore = CGRect(x: originX, y: originY, width: width, height: height)
             }
         } else {
             // LMB released: signal that drag just finished, preserve last rectangle.
-            m_finishedDragging = m_isDragging
-            m_isDragging = false
-            // m_dragRect is intentionally preserved so units can read it
+            finishedDragging = dragging
+            dragging = false
+            // dragRectStore is intentionally preserved so units can read it
             // on the same frame didFinishDragging() is true, matching original C# behaviour.
         }
     }
 
-    func isDragging() -> Bool  { m_isDragging }
-    func didFinishDragging() -> Bool { m_finishedDragging }
+    func isDragging() -> Bool  { dragging }
+    func didFinishDragging() -> Bool { finishedDragging }
 
     func hideCursor() {
-        m_cursorHidden = true
+        cursorHidden = true
         NSCursor.hide()
     }
 
     func showCursor() {
-        m_cursorHidden = false
+        cursorHidden = false
         NSCursor.unhide()
     }
 
     func setCursor(_ sup: Surface?) {
-        m_cursorSurface = sup
+        cursorSurface = sup
     }
 
     func positionCursor(_ x: CGFloat, _ y: CGFloat) {
-        m_x = max(0, min(x, CGFloat(Program.SCREEN_WIDTH)))
-        m_y = max(0, min(y, CGFloat(Program.SCREEN_HEIGHT)))
+        _x = max(0, min(x, CGFloat(Program.SCREEN_WIDTH)))
+        _y = max(0, min(y, CGFloat(Program.SCREEN_HEIGHT)))
     }
 
     /// Draws the custom cursor at the current position using the Video context.
     func drawCursor(en g: Video) {
-        guard !m_cursorHidden, let sup = m_cursorSurface else { return }
-        g.draw(sup, Int(m_x), Int(m_y), 255, 0)
+        guard !cursorHidden, let sup = cursorSurface else { return }
+        g.draw(sup, Int(_x), Int(_y), 255, 0)
     }
 }

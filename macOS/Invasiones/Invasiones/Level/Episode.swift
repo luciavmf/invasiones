@@ -22,49 +22,49 @@ class Episode {
 
     // MARK: - Constants
     private static let COUNT_TO_ASK_RESTART = 50
-    private static let OBJECTIVES_BOX_WIDTH             = 600
-    private static let OBJECTIVES_BOX_HEIGHT              = 270
-    private static let OBJECTIVES_BOX_BUTTON_Y    = 70
+    private static let OBJECTIVES_BOX_WIDTH = 600
+    private static let OBJECTIVES_BOX_HEIGHT = 270
+    private static let OBJECTIVES_BOX_BUTTON_Y = 70
 
     // MARK: - Declarations
-    private var m_button:        Button?
-    private var m_acceptButton: Button?
-    private var m_obstacles:   [Obstacle] = []
-    private var m_currentLevel:  Level?
-    private var m_levelIndex:     Int = 0
-    private var m_objectsToDraw = ObjectTable([[]])
-    private var m_camera:       Camera?
-    private var m_objective:     Objective?
-    private var m_enemy:      EnemyTeam?
-    private var m_player:      ArgentineTeam?
-    private var m_map:         Map?
-    private var m_state:       STATE = .LOADING
-    private var m_hud:          Hud?
-    private var m_count:       Int = 0
-    private var m_showObjectivePopup:        Bool = false
-    private var m_showObjectiveReminder: Bool = false
-    private var m_objectiveShowCount:       Int = 0
-    private var m_currentPage:                Int = 0
-    private var m_gameOverMenu: ConfirmationMenu
+    private var button: Button?
+    private var acceptButton: Button?
+    private var obstacles: [Obstacle] = []
+    private var currentLevel: Level?
+    private var levelIndex: Int = 0
+    private var objectsToDraw = ObjectTable([[]])
+    private var camera: Camera?
+    private var objective: Objective?
+    private var enemy: EnemyTeam?
+    private var player: ArgentineTeam?
+    private var map: Map?
+    private var stateValue: STATE = .LOADING
+    private var hud: Hud?
+    private var count: Int = 0
+    private var showObjectivePopup: Bool = false
+    private var showObjectiveReminder: Bool = false
+    private var objectiveShowCount: Int = 0
+    private var currentPage: Int = 0
+    private var gameOverMenu: ConfirmationMenu
 
     // Cheats
-    private var m_cheatGanarIndice:   Int = 0
-    private var m_cheatPerderIndice:  Int = 0
-    private var m_cheatObjetivoIndice:Int = 0
+    private var cheatGanarIndice: Int = 0
+    private var cheatPerderIndice: Int = 0
+    private var cheatObjetivoIndice: Int = 0
 
     // MARK: - Properties
-    var state: STATE { m_state }
+    var state: STATE { stateValue }
 
     // MARK: - Initializer
     init() {
-        m_gameOverMenu = ConfirmationMenu(Res.STR_CONTINUARJUEGO, Res.STR_NO, Res.STR_SI)
-        m_gameOverMenu.setPosition(0, 0, Surface.centerVertical | Surface.centerHorizontal)
+        gameOverMenu = ConfirmationMenu(Res.STR_CONTINUARJUEGO, Res.STR_NO, Res.STR_SI)
+        gameOverMenu.setPosition(0, 0, Surface.centerVertical | Surface.centerHorizontal)
     }
 
     deinit { dispose() }
 
     func dispose() {
-        m_map = nil
+        map = nil
     }
 
     // MARK: - Public control
@@ -81,7 +81,7 @@ class Episode {
 
     @discardableResult
     func update() -> Bool {
-        switch m_state {
+        switch stateValue {
         case .LOADING:              updateLoadingState()
         case .SHOW_INTRO:  updateShowIntroState()
         case .SHOW_OBJECTIVES:     updateShowObjectiveState()
@@ -96,7 +96,7 @@ class Episode {
     // MARK: - Draw
 
     func draw(_ g: Video) {
-        switch m_state {
+        switch stateValue {
         case .LOADING:             drawLoadingState(g)
         case .SHOW_OBJECTIVES:    drawShowObjectiveState(g)
         case .PLAYING:              drawPlayingState(g)
@@ -135,11 +135,11 @@ class Episode {
     }
 
     private func loadPaintObjects() -> Bool {
-        guard let map = m_map else { return false }
+        guard let map = map else { return false }
 
-        m_objectsToDraw.tabla = Array(repeating: Array(repeating: nil, count: map.physicalMapWidth),
+        objectsToDraw.tabla = Array(repeating: Array(repeating: nil, count: map.physicalMapWidth),
                                        count: map.physicalMapHeight)
-        m_obstacles = []
+        obstacles = []
 
         for i in 0..<map.height {
             for j in 0..<map.width {
@@ -149,11 +149,11 @@ class Episode {
 
                 let localId = tileId - Int(ts.firstGid)
                 let obs = Obstacle(index: localId, i: i * 2, j: j * 2, tileset: ts)
-                m_obstacles.append(obs)
+                obstacles.append(obs)
 
                 let fi = i * 2, fj = j * 2
-                if fi < m_objectsToDraw.tabla.count, fj < m_objectsToDraw.tabla[fi].count {
-                    m_objectsToDraw.tabla[fi][fj] = obs
+                if fi < objectsToDraw.tabla.count, fj < objectsToDraw.tabla[fi].count {
+                    objectsToDraw.tabla[fi][fj] = obs
                 }
             }
         }
@@ -161,67 +161,67 @@ class Episode {
     }
 
     private func loadLevel(_ levelIndex: Int) -> Bool {
-        if m_count == 0 {
-            m_levelIndex = levelIndex
-            m_hud      = Hud()
-            let hudAlto = m_hud?.height ?? 0
-            m_camera   = Camera(x: 0, y: 0, height: Video.height - hudAlto)
-            m_map     = Map(camera: m_camera!)
+        if count == 0 {
+            self.levelIndex = levelIndex
+            hud = Hud()
+            let hudAlto = hud?.height ?? 0
+            camera = Camera(x: 0, y: 0, height: Video.height - hudAlto)
+            map = Map(camera: camera!)
 
-        } else if m_count == 1 {
-            guard let map = m_map else { m_count += 1; return false }
-            if !map.load(Res.MAP_NIVEL1 + m_levelIndex) { return false }
+        } else if count == 1 {
+            guard let map = map else { count += 1; return false }
+            if !map.load(Res.MAP_NIVEL1 + levelIndex) { return false }
 
-            MapObject.map   = map
-            MapObject.camera = m_camera
+            MapObject.map = map
+            MapObject.camera = camera
 
             let level = Level()
-            level.load(m_levelIndex)
-            m_currentLevel = level
+            level.load(levelIndex)
+            currentLevel = level
 
-        } else if m_count == 2 {
+        } else if count == 2 {
             loadSprites()
 
-        } else if m_count == 3 {
-            m_button       = Button(label: Res.STR_SIGUIENTE, font: nil)
-            m_acceptButton = Button(label: Res.STR_ACEPTAR, font: nil)
+        } else if count == 3 {
+            button = Button(label: Res.STR_SIGUIENTE, font: nil)
+            acceptButton = Button(label: Res.STR_ACEPTAR, font: nil)
             ResourceManager.shared.loadUnitTypes()
 
-        } else if m_count == 4 {
+        } else if count == 4 {
             if !loadPaintObjects() { return false }
 
-        } else if m_count == 5 {
-            guard let map = m_map, let camera = m_camera, let hud = m_hud else {
-                m_count += 1; return false
+        } else if count == 5 {
+            guard let map = map, let camera = camera, let hud = hud else {
+                count += 1; return false
             }
-            m_player = ArgentineTeam(map: map, camera: camera,
-                                       objectsToDraw: m_objectsToDraw, hud: hud)
-            m_enemy = EnemyTeam(map: map, camera: camera,
-                                     objectsToDraw: m_objectsToDraw, hud: hud)
+            player = ArgentineTeam(map: map, camera: camera,
+                                       objectsToDraw: objectsToDraw, hud: hud)
+            enemy = EnemyTeam(map: map, camera: camera,
+                                     objectsToDraw: objectsToDraw, hud: hud)
 
-        } else if m_count == 6 {
-            if !(m_player?.loadUnits(m_levelIndex) ?? true) { return false }
+        } else if count == 6 {
+            if !(player?.loadUnits(levelIndex) ?? true) { return false }
 
-        } else if m_count == 10 {
-            if !(m_enemy?.loadUnits(m_levelIndex) ?? true) { return false }
-            m_count += 1
+        } else if count == 10 {
+            if !(enemy?.loadUnits(levelIndex) ?? true) { return false }
+            count += 1
             return true
         }
 
-        m_count += 1
+        count += 1
         return false
     }
 
     // MARK: - SHOW INTRODUCTION state
 
     private func updateShowIntroState() {
-        if m_count == 0 {
-            m_button?.setPosition(0, Definitions.OBJECTIVES_BUTTON_Y, Surface.centerHorizontal)
+        if count == 0 {
+            button?.setPosition(0, Definitions.OBJECTIVES_BUTTON_Y, Surface.centerHorizontal)
         }
-        m_count += 1
-        if m_button?.update() != 0 {
-            m_currentPage += 1
-            if m_currentPage == Definitions.PAGES_PER_INTRO - 1 {
+        count += 1
+        if button?.update() != 0 {
+            currentPage += 1
+            if currentPage == Definitions.PAGES_PER_INTRO - 1 {
                 setState(.PLAYING)
             }
         }
@@ -229,20 +229,20 @@ class Episode {
 
     private func setNewObjective() {
         Log.shared.debug("Le seteo un nuevo objetivo.........")
-        m_showObjectivePopup = true
-        let currentBattle = m_currentLevel?.currentBattleIndex ?? 0
-        m_objective = m_currentLevel?.nextObjective()
+        showObjectivePopup = true
+        let currentBattle = currentLevel?.currentBattleIndex ?? 0
+        objective = currentLevel?.nextObjective()
 
-        if (m_currentLevel?.currentBattleIndex ?? 0) != currentBattle {
+        if (currentLevel?.currentBattleIndex ?? 0) != currentBattle {
             Log.shared.debug("Pase del nivelllllllll")
             setState(.SHOW_INTRO)
         }
-        m_showObjectivePopup  = true
-        m_objectiveShowCount = 0
+        showObjectivePopup = true
+        objectiveShowCount = 0
 
-        m_player?.setObjective(m_objective)
+        player?.setObjective(objective)
 
-        if m_objective == nil {
+        if objective == nil {
             setState(.WON)
         }
     }
@@ -251,14 +251,14 @@ class Episode {
         drawPlayingState(g)
 
         g.setColor(Definitions.COLOR_OBJECTIVES)
-        let hudAlto = m_hud?.height ?? 0
+        let hudAlto = hud?.height ?? 0
         g.fillRect(0, -(hudAlto >> 1),
                            Video.width - (Definitions.OBJECTIVES_BORDER << 1),
                            Video.height  - (Definitions.OBJECTIVES_BORDER << 1) - hudAlto,
                            Definitions.OBJECTIVES_ALPHA,
                            Surface.centerVertical | Surface.centerHorizontal)
 
-        if m_currentPage == 0 {
+        if currentPage == 0 {
             g.setFont(ResourceManager.shared.fonts[Definitions.FONT_OBJECTIVES_TITLE],
                            Definitions.GUI_COLOR_TEXT)
         } else {
@@ -266,26 +266,26 @@ class Episode {
                            Definitions.GUI_COLOR_TEXT)
         }
 
-        let strIdx = Res.STR_PRIMER_BATALLA + m_currentPage +
-                     ((m_currentLevel?.currentBattleIndex ?? 0) * Definitions.PAGES_PER_INTRO)
+        let strIdx = Res.STR_PRIMER_BATALLA + currentPage +
+                     ((currentLevel?.currentBattleIndex ?? 0) * Definitions.PAGES_PER_INTRO)
         g.write(strIdx, 0, -(hudAlto >> 1), Surface.centerVertical | Surface.centerHorizontal)
-        m_button?.draw(g)
+        button?.draw(g)
     }
 
     // MARK: - SHOW OBJECTIVES state
 
     private func updateShowObjectiveState() {
-        if m_count == 0 {
-            m_acceptButton?.setPosition(0, Episode.OBJECTIVES_BOX_BUTTON_Y,
+        if count == 0 {
+            acceptButton?.setPosition(0, Episode.OBJECTIVES_BOX_BUTTON_Y,
                                            Surface.centerHorizontal | Surface.centerVertical)
         }
-        m_count += 1
-        if m_acceptButton?.update() != 0 {
-            m_currentPage += 1
-            if m_currentPage == Definitions.PAGES_PER_INTRO {
+        count += 1
+        if acceptButton?.update() != 0 {
+            currentPage += 1
+            if currentPage == Definitions.PAGES_PER_INTRO {
                 setState(.PLAYING)
-                m_showObjectivePopup        = false
-                m_showObjectiveReminder = true
+                showObjectivePopup = false
+                showObjectiveReminder = true
             }
         }
     }
@@ -293,7 +293,7 @@ class Episode {
     private func drawShowObjectiveState(_ g: Video) {
         drawPlayingState(g)
 
-        let hudAlto = m_hud?.height ?? 0
+        let hudAlto = hud?.height ?? 0
         g.setColor(Definitions.COLOR_OBJECTIVES)
         g.fillRect(0, -(hudAlto / 2),
                            Episode.OBJECTIVES_BOX_WIDTH, Episode.OBJECTIVES_BOX_HEIGHT,
@@ -308,50 +308,50 @@ class Episode {
 
         g.setFont(ResourceManager.shared.fonts[Definitions.FONT_OBJECTIVES],
                        Definitions.GUI_COLOR_TEXT)
-        let strIdx = Res.STR_PRIMER_BATALLA + m_currentPage +
-                     ((m_currentLevel?.currentBattleIndex ?? 0) * Definitions.PAGES_PER_INTRO)
+        let strIdx = Res.STR_PRIMER_BATALLA + currentPage +
+                     ((currentLevel?.currentBattleIndex ?? 0) * Definitions.PAGES_PER_INTRO)
         g.write(strIdx, 0, -(hudAlto >> 1) + 30, Surface.centerVertical | Surface.centerHorizontal)
 
-        m_acceptButton?.draw(g)
+        acceptButton?.draw(g)
     }
 
     // MARK: - PLAYING state
 
     private func updatePlayingState() {
-        if m_showObjectivePopup { m_objectiveShowCount += 1 }
+        if showObjectivePopup { objectiveShowCount += 1 }
 
         if Definitions.CHEATS_ENABLED { checkCheats() }
 
-        m_map?.update()
+        map?.update()
 
         // Reset visibility layer
-        if let map = m_map {
+        if let map = map {
             map.visibleTilesLayer = Array(repeating: Array(repeating: 0, count: map.physicalMapWidth),
                                            count: map.physicalMapHeight)
         }
 
-        m_player?.update()
-        m_enemy?.update()
+        player?.update()
+        enemy?.update()
 
-        m_hud?.argentineCount = m_player?.unitCount ?? 0
-        m_hud?.enemyCount   = m_enemy?.unitCount ?? 0
+        hud?.argentineCount = player?.unitCount ?? 0
+        hud?.enemyCount = enemy?.unitCount ?? 0
 
         checkGameOver()
 
-        m_hud?.update()
+        hud?.update()
         updateOrders()
 
-        m_obstacles.forEach { $0.update() }
+        obstacles.forEach { $0.update() }
     }
 
     private func checkGameOver() {
-        if (m_player?.unitCount ?? 1) == 0 {
+        if (player?.unitCount ?? 1) == 0 {
             setState(.LOST)
         }
     }
 
     private func updateOrders() {
-        if m_player?.completedObjective() == true {
+        if player?.completedObjective() == true {
             Log.shared.debug("Felicitaciones!! cumpliste el objetivo.....")
             setNewObjective()
         }
@@ -360,29 +360,29 @@ class Episode {
     private func drawPlayingState(_ g: Video) {
         g.fillRect(Definitions.COLOR_BLACK)
 
-        if let map = m_map { m_map?.drawLayer(g, map.TERRAIN_LAYER) }
+        if let map = map { map.drawLayer(g, map.TERRAIN_LAYER) }
 
         dibujarObjetos(g)
 
         drawSemiTransparentLayer(g)
 
-        m_hud?.draw(g)
+        hud?.draw(g)
 
-        m_player?.drawOrientationArrow(g)
+        player?.drawOrientationArrow(g)
 
-        if m_showObjectivePopup &&
-           m_objectiveShowCount > Definitions.OBJECTIVE_SHOW_START_COUNT {
+        if showObjectivePopup &&
+           objectiveShowCount > Definitions.OBJECTIVE_SHOW_START_COUNT {
             setState(.SHOW_OBJECTIVES)
-        } else if m_showObjectiveReminder &&
-                  m_objectiveShowCount > Definitions.OBJECTIVE_SHOW_START_COUNT {
-            let hudAlto = m_hud?.height ?? 0
-            let camAlto = m_camera?.height ?? Video.height
+        } else if showObjectiveReminder &&
+                  objectiveShowCount > Definitions.OBJECTIVE_SHOW_START_COUNT {
+            let hudAlto = hud?.height ?? 0
+            let camAlto = camera?.height ?? Video.height
             g.setFont(ResourceManager.shared.fonts[Definitions.FONT_OBJECTIVES_REMINDER],
                            Definitions.COLOR_OBJECTIVES_FONT)
             g.write(Res.STR_OBJETIVOS,
                        Definitions.OBJECTIVES_OFFSET << 1,
                        camAlto - (Definitions.OBJECTIVES_HEIGHT + Definitions.OBJECTIVES_OFFSET * 2) - 10, 0)
-            let strIdx = Res.STR_OBJETIVO_BATALLA_1_1 + (m_currentLevel?.completedObjectiveCount ?? 0)
+            let strIdx = Res.STR_OBJETIVO_BATALLA_1_1 + (currentLevel?.completedObjectiveCount ?? 0)
             g.write(strIdx,
                        Definitions.OBJECTIVES_OFFSET << 1,
                        camAlto - (Definitions.OBJECTIVES_HEIGHT + Definitions.OBJECTIVES_OFFSET * 2) + 5, 0)
@@ -397,14 +397,14 @@ class Episode {
     }
 
     private func drawSemiTransparentLayer(_ g: Video) {
-        guard let map = m_map, let camera = m_camera, let player = m_player else { return }
+        guard let map = map, let camera = camera, let player = player else { return }
 
         let oldClip = g.getClip()
         g.setClip(camera.startX, camera.startY, camera.width, camera.height)
 
         let rect = player.getPaintCoordinates()
-        var XX   = rect.x
-        var YY   = rect.y
+        var XX = rect.x
+        var YY = rect.y
         let endI = rect.w
         let endJ = rect.h
 
@@ -431,14 +431,14 @@ class Episode {
     }
 
     private func dibujarObjetos(_ g: Video) {
-        guard let map = m_map, let camera = m_camera, let player = m_player else { return }
+        guard let map = map, let camera = camera, let player = player else { return }
 
         let oldClip = g.getClip()
         g.setClip(camera.startX, camera.startY, camera.width, camera.height)
 
         let rect = player.getPaintCoordinates()
-        var XX   = rect.x
-        var YY   = rect.y
+        var XX = rect.x
+        var YY = rect.y
         let endI = rect.w
         let endJ = rect.h
 
@@ -450,7 +450,7 @@ class Episode {
             var i = XX, j = YY
             while tileX <= endI && j >= 0 {
                 if i >= 0 && i < map.physicalMapHeight && j < map.physicalMapWidth {
-                    if let obj = m_objectsToDraw.tabla[i][j] {
+                    if let obj = objectsToDraw.tabla[i][j] {
                         if let uni = obj as? Unit  { uni.draw(g) }
                         if let obs = obj as? Obstacle { obs.draw(g) }
                     }
@@ -463,7 +463,7 @@ class Episode {
         }
 
         // Fueguitos del jugador se dibujan encima (delegado a ArgentineFaction via Player)
-        // m_player.Dibujar(g) — in the original it drew fire effects; delegated if needed
+        // player.Dibujar(g) — in the original it drew fire effects; delegated if needed
 
         g.setClip(oldClip.x, oldClip.y, oldClip.w, oldClip.h)
     }
@@ -471,14 +471,14 @@ class Episode {
     // MARK: - WON state
 
     private func updateWonState() {
-        if m_button?.update() != 0 {
+        if button?.update() != 0 {
             setState(.END)
         }
     }
 
     private func drawWonState(_ g: Video) {
         drawPlayingState(g)
-        m_button?.draw(g)
+        button?.draw(g)
         g.setFont(ResourceManager.shared.fonts[Definitions.FONT_WIN],
                        Definitions.COLOR_WIN_TEXT)
         g.write(Res.STR_GANASTE, 0, 0, Surface.centerHorizontal | Surface.centerVertical)
@@ -487,14 +487,14 @@ class Episode {
     // MARK: - LOST state
 
     private func updateLostState() {
-        m_count += 1
-        guard m_count > Episode.COUNT_TO_ASK_RESTART else { return }
+        count += 1
+        guard count > Episode.COUNT_TO_ASK_RESTART else { return }
 
-        let result = m_gameOverMenu.update()
-        if result == ConfirmationMenu.SELECCION.IZQUIERDO.rawValue {
+        let result = gameOverMenu.update()
+        if result == ConfirmationMenu.Selection.left.rawValue {
             setState(.END)
         }
-        if result == ConfirmationMenu.SELECCION.DERECHO.rawValue {
+        if result == ConfirmationMenu.Selection.right.rawValue {
             setState(.LOADING)
         }
     }
@@ -504,8 +504,8 @@ class Episode {
         g.setFont(ResourceManager.shared.fonts[Definitions.FONT_WIN],
                        Definitions.COLOR_WIN_TEXT)
         g.write(Res.STR_PERDISTE, 0, -100, Surface.centerHorizontal | Surface.centerVertical)
-        if m_count > Episode.COUNT_TO_ASK_RESTART {
-            m_gameOverMenu.draw(g)
+        if count > Episode.COUNT_TO_ASK_RESTART {
+            gameOverMenu.draw(g)
         }
     }
 
@@ -514,42 +514,42 @@ class Episode {
     private func checkCheats() {
         let teclas = Keyboard.shared.pressedKeys
 
-        if teclas.contains(Keyboard.KEY_G) && m_cheatGanarIndice == 0 {
-            m_cheatGanarIndice += 1
-        } else if teclas.contains(Keyboard.KEY_A) && m_cheatGanarIndice == 1 {
-            m_cheatGanarIndice += 1
-        } else if teclas.contains(Keyboard.KEY_N) && m_cheatGanarIndice == 2 {
-            m_cheatGanarIndice += 1
-        } else if teclas.contains(Keyboard.KEY_X) && m_cheatGanarIndice == 3 {
-            m_cheatGanarIndice += 1
-        } else if teclas.contains(Keyboard.KEY_W) && m_cheatGanarIndice == 4 {
-            setState(.WON); m_cheatGanarIndice = 0
-        } else if teclas.contains(Keyboard.KEY_P) && m_cheatPerderIndice == 0 {
-            m_cheatPerderIndice += 1
-        } else if teclas.contains(Keyboard.KEY_E) && m_cheatPerderIndice == 1 {
-            m_cheatPerderIndice += 1
-        } else if teclas.contains(Keyboard.KEY_R) && m_cheatPerderIndice == 2 {
-            m_cheatPerderIndice += 1
-        } else if teclas.contains(Keyboard.KEY_X) && m_cheatPerderIndice == 3 {
-            m_cheatPerderIndice += 1
-        } else if teclas.contains(Keyboard.KEY_W) && m_cheatPerderIndice == 4 {
-            setState(.LOST); m_cheatPerderIndice = 0
-        } else if teclas.contains(Keyboard.KEY_O) && m_cheatObjetivoIndice == 0 {
-            m_cheatObjetivoIndice += 1
-        } else if teclas.contains(Keyboard.KEY_B) && m_cheatObjetivoIndice == 1 {
-            m_cheatObjetivoIndice += 1
-        } else if teclas.contains(Keyboard.KEY_J) && m_cheatObjetivoIndice == 2 {
-            m_cheatObjetivoIndice += 1
-        } else if teclas.contains(Keyboard.KEY_X) && m_cheatObjetivoIndice == 3 {
-            m_cheatObjetivoIndice += 1
-        } else if teclas.contains(Keyboard.KEY_W) && m_cheatObjetivoIndice == 4 {
-            setNewObjective(); m_cheatObjetivoIndice = 0
+        if teclas.contains(Keyboard.KEY_G) && cheatGanarIndice == 0 {
+            cheatGanarIndice += 1
+        } else if teclas.contains(Keyboard.KEY_A) && cheatGanarIndice == 1 {
+            cheatGanarIndice += 1
+        } else if teclas.contains(Keyboard.KEY_N) && cheatGanarIndice == 2 {
+            cheatGanarIndice += 1
+        } else if teclas.contains(Keyboard.KEY_X) && cheatGanarIndice == 3 {
+            cheatGanarIndice += 1
+        } else if teclas.contains(Keyboard.KEY_W) && cheatGanarIndice == 4 {
+            setState(.WON); cheatGanarIndice = 0
+        } else if teclas.contains(Keyboard.KEY_P) && cheatPerderIndice == 0 {
+            cheatPerderIndice += 1
+        } else if teclas.contains(Keyboard.KEY_E) && cheatPerderIndice == 1 {
+            cheatPerderIndice += 1
+        } else if teclas.contains(Keyboard.KEY_R) && cheatPerderIndice == 2 {
+            cheatPerderIndice += 1
+        } else if teclas.contains(Keyboard.KEY_X) && cheatPerderIndice == 3 {
+            cheatPerderIndice += 1
+        } else if teclas.contains(Keyboard.KEY_W) && cheatPerderIndice == 4 {
+            setState(.LOST); cheatPerderIndice = 0
+        } else if teclas.contains(Keyboard.KEY_O) && cheatObjetivoIndice == 0 {
+            cheatObjetivoIndice += 1
+        } else if teclas.contains(Keyboard.KEY_B) && cheatObjetivoIndice == 1 {
+            cheatObjetivoIndice += 1
+        } else if teclas.contains(Keyboard.KEY_J) && cheatObjetivoIndice == 2 {
+            cheatObjetivoIndice += 1
+        } else if teclas.contains(Keyboard.KEY_X) && cheatObjetivoIndice == 3 {
+            cheatObjetivoIndice += 1
+        } else if teclas.contains(Keyboard.KEY_W) && cheatObjetivoIndice == 4 {
+            setNewObjective(); cheatObjetivoIndice = 0
         } else if !teclas.isEmpty {
-            if teclas.contains(Keyboard.KEY_U) { m_player?.selectNextUnit() }
+            if teclas.contains(Keyboard.KEY_U) { player?.selectNextUnit() }
             Log.shared.debug("Reseteo todos los cheats--")
-            m_cheatObjetivoIndice = 0
-            m_cheatGanarIndice    = 0
-            m_cheatPerderIndice   = 0
+            cheatObjetivoIndice = 0
+            cheatGanarIndice = 0
+            cheatPerderIndice = 0
         }
         Keyboard.shared.clearKeys()
     }
@@ -557,9 +557,9 @@ class Episode {
     // MARK: - Private
 
     private func setState(_ state: STATE) {
-        m_count       = 0
-        m_state = state
-        m_currentPage = 0
-        if state == .SHOW_OBJECTIVES { m_currentPage = 2 }
+        count = 0
+        stateValue = state
+        currentPage = 0
+        if state == .SHOW_OBJECTIVES { currentPage = 2 }
     }
 }

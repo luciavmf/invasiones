@@ -28,12 +28,12 @@ class Surface {
     var currentAlpha: CGFloat = 1.0
 
     /// Size of the FULL texture (not the clip).
-    var width: Int { Int(texture?.size().width  ?? 0) }
-    var height:  Int { Int(texture?.size().height ?? 0) }
+    var width: Int { Int(texture?.size().width ?? 0) }
+    var height: Int { Int(texture?.size().height ?? 0) }
 
     /// Size of the active clip (or the full texture if no clip is set).
-    var clipWidth: Int { Int(currentTexture?.size().width  ?? texture?.size().width  ?? 0) }
-    var clipHeight:  Int { Int(currentTexture?.size().height ?? texture?.size().height ?? 0) }
+    var clipWidth: Int { Int(currentTexture?.size().width ?? texture?.size().width ?? 0) }
+    var clipHeight: Int { Int(currentTexture?.size().height ?? texture?.size().height ?? 0) }
 
     // MARK: - Initializers
 

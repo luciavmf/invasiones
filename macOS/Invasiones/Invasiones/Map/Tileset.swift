@@ -12,13 +12,38 @@ import Foundation
 class Tileset {
 
     // MARK: - Declarations
-    var firstGid:    Int16 = 0
-    private var name:    String = ""
-    private(set) var id:     Int16  = 0
-    private(set) var tileWidth: Int16 = 0
-    private(set) var tileHeight:  Int16 = 0
-    private(set) var image: Surface?
-    var tiles:  [Tile?] = []
+    var firstGid: Int16 = 0
+    private(set) var id: Int16 = 0
+    fileprivate(set) var tileWidth: Int16 = 0
+    fileprivate(set) var tileHeight: Int16 = 0
+    fileprivate(set) var name: String = "" {
+        didSet {
+            switch name.lowercased() {
+            case "tierra":      id = Int16(Res.TLS_TIERRA)
+            case "agua":        id = Int16(Res.TLS_AGUA)
+            case "pasto":       id = Int16(Res.TLS_PASTO)
+            case "arboles":     id = Int16(Res.TLS_ARBOLES)
+            case "unidades":    id = Int16(Res.TLS_UNIDADES)
+            case "piedras":     id = Int16(Res.TLS_PIEDRAS)
+            case "texturas":    id = Int16(Res.TLS_TEXTURAS)
+            case "piedras2":    id = Int16(Res.TLS_PIEDRAS2)
+            case "enfermeria":  id = Int16(Res.TLS_ENFERMERIA)
+            case "edificios":   id = Int16(Res.TLS_EDIFICIOS)
+            case "invalidados": id = Int16(Res.TLS_INVALIDADO)
+            case "fuerte":      id = Int16(Res.TLS_FUERTE)
+            default: break
+            }
+        }
+    }
+    fileprivate(set) var image: Surface? {
+        didSet {
+            if let img = image, tileWidth > 0, tileHeight > 0 {
+                let count = (img.height / Int(tileHeight)) * (img.width / Int(tileWidth))
+                tiles = Array(repeating: nil, count: count)
+            }
+        }
+    }
+    var tiles: [Tile?] = []
 
     // MARK: - Initializer
     init() {}
@@ -45,42 +70,12 @@ class Tileset {
     func getTileRect(_ tileId: Int) -> (x: Int, y: Int, w: Int, h: Int) {
         guard let img = image, tileWidth > 0, tileHeight > 0 else { return (0, 0, 0, 0) }
         let cols = img.width / Int(tileWidth)
-        let col  = cols > 0 ? tileId % cols : 0
+        let col = cols > 0 ? tileId % cols : 0
         let row = cols > 0 ? tileId / cols : 0
         return (col * Int(tileWidth), row * Int(tileHeight),
                 Int(tileWidth), Int(tileHeight))
     }
 
-    /// Sets the name and infers the numeric ID.
-    func setName(_ name: String) {
-        self.name = name
-        switch name.lowercased() {
-        case "tierra":      id = Int16(Res.TLS_TIERRA)
-        case "agua":        id = Int16(Res.TLS_AGUA)
-        case "pasto":       id = Int16(Res.TLS_PASTO)
-        case "arboles":     id = Int16(Res.TLS_ARBOLES)
-        case "unidades":    id = Int16(Res.TLS_UNIDADES)
-        case "piedras":     id = Int16(Res.TLS_PIEDRAS)
-        case "texturas":    id = Int16(Res.TLS_TEXTURAS)
-        case "piedras2":    id = Int16(Res.TLS_PIEDRAS2)
-        case "enfermeria":  id = Int16(Res.TLS_ENFERMERIA)
-        case "edificios":   id = Int16(Res.TLS_EDIFICIOS)
-        case "invalidados": id = Int16(Res.TLS_INVALIDADO)
-        case "fuerte":      id = Int16(Res.TLS_FUERTE)
-        default: break
-        }
-    }
-
-    func setTileWidth(_ v: Int16) { tileWidth = v }
-    func setTileHeight(_ v: Int16)  { tileHeight  = v }
-
-    func setImage(_ sup: Surface?) {
-        image = sup
-        if let img = sup, tileWidth > 0, tileHeight > 0 {
-            let count = (img.height / Int(tileHeight)) * (img.width / Int(tileWidth))
-            tiles = Array(repeating: nil, count: count)
-        }
-    }
 }
 
 // MARK: - Internal XML parser
@@ -103,9 +98,9 @@ private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
 
         switch name {
         case "tileset":
-            if let n = attributes["name"] { ts.setName(n) }
-            if let w = attributes["tilewidth"]  { ts.setTileWidth(Int16(w) ?? 0) }
-            if let h = attributes["tileheight"] { ts.setTileHeight(Int16(h)  ?? 0) }
+            if let n = attributes["name"] { ts.name = n }
+            if let w = attributes["tilewidth"]  { ts.tileWidth  = Int16(w) ?? 0 }
+            if let h = attributes["tileheight"] { ts.tileHeight = Int16(h) ?? 0 }
 
         case "image":
             if let src = attributes["source"] {
@@ -114,7 +109,7 @@ private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
                     ?? Utils.getPath(
                         (Program.SCENARIOS_PATH as NSString).appendingPathComponent(src))
                 if let path = fullPath {
-                    ts.setImage(ResourceManager.shared.getImage(path))
+                    ts.image = ResourceManager.shared.getImage(path)
                 } else {
                     Log.shared.error("Tileset: no se encuentra image \(src)")
                 }
@@ -130,7 +125,7 @@ private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
 
         case "property":
             guard currentTileId >= 0, currentTileId < ts.tiles.count else { break }
-            let propName  = (attributes["name"]  ?? "").lowercased()
+            let propName = (attributes["name"] ?? "").lowercased()
             let propValue = attributes["value"] ?? ""
             if propName == "id" || propName == "unidad" {
                 switch propValue {

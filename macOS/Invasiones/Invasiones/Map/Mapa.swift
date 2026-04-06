@@ -14,82 +14,76 @@ class Map {
 
     // MARK: - Constants
     private let MAX_LAYERS_COUNT = 8
-    private let INFO_LAYER           = 8
+    private let INFO_LAYER = 8
 
     // MARK: - Layer indices (read from XML)
-    private(set) var TERRAIN_LAYER:               Int = 0
-    private var OBSTACLES_LAYER:                 Int = 0
-    private var PLAYER_UNITS_LAYER:           Int = 0
-    private var INVALIDATED_POSITIONS_LAYER:     Int = 0
+    private(set) var TERRAIN_LAYER: Int = 0
+    private var OBSTACLES_LAYER: Int = 0
+    private var PLAYER_UNITS_LAYER: Int = 0
+    private var INVALIDATED_POSITIONS_LAYER: Int = 0
 
     static let TILE_VISIBLE: Int = 1
 
     // MARK: - Datos del mapa
-    /// `m_map[layer][i][j]` = tile ID (Int16).
-    private var m_map: [[[Int16]]] = []           // [layer][col][row]
-    private var m_layerNames: [String: Int] = [:]
-    private var m_mapLoaded  = false
-    private var m_maxLayers = 0
+    /// `mapData[layer][i][j]` = tile ID (Int16).
+    private var mapData: [[[Int16]]] = []           // [layer][col][row]
+    private var layerNames: [String: Int] = [:]
+    private var mapLoaded = false
+    private var maxLayers = 0
 
-    private var m_heightInTiles:          Int = 0
-    private var m_physicalHeightInTiles: Int = 0
-    private var m_widthInTiles:         Int = 0
-    private var m_physicalWidthInTiles: Int = 0
+    private(set) var height: Int = 0
+    private var physicalHeight: Int = 0
+    private(set) var width: Int = 0
+    private var physicalWidth: Int = 0
 
-    private(set) var tileWidth:      Int = 0
-    private(set) var tileHeight:       Int = 0
+    private(set) var tileWidth: Int = 0
+    private(set) var tileHeight: Int = 0
     private(set) var physicalTileWidth: Int = 0
-    private(set) var physicalTileHeight:  Int = 0
+    private(set) var physicalTileHeight: Int = 0
 
-    private var m_tilesets:      [Tileset?] = Array(repeating: nil, count: Res.TLS_COUNT)
-    private var m_tilesetCount: Int = 0
+    private(set) var tilesets: [Tileset?] = Array(repeating: nil, count: Res.TLS_COUNT)
+    private var tilesetCount: Int = 0
 
-    private static var m_tilesetDebug: Tileset?
+    private static var tilesetDebug: Tileset?
 
     // MARK: - Mouse on tile
-    private var m_tileMouse:      (x: Int, y: Int) = (0, 0)
-    private var m_tileChicoMouse: (x: Int, y: Int) = (0, 0)
+    private(set) var tileUnderMouse: (x: Int, y: Int) = (0, 0)
+    private(set) var smallTileUnderMouse: (x: Int, y: Int) = (0, 0)
 
     // MARK: - Physical map (small tiles, ×2 resolution)
-    private(set) var physicalTilesLayer:  [[Int16]] = []  // [col * 2][row * 2]
+    private(set) var physicalTilesLayer: [[Int16]] = []  // [col * 2][row * 2]
     var visibleTilesLayer: [[Int16]] = []
 
     // MARK: - Grey tile image (debug / semi-transparent selection)
-    private var m_greyTileImage: Surface?
+    private var greyTileImage: Surface?
 
     // MARK: - Camera
-    private let m_camera: Camera
+    private let camera: Camera
 
-    // MARK: - Public properties
-    var height:      Int { m_heightInTiles }
-    var width:     Int { m_widthInTiles }
-    var physicalMapHeight:  Int { m_physicalHeightInTiles }
-    var physicalMapWidth: Int { m_physicalWidthInTiles }
-
-    var tileUnderMouse:      (x: Int, y: Int) { m_tileMouse }
-    var smallTileUnderMouse:     (x: Int, y: Int) { m_tileChicoMouse }
+    // MARK: - Computed helpers
+    var physicalMapHeight: Int { physicalHeight }
+    var physicalMapWidth: Int { physicalWidth }
 
     var unitsLayer: [[Int16]] {
-        guard PLAYER_UNITS_LAYER < m_map.count else { return [] }
-        return m_map[PLAYER_UNITS_LAYER]
+        guard PLAYER_UNITS_LAYER < mapData.count else { return [] }
+        return mapData[PLAYER_UNITS_LAYER]
     }
     var obstaclesLayer: [[Int16]] {
-        guard OBSTACLES_LAYER < m_map.count else { return [] }
-        return m_map[OBSTACLES_LAYER]
+        guard OBSTACLES_LAYER < mapData.count else { return [] }
+        return mapData[OBSTACLES_LAYER]
     }
     var buildingsLayer: [[Int16]] {
-        guard INVALIDATED_POSITIONS_LAYER < m_map.count else { return [] }
-        return m_map[INVALIDATED_POSITIONS_LAYER]
+        guard INVALIDATED_POSITIONS_LAYER < mapData.count else { return [] }
+        return mapData[INVALIDATED_POSITIONS_LAYER]
     }
     var terrainLayer: [[Int16]] {
-        guard TERRAIN_LAYER < m_map.count else { return [] }
-        return m_map[TERRAIN_LAYER]
+        guard TERRAIN_LAYER < mapData.count else { return [] }
+        return mapData[TERRAIN_LAYER]
     }
-    var tilesets: [Tileset?] { m_tilesets }
 
     // MARK: - Initializer
     init(camera: Camera) {
-        m_camera = camera
+        self.camera = camera
     }
 
     // MARK: - Loading
@@ -106,17 +100,17 @@ class Map {
             return false
         }
 
-        m_tilesetCount = 0
-        m_maxLayers = 0
-        m_map = []
-        m_layerNames = [:]
+        tilesetCount = 0
+        maxLayers = 0
+        mapData = []
+        layerNames = [:]
 
         guard readMapInfo(mapPath) else { return false }
         guard readTilesets(mapPath, paths: paths) else { return false }
         guard readLayers(mapPath) else { return false }
 
         loadLayerInfo(paths: paths)
-        m_mapLoaded = true
+        mapLoaded = true
         return true
     }
 
@@ -125,25 +119,25 @@ class Map {
     /// Draws layer `layer` onto the given Video using the current camera.
     @discardableResult
     func drawLayer(_ g: Video, _ layer: Int) -> Bool {
-        guard layer < m_maxLayers, layer >= 0 else { return false }
-        guard m_mapLoaded else { return false }
+        guard layer < maxLayers, layer >= 0 else { return false }
+        guard mapLoaded else { return false }
 
         let oldClip = g.getClip()
-        g.setClip(m_camera.startX, m_camera.startY, m_camera.width, m_camera.height)
+        g.setClip(camera.startX, camera.startY, camera.width, camera.height)
 
         var toggle = true
-        let p = calculateFirstTileToDraw(m_camera.X, m_camera.Y)
+        let p = calculateFirstTileToDraw(camera.X, camera.Y)
         var XX = p.x, YY = p.y
 
-        var startPosX = m_camera.startX + (((XX - YY) * tileWidth) >> 1) + m_camera.X
-        var startPosY = m_camera.startY + (((XX + YY) * tileHeight)  >> 1) + m_camera.Y
+        var startPosX = camera.startX + (((XX - YY) * tileWidth) >> 1) + camera.X
+        var startPosY = camera.startY + (((XX + YY) * tileHeight)  >> 1) + camera.Y
 
-        while startPosY <= (m_camera.height + m_camera.startY) {
+        while startPosY <= (camera.height + camera.startY) {
             var tileX = 0
             var i = XX, j = YY
-            while (tileX * tileWidth + startPosX) <= (m_camera.startX + m_camera.width) && j >= 0 {
-                if i < m_heightInTiles && i >= 0 && j < m_widthInTiles && j >= 0 {
-                    let tileId = Int(m_map[layer][i][j])
+            while (tileX * tileWidth + startPosX) <= (camera.startX + camera.width) && j >= 0 {
+                if i < height && i >= 0 && j < width && j >= 0 {
+                    let tileId = Int(mapData[layer][i][j])
                     if tileId != 0, let ts = getTileset(tileId) {
                         let localId = tileId - Int(ts.firstGid)
                         let rect = ts.getTileRect(localId)
@@ -172,89 +166,89 @@ class Map {
     /// Draws a small tile (physical map) at the corresponding isometric position.
     /// If `semiTransparente` is true, draws the semi-transparent grey tile (fog-of-war).
     func drawSmallTile(_ g: Video, _ i: Int, _ j: Int, _ semiTransparente: Bool) {
-        guard i >= 0, j >= 0, i < m_physicalHeightInTiles, j < m_physicalWidthInTiles else { return }
+        guard i >= 0, j >= 0, i < physicalHeight, j < physicalWidth else { return }
 
-        let posX = m_camera.startX + (((i - j) * tileWidth / 2) >> 1) + m_camera.X + tileWidth / 4
-        let posY = m_camera.startY + (((i + j) * tileHeight  / 2) >> 1) + m_camera.Y
+        let posX = camera.startX + (((i - j) * tileWidth / 2) >> 1) + camera.X + tileWidth / 4
+        let posY = camera.startY + (((i + j) * tileHeight  / 2) >> 1) + camera.Y
 
         if semiTransparente {
-            if m_greyTileImage == nil {
-                m_greyTileImage = ResourceManager.shared.getImage(Res.IMG_TILE_GRIS)
+            if greyTileImage == nil {
+                greyTileImage = ResourceManager.shared.getImage(Res.IMG_TILE_GRIS)
             }
-            g.draw(m_greyTileImage, posX, posY, 128, 0)
+            g.draw(greyTileImage, posX, posY, 128, 0)
         }
     }
 
     // MARK: - Update (camera scroll)
 
     func update() {
-        guard m_mapLoaded else { return }
+        guard mapLoaded else { return }
 
         let mx = Int(Mouse.shared.X)
         let my = Int(Mouse.shared.Y)
 
-        if mx < m_camera.border {
-            if m_camera.X + m_camera.speed <= (m_widthInTiles * tileWidth) / 2 {
-                let p = calculateFirstTileToDraw(m_camera.X, m_camera.Y)
+        if mx < camera.border {
+            if camera.X + camera.speed <= (width * tileWidth) / 2 {
+                let p = calculateFirstTileToDraw(camera.X, camera.Y)
                 if p.x < -13 {
-                    m_camera.Y -= m_camera.speed / 2
+                    camera.Y -= camera.speed / 2
                 } else {
-                    let p2 = calculateFirstTileToDraw(m_camera.X, m_camera.Y - m_camera.height)
-                    if p2.y > m_heightInTiles + 13 { m_camera.Y += m_camera.speed / 2 }
+                    let p2 = calculateFirstTileToDraw(camera.X, camera.Y - camera.height)
+                    if p2.y > height + 13 { camera.Y += camera.speed / 2 }
                 }
-                m_camera.X += m_camera.speed
+                camera.X += camera.speed
             }
         }
 
-        if my > m_camera.height - m_camera.border {
-            if (m_camera.Y - m_camera.speed) >= (m_camera.height - m_heightInTiles * tileHeight) &&
-               m_camera.Y - m_camera.speed <= 0 {
-                let p = calculateFirstTileToDraw(m_camera.X, m_camera.Y - m_camera.height)
-                if p.y > m_heightInTiles + 13 {
-                    m_camera.Y -= m_camera.speed / 2
-                    m_camera.X -= m_camera.speed
+        if my > camera.height - camera.border {
+            if (camera.Y - camera.speed) >= (camera.height - height * tileHeight) &&
+               camera.Y - camera.speed <= 0 {
+                let p = calculateFirstTileToDraw(camera.X, camera.Y - camera.height)
+                if p.y > height + 13 {
+                    camera.Y -= camera.speed / 2
+                    camera.X -= camera.speed
                 } else {
-                    let p2 = calculateFirstTileToDraw(m_camera.X - m_camera.width, m_camera.Y - m_camera.height)
-                    if p2.x > m_widthInTiles + 13 {
-                        m_camera.Y -= m_camera.speed / 2
-                        m_camera.X += m_camera.speed
+                    let p2 = calculateFirstTileToDraw(camera.X - camera.width, camera.Y - camera.height)
+                    if p2.x > width + 13 {
+                        camera.Y -= camera.speed / 2
+                        camera.X += camera.speed
                     } else {
-                        m_camera.Y -= m_camera.speed
+                        camera.Y -= camera.speed
                     }
                 }
             }
         }
 
-        if my < m_camera.border {
-            if m_camera.Y + m_camera.speed <= 0 {
-                let p = calculateFirstTileToDraw(m_camera.X, m_camera.Y)
+        if my < camera.border {
+            if camera.Y + camera.speed <= 0 {
+                let p = calculateFirstTileToDraw(camera.X, camera.Y)
                 if p.x < -13 {
-                    m_camera.X -= m_camera.speed
-                    m_camera.Y += m_camera.speed / 2
+                    camera.X -= camera.speed
+                    camera.Y += camera.speed / 2
                 } else {
-                    let p2 = calculateFirstTileToDraw(m_camera.X - m_camera.width, m_camera.Y)
+                    let p2 = calculateFirstTileToDraw(camera.X - camera.width, camera.Y)
                     if p2.y < -13 {
-                        m_camera.X += m_camera.speed
-                        m_camera.Y += m_camera.speed / 2
+                        camera.X += camera.speed
+                        camera.Y += camera.speed / 2
                     } else {
-                        m_camera.Y += m_camera.speed
+                        camera.Y += camera.speed
                     }
                 }
             }
         }
 
-        if mx > m_camera.width - m_camera.border {
-            let p = calculateFirstTileToDraw(m_camera.X - m_camera.width, m_camera.Y)
-            if (m_camera.X - m_camera.width - m_camera.speed + tileWidth)
-                >= -(m_widthInTiles * tileWidth) / 2 ||
-               (m_camera.X - m_camera.speed) > 0 {
+        if mx > camera.width - camera.border {
+            let p = calculateFirstTileToDraw(camera.X - camera.width, camera.Y)
+            if (camera.X - camera.width - camera.speed + tileWidth)
+                >= -(width * tileWidth) / 2 ||
+               (camera.X - camera.speed) > 0 {
                 if p.y < -13 {
-                    m_camera.Y -= m_camera.speed / 2
+                    camera.Y -= camera.speed / 2
                 } else {
-                    let p2 = calculateFirstTileToDraw(m_camera.X - m_camera.width, m_camera.Y - m_camera.height)
-                    if p2.x > m_heightInTiles + 13 { m_camera.Y += m_camera.speed / 2 }
+                    let p2 = calculateFirstTileToDraw(camera.X - camera.width, camera.Y - camera.height)
+                    if p2.x > height + 13 { camera.Y += camera.speed / 2 }
                 }
-                m_camera.X -= m_camera.speed
+                camera.X -= camera.speed
             }
         }
 
@@ -265,8 +259,8 @@ class Map {
 
     func getTileset(_ tileId: Int) -> Tileset? {
         var result: Tileset? = nil
-        for i in 0..<m_tilesetCount {
-            if let ts = m_tilesets[i], tileId >= Int(ts.firstGid) {
+        for i in 0..<tilesetCount {
+            if let ts = tilesets[i], tileId >= Int(ts.firstGid) {
                 result = ts
             }
         }
@@ -275,7 +269,7 @@ class Map {
 
     func isWalkable(_ x: Int, _ y: Int) -> Bool {
         guard x >= 0, y >= 0,
-              x < m_widthInTiles * 2, y < m_heightInTiles * 2,
+              x < width * 2, y < height * 2,
               x < physicalTilesLayer.count,
               y < physicalTilesLayer[x].count else { return false }
         let id = Int(physicalTilesLayer[x][y])
@@ -287,9 +281,9 @@ class Map {
     /// Returns (-1,-1) if no walkable tile is found.
     func getLineOfSightPosition(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> (x: Int, y: Int) {
         var col = Float(x1)
-        var row    = Float(y1)
+        var row = Float(y1)
 
-        let rowSlope    = getRowSlope(x1, x2, y1, y2)
+        let rowSlope = getRowSlope(x1, x2, y1, y2)
         let colSlope = getColumnSlope(x1, x2, y1, y2)
 
         if abs(rowSlope) == 1.0 {
@@ -297,7 +291,7 @@ class Map {
                 let ci = Int(col.rounded(.down))
                 let fi = Int(row.rounded(.down))
                 if isWalkable(ci, fi) { return (ci, fi) }
-                row    += rowSlope
+                row += rowSlope
                 col += colSlope
             }
         } else {
@@ -305,7 +299,7 @@ class Map {
                 let ci = Int(col.rounded(.down))
                 let fi = Int(row.rounded(.down))
                 if isWalkable(ci, fi) { return (ci, fi) }
-                row    += rowSlope
+                row += rowSlope
                 col += colSlope
             }
         }
@@ -332,8 +326,8 @@ class Map {
 
     func invalidateTile(_ x: Int, _ y: Int) {
         guard x >= 0, y >= 0,
-              x + 1 < m_widthInTiles * 2,
-              y + 1 < m_heightInTiles * 2 else { return }
+              x + 1 < width * 2,
+              y + 1 < height * 2 else { return }
         let v = Int16(Res.TLS_ARBOLES)
         physicalTilesLayer[x][y]         = v
         physicalTilesLayer[x + 1][y]     = v
@@ -351,30 +345,30 @@ class Map {
     }
 
     private func updateMouseCoords() {
-        guard m_mapLoaded else { return }
+        guard mapLoaded else { return }
         let p = tilePositionFromXY(Int(Mouse.shared.X), Int(Mouse.shared.Y))
-        m_tileMouse = p
+        tileUnderMouse = p
     }
 
     private func tilePositionFromXY(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
         guard tileHeight > 0, tileWidth > 0 else { return (0, 0) }
-        // Logical tile coords (for m_tileMouse — buildings, obstacles)
-        let a = (y - m_camera.Y - m_camera.startY) / tileHeight
+        // Logical tile coords (for tileUnderMouse — buildings, obstacles)
+        let a = (y - camera.Y - camera.startY) / tileHeight
         let b: Int
-        if x - m_camera.X > 0 {
-            b = (x - m_camera.X - m_camera.startX) / tileWidth
+        if x - camera.X > 0 {
+            b = (x - camera.X - camera.startX) / tileWidth
         } else {
-            b = (x - m_camera.X - m_camera.startX - tileWidth) / tileWidth
+            b = (x - camera.X - camera.startX - tileWidth) / tileWidth
         }
-        // Physical tile coords (2× resolution — for m_tileChicoMouse, pathfinding, movement)
-        let aF = (y - m_camera.Y - m_camera.startY) / physicalTileHeight
+        // Physical tile coords (2× resolution — for smallTileUnderMouse, pathfinding, movement)
+        let aF = (y - camera.Y - camera.startY) / physicalTileHeight
         let bF: Int
-        if x - m_camera.X > 0 {
-            bF = (x - m_camera.X - m_camera.startX) / physicalTileWidth
+        if x - camera.X > 0 {
+            bF = (x - camera.X - camera.startX) / physicalTileWidth
         } else {
-            bF = (x - m_camera.X - m_camera.startX - physicalTileWidth) / physicalTileWidth
+            bF = (x - camera.X - camera.startX - physicalTileWidth) / physicalTileWidth
         }
-        m_tileChicoMouse = (aF + bF, aF - bF)
+        smallTileUnderMouse = (aF + bF, aF - bF)
         return (a + b, a - b)
     }
 
@@ -388,12 +382,12 @@ class Map {
         guard d.orientation == "isometric" else {
             Log.shared.error("Map: orientación no isométrica."); return false
         }
-        m_widthInTiles = d.width;  m_physicalWidthInTiles = d.width * 2
-        m_heightInTiles  = d.height;   m_physicalHeightInTiles  = d.height  * 2
-        tileWidth = d.tileWidth;   physicalTileWidth = d.tileWidth / 2
-        tileHeight  = d.tileHeight;    physicalTileHeight  = d.tileHeight  / 2
-        m_camera.X = ((d.tileCamaraJ - d.tileCamaraI) * tileWidth) >> 1
-        m_camera.Y = -((d.tileCamaraJ + d.tileCamaraI) * tileHeight) >> 1
+        width = d.width; physicalWidth = d.width * 2
+        height = d.height; physicalHeight = d.height * 2
+        tileWidth = d.tileWidth; physicalTileWidth = d.tileWidth / 2
+        tileHeight = d.tileHeight; physicalTileHeight = d.tileHeight / 2
+        camera.X = ((d.tileCamaraJ - d.tileCamaraI) * tileWidth) >> 1
+        camera.Y = -((d.tileCamaraJ + d.tileCamaraI) * tileHeight) >> 1
         return true
     }
 
@@ -425,31 +419,31 @@ class Map {
     }
 
     private func loadLayerInfo(paths: [String?]) {
-        if Map.m_tilesetDebug == nil {
+        if Map.tilesetDebug == nil {
             let ts = Tileset()
             if let p = paths[Res.TLS_DEBUG] { ts.load(p) }
-            Map.m_tilesetDebug = ts
+            Map.tilesetDebug = ts
         }
 
         // Expand the map to the INFO layer (INFO_LAYER = 8)
-        while m_map.count <= INFO_LAYER {
-            m_map.append(Array(repeating: Array(repeating: 0, count: m_heightInTiles),
-                                count: m_widthInTiles))
+        while mapData.count <= INFO_LAYER {
+            mapData.append(Array(repeating: Array(repeating: 0, count: height),
+                                count: width))
         }
 
         // Initialize the physical map and visibility map (double resolution)
-        physicalTilesLayer  = Array(repeating: Array(repeating: 0, count: m_heightInTiles * 2),
-                                  count: m_widthInTiles * 2)
-        visibleTilesLayer = Array(repeating: Array(repeating: 0, count: m_heightInTiles * 2),
-                                  count: m_widthInTiles * 2)
+        physicalTilesLayer  = Array(repeating: Array(repeating: 0, count: height * 2),
+                                  count: width * 2)
+        visibleTilesLayer = Array(repeating: Array(repeating: 0, count: height * 2),
+                                  count: width * 2)
 
-        for layer in 0..<m_maxLayers {
-            for i in 0..<m_widthInTiles {
-                for j in 0..<m_heightInTiles {
-                    if let ts = getTileset(Int(m_map[layer][i][j])),
+        for layer in 0..<maxLayers {
+            for i in 0..<width {
+                for j in 0..<height {
+                    if let ts = getTileset(Int(mapData[layer][i][j])),
                        ts.id != Int16(Res.TLS_UNIDADES) {
                         let tsId = ts.id
-                        m_map[INFO_LAYER][i][j] = tsId
+                        mapData[INFO_LAYER][i][j] = tsId
                         let ci = i * 2, cj = j * 2
                         if ci + 1 < physicalTilesLayer.count && cj + 1 < physicalTilesLayer[ci].count {
                             physicalTilesLayer[ci][cj]     = tsId
@@ -467,7 +461,7 @@ class Map {
     // MARK: - Helpers called from delegates
 
     fileprivate func addLayerName(_ name: String, _ index: Int) {
-        m_layerNames[name] = index
+        layerNames[name] = index
         switch name.trimmingCharacters(in: .whitespaces).lowercased() {
         case "obstaculos":          OBSTACLES_LAYER = index
         case "terreno":             TERRAIN_LAYER    = index
@@ -478,23 +472,21 @@ class Map {
     }
 
     fileprivate func addLayer(_ layerData: [[Int16]]) {
-        guard m_maxLayers < MAX_LAYERS_COUNT else { return }
-        while m_map.count <= m_maxLayers {
-            m_map.append(Array(repeating: Array(repeating: 0, count: m_heightInTiles),
-                                count: m_widthInTiles))
+        guard maxLayers < MAX_LAYERS_COUNT else { return }
+        while mapData.count <= maxLayers {
+            mapData.append(Array(repeating: Array(repeating: 0, count: height),
+                                count: width))
         }
-        m_map[m_maxLayers] = layerData
-        m_maxLayers += 1
+        mapData[maxLayers] = layerData
+        maxLayers += 1
     }
 
     fileprivate func addTileset(_ ts: Tileset) {
-        guard m_tilesetCount < m_tilesets.count else { return }
-        m_tilesets[m_tilesetCount] = ts
-        m_tilesetCount += 1
+        guard tilesetCount < tilesets.count else { return }
+        tilesets[tilesetCount] = ts
+        tilesetCount += 1
     }
 
-    fileprivate var widthInTiles:  Int { m_widthInTiles }
-    fileprivate var heightInTiles: Int { m_heightInTiles }
 }
 
 // MARK: - Private XML delegates
@@ -510,10 +502,10 @@ private class MapInfoDelegate: NSObject, XMLParserDelegate {
                 attributes a: [String: String]) {
         if name == "map" {
             orientacao = a["orientation"] ?? ""
-            width     = Int(a["width"]      ?? "0") ?? 0
-            height      = Int(a["height"]     ?? "0") ?? 0
-            tileWidth = Int(a["tilewidth"]  ?? "0") ?? 0
-            tileHeight  = Int(a["tileheight"] ?? "0") ?? 0
+            width = Int(a["width"] ?? "0") ?? 0
+            height = Int(a["height"] ?? "0") ?? 0
+            tileWidth = Int(a["tilewidth"] ?? "0") ?? 0
+            tileHeight = Int(a["tileheight"] ?? "0") ?? 0
         } else if name == "properties" {
             enProperties = true
         } else if enProperties && name == "property" {
@@ -563,23 +555,24 @@ private class TilesetRefDelegate: NSObject, XMLParserDelegate {
 private class LayerDelegate: NSObject, XMLParserDelegate {
     private weak var map: Map?
     private var layerName = ""
-    private var layerIndex  = 0
-    private var inLayer    = false
-    private var inData     = false
-    private var encoding   = ""
+    private var layerIndex = 0
+    private var inLayer = false
+    private var inData = false
+    private var encoding = ""
     private var dataBuffer = ""
 
     init(map: Map) { self.map = map }
 
-    func parser(_ parser: XMLParser, didStartElement name: String,
+    func parser(
+        _ parser: XMLParser, didStartElement name: String,
                 namespaceURI: String?, qualifiedName: String?,
                 attributes a: [String: String]) {
         if name == "layer" {
             layerName = a["name"] ?? ""
-            inLayer    = true
+            inLayer = true
         } else if inLayer && name == "data" {
-            encoding   = a["encoding"] ?? ""
-            inData     = true
+            encoding = a["encoding"] ?? ""
+            inData = true
             dataBuffer = ""
         }
     }
@@ -596,14 +589,14 @@ private class LayerDelegate: NSObject, XMLParserDelegate {
             if encoding == "base64" {
                 let trimmed = dataBuffer.trimmingCharacters(in: .whitespacesAndNewlines)
                 if let decoded = Data(base64Encoded: trimmed, options: .ignoreUnknownCharacters) {
-                    var tiles = Array(repeating: Array(repeating: Int16(0), count: m.heightInTiles),
-                                      count: m.widthInTiles)
+                    var tiles = Array(repeating: Array(repeating: Int16(0), count: m.height),
+                                      count: m.width)
                     let bytes = [UInt8](decoded)
                     var idx = 0
                     // TMX stores tiles row by row (row-major): first all columns
                     // of row 0, then those of row 1, etc.
-                    for j in 0..<m.heightInTiles {
-                        for i in 0..<m.widthInTiles {
+                    for j in 0..<m.height {
+                        for i in 0..<m.width {
                             if idx + 3 < bytes.count {
                                 // 32-bit little-endian tile ID
                                 let id = UInt32(bytes[idx])
@@ -615,7 +608,7 @@ private class LayerDelegate: NSObject, XMLParserDelegate {
                             idx += 4
                         }
                     }
-                    m.addLayerName(layerName, m.heightInTiles == 0 ? 0 : layerIndex)
+                    m.addLayerName(layerName, m.height == 0 ? 0 : layerIndex)
                     m.addLayer(tiles)
                     layerIndex += 1
                 }

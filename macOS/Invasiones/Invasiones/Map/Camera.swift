@@ -15,34 +15,26 @@ class Camera {
     var X: Int
     var Y: Int
 
-    private var m_startX: Int = 0
-    private var m_startY: Int = 0
-    private var m_width:   Int = Program.SCREEN_WIDTH
-    private var m_height:    Int
-    private var m_border:   Int = 20
-    private var m_speed: Int = 20
-
-    // MARK: - Properties
-    var startX:   Int { m_startX }
-    var startY:   Int { m_startY }
-    var width:     Int { m_width }
-    var height:      Int { m_height }
-    var border:     Int { m_border }
-    var speed: Int { m_speed }
+    private(set) var startX: Int = 0
+    private(set) var startY: Int = 0
+    private(set) var width: Int = Program.SCREEN_WIDTH
+    private(set) var height: Int
+    private(set) var border: Int = 20
+    private(set) var speed: Int = 20
 
     // MARK: - Initializer
     init(x: Int, y: Int, height: Int) {
         X = x
         Y = y
-        m_height = height
+        self.height = height
     }
 
     // MARK: - Methods
 
     func setScreenCoords(_ x: Int, _ y: Int, _ w: Int, _ h: Int) {
-        m_startX = max(0, x)
-        m_startY = max(0, y)
-        m_width   = (w + x <= Program.SCREEN_WIDTH) ? w : (Program.SCREEN_WIDTH - x)
-        m_height    = (h + y <= Program.SCREEN_HEIGHT)  ? h : (Program.SCREEN_HEIGHT  - y)
+        startX = max(0, x)
+        startY = max(0, y)
+        width = (w + x <= Program.SCREEN_WIDTH) ? w : (Program.SCREEN_WIDTH - x)
+        height = (h + y <= Program.SCREEN_HEIGHT) ? h : (Program.SCREEN_HEIGHT - y)
     }
 }

@@ -16,57 +16,56 @@ class GameState: State {
     private enum MENU_ITEM: Int { case CONTINUAR = 0, QUIT = 1 }
 
     // MARK: - Declarations
-    private var m_episode:            Episode?
-    private var m_gameMenu:       Menu?
-    private var m_confirmMenu: ConfirmationMenu?
-    private var m_state:             STATE = .START
+    private var episode: Episode?
+    private var gameMenu: Menu?
+    private var confirmMenu: ConfirmationMenu?
+    private var stateValue: STATE = .START
 
     // MARK: - State overrides
 
     override func start() {
-        m_state = .START
+        stateValue = .START
 
-        m_gameMenu = Menu(image: nil, itemCount: 2, x: 0, y: 0,
+        gameMenu = Menu(image: nil, itemCount: 2, x: 0, y: 0,
                               anchor: Surface.centerHorizontal | Surface.centerVertical)
-        m_gameMenu?.setFont(
-            ResourceManager.shared.fonts[Definitions.FONT_MENU])
-        m_gameMenu?.addItem(MENU_ITEM.CONTINUAR.rawValue,
+        gameMenu?.font = ResourceManager.shared.fonts[Definitions.FONT_MENU]
+        gameMenu?.addItem(MENU_ITEM.CONTINUAR.rawValue,
                                     Res.STR_MENU_CONTINUAR, Menu.ITEM_VISIBLE)
-        m_gameMenu?.addItem(MENU_ITEM.QUIT.rawValue,
+        gameMenu?.addItem(MENU_ITEM.QUIT.rawValue,
                                     Res.STR_MENU_SALIR, Menu.ITEM_VISIBLE)
     }
 
     override func update() {
-        switch m_state {
+        switch stateValue {
 
         case .START:
-            m_episode = Episode()
-            m_episode?.start()
-            m_state = .PLAYING
+            episode = Episode()
+            episode?.start()
+            stateValue = .PLAYING
 
-            m_button = Button(label: Res.STR_BOTON_MENU_DEL_JUEGO, font: nil)
-            if let b = m_button {
+            button = Button(label: Res.STR_BOTON_MENU_DEL_JUEGO, font: nil)
+            if let b = button {
                 b.setPosition(Video.width - b.width - Button.OFFSET_LIMITE_PANTALLA,
                                  Button.OFFSET_LIMITE_PANTALLA, 0)
             }
 
-            m_confirmMenu = ConfirmationMenu(Res.STR_CONFIRMACION_SALIR,
+            confirmMenu = ConfirmationMenu(Res.STR_CONFIRMACION_SALIR,
                                                       Res.STR_NO, Res.STR_SI)
-            m_confirmMenu?.setPosition(0, 0, Surface.centerVertical | Surface.centerHorizontal)
+            confirmMenu?.setPosition(0, 0, Surface.centerVertical | Surface.centerHorizontal)
 
         case .PLAYING:
-            m_episode?.update()
-            if m_episode?.state == .PLAYING {
-                if m_button?.update() != 0 {
+            episode?.update()
+            if episode?.state == .PLAYING {
+                if button?.update() != 0 {
                     setState(.MENU)
                 }
             }
-            if m_episode?.state == .END {
+            if episode?.state == .END {
                 stateMachine.setNextState(.MAIN_MENU)
             }
 
         case .MENU:
-            if let item = m_gameMenu?.update() {
+            if let item = gameMenu?.update() {
                 switch MENU_ITEM(rawValue: item) {
                 case .CONTINUAR: setState(.PLAYING)
                 case .QUIT:     setState(.CONFIRMACION)
@@ -75,11 +74,11 @@ class GameState: State {
             }
 
         case .CONFIRMACION:
-            if let result = m_confirmMenu?.update() {
-                if result == ConfirmationMenu.SELECCION.IZQUIERDO.rawValue {
+            if let result = confirmMenu?.update() {
+                if result == ConfirmationMenu.Selection.left.rawValue {
                     setState(.PLAYING)
                 }
-                if result == ConfirmationMenu.SELECCION.DERECHO.rawValue {
+                if result == ConfirmationMenu.Selection.right.rawValue {
                     stateMachine.setNextState(.MAIN_MENU)
                 }
             }
@@ -90,25 +89,25 @@ class GameState: State {
     }
 
     override func draw(_ g: Video) {
-        switch m_state {
+        switch stateValue {
 
         case .PLAYING:
-            m_episode?.draw(g)
-            if m_episode?.state == .PLAYING {
-                m_button?.draw(g)
+            episode?.draw(g)
+            if episode?.state == .PLAYING {
+                button?.draw(g)
             }
 
         case .MENU:
-            m_episode?.draw(g)
-            m_gameMenu?.draw(g)
+            episode?.draw(g)
+            gameMenu?.draw(g)
             g.setFont(ResourceManager.shared.fonts[Definitions.FONT_TITLE],
                            Definitions.COLOR_WHITE)
             g.write(Res.STR_JUEGO_PAUSADO, 0, Definitions.GAME_PAUSED_Y,
                        Surface.centerVertical | Surface.centerHorizontal)
 
         case .CONFIRMACION:
-            m_episode?.draw(g)
-            m_confirmMenu?.draw(g)
+            episode?.draw(g)
+            confirmMenu?.draw(g)
 
         default:
             break
@@ -120,7 +119,7 @@ class GameState: State {
     // MARK: - Private
 
     private func setState(_ state: STATE) {
-        m_state = state
+        stateValue = state
     }
 }
 

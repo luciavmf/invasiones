@@ -14,7 +14,7 @@ class GameScene: SKScene {
 
     // MARK: - Declarations
     private var gameFrame = GameFrame()
-    private var m_lastKeyPressed: Int = -1
+    private var lastKeyPressed: Int = -1
 
     // MARK: - Scene lifecycle
     override func didMove(to view: SKView) {
@@ -40,9 +40,9 @@ class GameScene: SKScene {
         // NSEvent.mouseLocation is always accurate; does not depend on mouseMoved firing.
         if let v = view, let win = v.window {
             let screenPos = NSEvent.mouseLocation
-            let winPos    = win.convertPoint(fromScreen: screenPos)
-            let viewPos   = v.convert(winPos, from: nil)
-            let scenePos  = convertPoint(fromView: viewPos)
+            let winPos = win.convertPoint(fromScreen: screenPos)
+            let viewPos = v.convert(winPos, from: nil)
+            let scenePos = convertPoint(fromView: viewPos)
             Mouse.shared.X = scenePos.x
             Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - scenePos.y
         }
@@ -98,14 +98,14 @@ class GameScene: SKScene {
     override func keyDown(with event: NSEvent) {
         guard !event.isARepeat else { return }
         let keyCode = Int(event.keyCode)
-        if keyCode != m_lastKeyPressed {
-            m_lastKeyPressed = keyCode
+        if keyCode != lastKeyPressed {
+            lastKeyPressed = keyCode
             Keyboard.shared.pressKey(keyCode)
         }
     }
 
     override func keyUp(with event: NSEvent) {
-        m_lastKeyPressed = -1
+        lastKeyPressed = -1
         Keyboard.shared.releaseKey(Int(event.keyCode))
     }
 }

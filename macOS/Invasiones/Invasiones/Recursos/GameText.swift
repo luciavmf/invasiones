@@ -35,7 +35,7 @@ class GameText: NSObject, XMLParserDelegate {
             return false
         }
 
-        s_strings = parser.m_parsedStrings
+        s_strings = parser.parsedStrings
         return true
     }
 
@@ -48,35 +48,35 @@ class GameText: NSObject, XMLParserDelegate {
     }
 
     // MARK: - XMLParserDelegate (temporary instance used only during parsing)
-    private var m_parsedStrings: [String] = Array(repeating: "", count: Res.STR_COUNT)
-    private var m_index = 0
-    private var m_currentText = ""
-    private var m_inElement = false
+    private var parsedStrings: [String] = Array(repeating: "", count: Res.STR_COUNT)
+    private var index = 0
+    private var currentText = ""
+    private var inElement = false
 
     func parser(_ parser: XMLParser, didStartElement elementName: String,
                 namespaceURI: String?, qualifiedName qName: String?,
                 attributes attributeDict: [String: String] = [:]) {
         // Skip the root element (<strings>)
         if elementName.lowercased() != "strings" {
-            m_currentText = ""
-            m_inElement = true
+            currentText = ""
+            inElement = true
         }
     }
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
-        if m_inElement {
-            m_currentText += string
+        if inElement {
+            currentText += string
         }
     }
 
     func parser(_ parser: XMLParser, didEndElement elementName: String,
                 namespaceURI: String?, qualifiedName qName: String?) {
-        if m_inElement && m_index < Res.STR_COUNT {
-            let trimmed = m_currentText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if inElement && index < Res.STR_COUNT {
+            let trimmed = currentText.trimmingCharacters(in: .whitespacesAndNewlines)
             // strings.xml uses the literal sequence "\n"; convert it to a real newline.
-            m_parsedStrings[m_index] = trimmed.replacingOccurrences(of: "\\n", with: "\n")
-            m_index += 1
-            m_inElement = false
+            parsedStrings[index] = trimmed.replacingOccurrences(of: "\\n", with: "\n")
+            index += 1
+            inElement = false
         }
     }
 }

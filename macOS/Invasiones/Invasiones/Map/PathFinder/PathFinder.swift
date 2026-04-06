@@ -33,16 +33,16 @@ class PathFinder {
     private let TIMEOUT_SECS:   Double = 4.5
 
     // MARK: - Singleton
-    private static var m_instance: PathFinder?
+    private static var _instance: PathFinder?
 
     static var instance: PathFinder {
-        if m_instance == nil { m_instance = PathFinder() }
-        return m_instance!
+        if _instance == nil { _instance = PathFinder() }
+        return _instance!
     }
 
     // MARK: - Declarations
-    private var m_physicalTiles: [[Int16]] = []
-    private weak var m_map: Map?
+    private var physicalTiles: [[Int16]] = []
+    private weak var map: Map?
 
     private init() {}
 
@@ -50,15 +50,15 @@ class PathFinder {
 
     func loadMap(_ map: Map) -> Bool {
         guard !map.physicalTilesLayer.isEmpty else { return false }
-        m_physicalTiles = map.physicalTilesLayer
-        m_map = map
+        physicalTiles = map.physicalTilesLayer
+        self.map = map
         return true
     }
 
     /// Returns the shortest path (stack of (i,j) points) or nil if none exists.
     func findShortestPath(_ startI: Int, _ startJ: Int,
                           _ targetI: Int, _ targetJ: Int) -> [(i: Int, j: Int)]? {
-        guard let map = m_map, !m_physicalTiles.isEmpty else {
+        guard let map = self.map, !physicalTiles.isEmpty else {
             Log.shared.warn("PathFinder: map not loaded.")
             return nil
         }
@@ -67,7 +67,7 @@ class PathFinder {
             return nil
         }
 
-        let start  = Node(startI, startJ)
+        let start = Node(startI, startJ)
         let target = Node(targetI, targetJ)
 
         var open:   [Node] = [start]
@@ -100,10 +100,10 @@ class PathFinder {
 
     private func addChildren(_ parent: Node, open: inout [Node],
                               closed: [Node], target: Node, map: Map) {
-        let up    = openNode(parent, parent.i - 1, parent.j,     COST_STRAIGHT,  &open, closed, target, map)
-        let right = openNode(parent, parent.i,     parent.j + 1, COST_STRAIGHT,  &open, closed, target, map)
-        let down  = openNode(parent, parent.i + 1, parent.j,     COST_STRAIGHT,  &open, closed, target, map)
-        let left  = openNode(parent, parent.i,     parent.j - 1, COST_STRAIGHT,  &open, closed, target, map)
+        let up = openNode(parent, parent.i - 1, parent.j, COST_STRAIGHT, &open, closed, target, map)
+        let right = openNode(parent, parent.i, parent.j + 1, COST_STRAIGHT, &open, closed, target, map)
+        let down = openNode(parent, parent.i + 1, parent.j, COST_STRAIGHT, &open, closed, target, map)
+        let left = openNode(parent, parent.i, parent.j - 1, COST_STRAIGHT, &open, closed, target, map)
         if up    && right { openNode(parent, parent.i - 1, parent.j + 1, COST_DIAGONAL, &open, closed, target, map) }
         if right && down  { openNode(parent, parent.i + 1, parent.j + 1, COST_DIAGONAL, &open, closed, target, map) }
         if down  && left  { openNode(parent, parent.i + 1, parent.j - 1, COST_DIAGONAL, &open, closed, target, map) }

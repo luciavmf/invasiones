@@ -12,25 +12,19 @@ import Foundation
 class Objective {
 
     // MARK: - Declarations
-    private var m_commands:    [Command] = []  // used as stack (LIFO via popLast)
-    private let m_imagePath: String?
+    var commands: [Command] = []  // used as stack (LIFO via popLast)
+    private let imagePath: String?
 
     // MARK: - Initializer
     init(pathImagen: String?) {
-        m_imagePath = pathImagen
-    }
-
-    // MARK: - Properties
-    var commands: [Command] {
-        get { m_commands }
-        set { m_commands = newValue }
+        imagePath = pathImagen
     }
 
     // MARK: - Methods
 
     /// Returns and removes the next order (LIFO).
     func nextCommand() -> Command? {
-        guard !m_commands.isEmpty else { return nil }
-        return m_commands.removeLast()
+        guard !commands.isEmpty else { return nil }
+        return commands.removeLast()
     }
 }

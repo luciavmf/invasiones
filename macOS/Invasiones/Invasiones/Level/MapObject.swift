@@ -13,44 +13,34 @@ class MapObject {
 
     // MARK: - Shared statics (equivalent to static fields in C#)
     static var camera: Camera?
-    static var map:   Map?
+    static var map: Map?
 
     // MARK: - Attributes
-    var m_image:            Surface?
-    var m_worldPos:   (x: Int, y: Int) = (0, 0)
-    var m_physicalTilePos:   (x: Int, y: Int) = (0, 0)
-    var m_previousTilePos: (x: Int, y: Int) = (0, 0)
-    var m_frameWidth:        Int = 0
-    var m_frameHeight:         Int = 0
-    var m_x:                 Int = 0
-    var m_y:                 Int = 0
+    var image:            Surface?
+    var worldPos:         (x: Int, y: Int) = (0, 0)
+    var physicalTilePos:  (x: Int, y: Int) = (0, 0)
+    var previousTile:     (x: Int, y: Int) = (0, 0)
+    var frameWidth:       Int = 0
+    var frameHeight:      Int = 0
+    var x:                Int = 0
+    var y:                Int = 0
 
     // MARK: - Public properties
-    var physicalTilePos: (x: Int, y: Int) {
-        get { m_physicalTilePos }
-        set { m_physicalTilePos = newValue }
-    }
-
-    var previousTile: (x: Int, y: Int) {
-        get { m_previousTilePos }
-        set { m_previousTilePos = newValue }
-    }
-
-    var worldPosFlat: (x: Int, y: Int) { m_worldPos }
+    var worldPosFlat: (x: Int, y: Int) { worldPos }
 
     // MARK: - Initializeres
 
     init() {}
 
     init(sup: Surface?, i: Int, j: Int) {
-        m_image = sup
+        self.image = sup
         if let img = sup {
-            m_frameHeight  = img.height
-            m_frameWidth = img.width
+            frameHeight = img.height
+            frameWidth = img.width
         }
-        m_physicalTilePos = (i, j)
+        physicalTilePos = (i, j)
         let p = tileToWorld(i, j)
-        m_worldPos = p
+        worldPos = p
     }
 
     // MARK: - Methods
@@ -63,16 +53,17 @@ class MapObject {
 
     func updateScreenPos() {
         guard let cam = MapObject.camera else { return }
-        m_x = cam.startX + m_worldPos.x + cam.X
-        m_y = cam.startY + m_worldPos.y + cam.Y
+        x = cam.startX + worldPos.x + cam.X
+        y = cam.startY + worldPos.y + cam.Y
     }
 
     func draw(_ g: Video) {
-        guard let img = m_image, let map = MapObject.map else { return }
-        g.draw(img,
-                  m_x - m_frameWidth / 2 + map.tileWidth / 2,
-                  m_y - m_frameHeight  + map.tileHeight  / 4,
-                  0)
+        guard let img = image, let map = MapObject.map else { return }
+        g.draw(
+            img,
+            x - frameWidth / 2 + map.tileWidth / 2,
+            y - frameHeight  + map.tileHeight  / 4,
+            0)
     }
 
     /// Transforms tile (i, j) into (x, y) position in the flat world.
@@ -84,16 +75,16 @@ class MapObject {
     }
 
     func setTilePosition(_ i: Int, _ j: Int) {
-        m_physicalTilePos = (i, j)
+        physicalTilePos = (i, j)
         let p = tileToWorld(i, j)
-        m_worldPos = p
+        worldPos = p
         updateScreenPos()
     }
 
-    // Initializes m_x, m_y from the current tile position (called when creating the unit).
+    // Initializes x, y from the current tile position (called when creating the unit).
     func initializeXY() {
-        let p = tileToWorld(m_physicalTilePos.x, m_physicalTilePos.y)
-        m_worldPos = p
+        let p = tileToWorld(physicalTilePos.x, physicalTilePos.y)
+        worldPos = p
         updateScreenPos()
     }
 }

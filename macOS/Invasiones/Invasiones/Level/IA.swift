@@ -13,17 +13,17 @@ class IA {
 
     // MARK: - Private class
     private class Batalla {
-        var m_commands: [Command] = []  // LIFO via popLast
+        var commands: [Command] = []  // LIFO via popLast
     }
 
     // MARK: - Declarations
-    private var m_battles:           [Batalla]
-    private var m_battleCount: Int = 0
-    private var m_currentBattle:   Int = 0
+    private var battles: [Batalla]
+    private var battleCount: Int = 0
+    private var currentBattle: Int = 0
 
     // MARK: - Initializer
     init() {
-        m_battles = Array(repeating: Batalla(), count: Level.MAX_BATTLES)
+        battles = Array(repeating: Batalla(), count: Level.MAX_BATTLES)
     }
 
     // MARK: - Loading
@@ -34,7 +34,7 @@ class IA {
             Log.shared.debug("IA: No se encuentra el archivo: \(pathStr)")
             return
         }
-        m_battleCount = 0
+        battleCount = 0
 
         guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else { return }
         let d = IAXMLDelegate()
@@ -43,39 +43,39 @@ class IA {
         withExtendedLifetime(d) {}
 
         for (i, commands) in d.batallas.enumerated() {
-            if i < m_battles.count {
-                m_battles[i].m_commands = commands.reversed()
-                m_battleCount += 1
+            if i < battles.count {
+                battles[i].commands = commands.reversed()
+                battleCount += 1
             }
         }
-        m_currentBattle = 0
+        currentBattle = 0
     }
 
     // MARK: - Methods
 
     func nextCommand() -> Command? {
-        guard m_currentBattle < m_battleCount else {
+        guard currentBattle < battleCount else {
             Log.shared.debug("IA: No hay mas batallas.")
             return nil
         }
 
-        if m_battles[m_currentBattle].m_commands.isEmpty {
+        if battles[currentBattle].commands.isEmpty {
             Log.shared.debug("IA: Paso a la siguiente battle.")
-            m_currentBattle += 1
-            if m_currentBattle >= m_battleCount {
+            currentBattle += 1
+            if currentBattle >= battleCount {
                 Log.shared.debug("IA: No hay mas batallas.")
                 return nil
             }
         }
 
-        return m_battles[m_currentBattle].m_commands.popLast()
+        return battles[currentBattle].commands.popLast()
     }
 }
 
 // MARK: - XML parser
 
 private class IAXMLDelegate: NSObject, XMLParserDelegate {
-    var batallas:   [[Command]] = []
+    var batallas: [[Command]] = []
     private var current: [Command] = []
     private var inBattle = false
 
@@ -90,9 +90,9 @@ private class IAXMLDelegate: NSObject, XMLParserDelegate {
             let jVal = (Int(a["j"] ?? "0") ?? 0) << 1
             let type: Command.TYPE
             switch name {
-            case "llegar":    type = .MOVE
+            case "llegar": type = .MOVE
             case "patrol": type = .PATROL
-            default:          type = .INVALID
+            default: type = .INVALID
             }
             if type != .INVALID {
                 current.append(Command(type, iVal, jVal))
@@ -104,7 +104,7 @@ private class IAXMLDelegate: NSObject, XMLParserDelegate {
                 namespaceURI: String?, qualifiedName: String?) {
         if name == "battle" {
             batallas.append(current.reversed())
-            current   = []
+            current = []
             inBattle = false
         }
     }

@@ -13,14 +13,7 @@ import Foundation
 class Log {
 
     // MARK: - Singleton
-    private static var instance: Log?
-
-    static var shared: Log {
-        if instance == nil {
-            instance = Log()
-        }
-        return instance!
-    }
+    static let shared = Log()
 
     // MARK: - Declarations
     private static var enabled = true
@@ -40,16 +33,11 @@ class Log {
 #endif
     }
 
-    deinit {
-        dispose()
-    }
-
     func dispose() {
 #if DEBUG
         fileWriter?.closeFile()
         fileWriter = nil
 #endif
-        Log.instance = nil
     }
 
     // MARK: - Methods
