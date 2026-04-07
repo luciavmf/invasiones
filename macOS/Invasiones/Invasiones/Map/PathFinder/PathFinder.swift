@@ -37,7 +37,7 @@ class PathFinder {
     static let shared: PathFinder = PathFinder()
 
     // MARK: - Declarations
-    private var physicalTiles: [[Int16]] = []
+    private var physicalTiles: [[Int]] = []
     private weak var map: Map?
 
     private init() { }

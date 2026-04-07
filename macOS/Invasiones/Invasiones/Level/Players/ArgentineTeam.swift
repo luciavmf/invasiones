@@ -59,20 +59,20 @@ class ArgentineTeam: Player {
         count = 99999
 
         guard let tilesetUnidades = map.tilesets.compactMap({ $0 }).first(where: {
-            $0.id == Int16(Res.TLS_UNIDADES)
+            $0.id == Res.TLS_UNIDADES
         }) else { return }
 
         units = []
 
         for i in 0..<map.width {
             for j in 0..<map.height {
-                let tileId = Int(map.unitsLayer[i][j])
+                let tileId = map.unitsLayer[i][j]
                 guard tileId != 0 else { continue }
 
-                let localId = tileId - Int(tilesetUnidades.firstGid)
+                let localId = tileId - tilesetUnidades.firstGid
                 guard localId >= 0, localId < tilesetUnidades.tiles.count,
                       let tile = tilesetUnidades.tiles[localId],
-                      tile.id == Int16(Res.TILE_UNIDADES_ID_PATRICIO) else { continue }
+                      tile.id == Res.TILE_UNIDADES_ID_PATRICIO else { continue }
 
                 let list = placeUnits(type: Res.UNIDAD_PATRICIO, count: tile.count, x: i << 1, y: j << 1)
 
@@ -325,14 +325,14 @@ class ArgentineTeam: Player {
                 guard tileUnderMouse.y < map.height  && tileUnderMouse.y >= 0 &&
                       tileUnderMouse.x < map.width && tileUnderMouse.x >= 0 else { return }
 
-                let buildingTileId = Int(map.buildingsLayer[tileUnderMouse.x][tileUnderMouse.y])
+                let buildingTileId = map.buildingsLayer[tileUnderMouse.x][tileUnderMouse.y]
                 guard buildingTileId != 0, let ts = map.getTileset(buildingTileId) else { return }
 
-                let localId = buildingTileId - Int(ts.firstGid)
+                let localId = buildingTileId - ts.firstGid
                 guard localId >= 0, localId < ts.tiles.count,
                       let tileProp = ts.tiles[localId],
-                      ts.id == Int16(Res.TLS_INVALIDADO),
-                      tileProp.id == Int16(Res.TILE_INVALIDADOS_ID_ENFERMERIA) else { return }
+                      ts.id == Res.TLS_INVALIDADO,
+                      tileProp.id == Res.TILE_INVALIDADOS_ID_ENFERMERIA else { return }
 
                 Log.shared.debug("Me llevan a heal.")
                 if let group = selectedGroup,
@@ -429,14 +429,14 @@ class ArgentineTeam: Player {
         guard tileUnderMouse.y < map.height  && tileUnderMouse.y >= 0 &&
               tileUnderMouse.x < map.width && tileUnderMouse.x >= 0 else { return }
 
-        let buildingTileId = Int(map.buildingsLayer[tileUnderMouse.x][tileUnderMouse.y])
+        let buildingTileId = map.buildingsLayer[tileUnderMouse.x][tileUnderMouse.y]
         guard buildingTileId != 0, let ts = map.getTileset(buildingTileId) else { return }
 
-        let localId = buildingTileId - Int(ts.firstGid)
+        let localId = buildingTileId - ts.firstGid
         guard localId >= 0, localId < ts.tiles.count,
               let tileProp = ts.tiles[localId],
-              ts.id == Int16(Res.TLS_INVALIDADO),
-              tileProp.id == Int16(Res.TILE_INVALIDADOS_ID_ENFERMERIA) else { return }
+              ts.id == Res.TLS_INVALIDADO,
+              tileProp.id == Res.TILE_INVALIDADOS_ID_ENFERMERIA else { return }
 
         let needsHeal = (selectedUnit.map { $0.health < $0.resistancePoints } ?? false)
                      || (selectedGroup.map  { $0.health < $0.resistancePoints } ?? false)

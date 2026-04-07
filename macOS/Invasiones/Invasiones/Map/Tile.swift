@@ -10,9 +10,9 @@
 import Foundation
 
 class Tile {
-    var id: Int16 = 0
+    var id: Int = 0
     var count: Int = 0
-    var cost: Int16 = 0
+    var cost: Int = 0
 
     init() {}
 }

@@ -25,8 +25,7 @@ class Map {
     static let TILE_VISIBLE: Int = 1
 
     // MARK: - Datos del mapa
-    /// `mapData[layer][i][j]` = tile ID (Int16).
-    private var mapData: [[[Int16]]] = []           // [layer][col][row]
+    private var mapData: [[[Int]]] = []           // [layer][col][row]
     private var layerNames: [String: Int] = [:]
     private var mapLoaded = false
     private var maxLayers = 0
@@ -51,8 +50,8 @@ class Map {
     private(set) var smallTileUnderMouse: (x: Int, y: Int) = (0, 0)
 
     // MARK: - Physical map (small tiles, ×2 resolution)
-    private(set) var physicalTilesLayer: [[Int16]] = []  // [col * 2][row * 2]
-    var visibleTilesLayer: [[Int16]] = []
+    private(set) var physicalTilesLayer: [[Int]] = []  // [col * 2][row * 2]
+    var visibleTilesLayer: [[Int]] = []
 
     // MARK: - Grey tile image (debug / semi-transparent selection)
     private var greyTileImage: Surface?
@@ -64,19 +63,19 @@ class Map {
     var physicalMapHeight: Int { physicalHeight }
     var physicalMapWidth: Int { physicalWidth }
 
-    var unitsLayer: [[Int16]] {
+    var unitsLayer: [[Int]] {
         guard PLAYER_UNITS_LAYER < mapData.count else { return [] }
         return mapData[PLAYER_UNITS_LAYER]
     }
-    var obstaclesLayer: [[Int16]] {
+    var obstaclesLayer: [[Int]] {
         guard OBSTACLES_LAYER < mapData.count else { return [] }
         return mapData[OBSTACLES_LAYER]
     }
-    var buildingsLayer: [[Int16]] {
+    var buildingsLayer: [[Int]] {
         guard INVALIDATED_POSITIONS_LAYER < mapData.count else { return [] }
         return mapData[INVALIDATED_POSITIONS_LAYER]
     }
-    var terrainLayer: [[Int16]] {
+    var terrainLayer: [[Int]] {
         guard TERRAIN_LAYER < mapData.count else { return [] }
         return mapData[TERRAIN_LAYER]
     }
@@ -133,9 +132,9 @@ class Map {
             var i = XX, j = YY
             while (tileX * tileWidth + startPosX) <= (camera.startX + camera.width) && j >= 0 {
                 if i < height && i >= 0 && j < width && j >= 0 {
-                    let tileId = Int(mapData[layer][i][j])
+                    let tileId = mapData[layer][i][j]
                     if tileId != 0, let ts = getTileset(tileId) {
-                        let localId = tileId - Int(ts.firstGid)
+                        let localId = tileId - ts.firstGid
                         let rect = ts.getTileRect(localId)
                         g.draw(ts.image, rect.x, rect.y, rect.w, rect.h,
                                   tileX * tileWidth + startPosX, startPosY)
@@ -256,7 +255,7 @@ class Map {
     func getTileset(_ tileId: Int) -> Tileset? {
         var result: Tileset? = nil
         for i in 0..<tilesetCount {
-            if let ts = tilesets[i], tileId >= Int(ts.firstGid) {
+            if let ts = tilesets[i], tileId >= ts.firstGid {
                 result = ts
             }
         }
@@ -268,7 +267,7 @@ class Map {
               x < width * 2, y < height * 2,
               x < physicalTilesLayer.count,
               y < physicalTilesLayer[x].count else { return false }
-        let id = Int(physicalTilesLayer[x][y])
+        let id = physicalTilesLayer[x][y]
         return id == Res.TLS_PASTO || id == Res.TLS_TIERRA
     }
 
@@ -324,7 +323,7 @@ class Map {
         guard x >= 0, y >= 0,
               x + 1 < width * 2,
               y + 1 < height * 2 else { return }
-        let v = Int16(Res.TLS_ARBOLES)
+        let v = Res.TLS_ARBOLES
         physicalTilesLayer[x][y]         = v
         physicalTilesLayer[x + 1][y]     = v
         physicalTilesLayer[x + 1][y + 1] = v
@@ -446,8 +445,8 @@ class Map {
         for layer in 0..<maxLayers {
             for i in 0..<width {
                 for j in 0..<height {
-                    if let ts = getTileset(Int(mapData[layer][i][j])),
-                       ts.id != Int16(Res.TLS_UNIDADES) {
+                    if let ts = getTileset(mapData[layer][i][j]),
+                       ts.id != Res.TLS_UNIDADES {
                         let tsId = ts.id
                         mapData[INFO_LAYER][i][j] = tsId
                         let ci = i * 2, cj = j * 2
@@ -477,7 +476,7 @@ class Map {
         }
     }
 
-    fileprivate func addLayer(_ layerData: [[Int16]]) {
+    fileprivate func addLayer(_ layerData: [[Int]]) {
         guard maxLayers < MAX_LAYERS_COUNT else { return }
         while mapData.count <= maxLayers {
             mapData.append(Array(repeating: Array(repeating: 0, count: height),
@@ -535,7 +534,7 @@ private class MapInfoDelegate: NSObject, XMLParserDelegate {
 private class TilesetRefDelegate: NSObject, XMLParserDelegate {
     private let base: String
     /// Collected during parsing; tilesets are loaded after parse() returns to avoid reentrance.
-    var collected: [(gid: Int16, path: String)] = []
+    var collected: [(gid: Int, path: String)] = []
 
     init(base: String) {
         self.base = base
@@ -545,7 +544,7 @@ private class TilesetRefDelegate: NSObject, XMLParserDelegate {
                 namespaceURI: String?, qualifiedName: String?,
                 attributes a: [String: String]) {
         guard name == "tileset", let src = a["source"] else { return }
-        let gid = Int16(a["firstgid"] ?? "0") ?? 0
+        let gid = Int(a["firstgid"] ?? "0") ?? 0
         let candidate1 = (base as NSString).appendingPathComponent(src)
         let candidate2 = (Program.SCENARIOS_PATH as NSString).appendingPathComponent(src)
         if let p = Utils.getPath(candidate1)
@@ -595,7 +594,7 @@ private class LayerDelegate: NSObject, XMLParserDelegate {
             if encoding == "base64" {
                 let trimmed = dataBuffer.trimmingCharacters(in: .whitespacesAndNewlines)
                 if let decoded = Data(base64Encoded: trimmed, options: .ignoreUnknownCharacters) {
-                    var tiles = Array(repeating: Array(repeating: Int16(0), count: m.height),
+                    var tiles = Array(repeating: Array(repeating: 0, count: m.height),
                                       count: m.width)
                     let bytes = [UInt8](decoded)
                     var idx = 0
@@ -609,7 +608,7 @@ private class LayerDelegate: NSObject, XMLParserDelegate {
                                     | UInt32(bytes[idx+1]) << 8
                                     | UInt32(bytes[idx+2]) << 16
                                     | UInt32(bytes[idx+3]) << 24
-                                tiles[i][j] = Int16(id & 0x1FFF) // flip bit mask (bits 29-31)
+                                tiles[i][j] = Int(id & 0x1FFF) // flip bit mask (bits 29-31)
                             }
                             idx += 4
                         }
