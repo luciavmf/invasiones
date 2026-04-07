@@ -9,10 +9,8 @@
 
 import Foundation
 
-class Tile {
+struct Tile {
     var id: Int = 0
     var count: Int = 0
     var cost: Int = 0
-
-    init() {}
 }

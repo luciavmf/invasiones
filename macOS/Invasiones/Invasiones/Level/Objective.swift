@@ -10,7 +10,7 @@
 import Foundation
 
 /// Represents a level objective: a stack of commands that must be fulfilled in order to advance.
-class Objective {
+struct Objective {
 
     // MARK: - Declarations
     /// The ordered list of commands that make up this objective (used as a LIFO stack).
@@ -26,7 +26,7 @@ class Objective {
     // MARK: - Methods
 
     /// Returns and removes the next order (LIFO).
-    func nextCommand() -> Command? {
+    mutating func nextCommand() -> Command? {
         guard !commands.isEmpty else { return nil }
         return commands.removeLast()
     }
