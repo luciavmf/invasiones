@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-macOS port of a Windows C# RTS (real-time strategy) game, translated to Swift using SpriteKit for rendering. Actively in progress.
+macOS port of a Windows C# RTS (real-time strategy) game, translated to Swift using SpriteKit for rendering. The original C# source lives at `../../Juego/Invasiones/fuente/` and is the authoritative reference for game logic and documentation.
 
 ## Build & Run
 
@@ -20,55 +20,58 @@ Debug builds show FPS/node count and run in windowed mode. Release builds run fu
 ### Frame Loop
 
 ```
-GameScene.update(_:)          [SpriteKit callback, 20 FPS]
-  → GameFrame.actualizar()    [loads resources on first frame]
-  → MaquinaDeEstados          [state machine dispatcher]
-  → Estado.actualizar()       [current state logic]
-  → Estado.dibujar(Video)     [current state rendering]
-  → Video.limpiar()           [clears SKNode canvas for next frame]
+GameScene.update(_:)       [SpriteKit callback, 20 FPS]
+  → GameFrame.update()     [dispatches to state machine]
+  → StateMachine.update()  [handles pending transitions, calls current state]
+  → State.update()         [current state logic]
+  → State.draw(Video)      [current state rendering]
+  → Video.clear()          [removes all SKNodes for next frame]
 ```
 
 ### State Machine
 
-`MaquinaDeEstados` (`SM/`) manages all top-level game states:
-- `EstadoLogo` → `EstadoMenuPpal` → `EstadoJuego` → `EstadoSalir`
-- States implement `iniciar()`, `actualizar()`, `dibujar()`, `salir()`
-- State transitions are queued and executed at start of next frame
+`StateMachine` (`StateMachiche/`) manages top-level game states:
+- `LogoState` → `MainMenuState` → `GameState` → `ExitState`
+- States implement `start()`, `update()`, `draw()`, `exit()`
+- `setNextState()` queues a transition; it executes at the start of the next `update()` call
+- `setState()` switches immediately without calling `exit()`/`start()` — used only for the initial state
+- `LogoState.start()` is **never called** — the first state is set via `setState()`, bypassing `start()`. Init code must go in `GameFrame.startGame()`
 
-### Active Battle: `EstadoJuego` → `Episodio`
+### Active Battle: `GameState` → `Episode`
 
-`Episodio` (`Nivel/`) owns the complete battle session:
+`Episode` (`Level/`) owns the complete battle session:
 
 ```
-Episodio
-├── Nivel          [objective tracker, loads nivel_N.xml]
-├── Mapa           [isometric TMX tile map, multi-layer]
-├── BandoArgentino [player forces]
-│   └── Grupos → Unidades
-├── BandoEnemigo   [AI forces]
-│   └── Grupos → Unidades
-└── IA             [enemy decision-making]
+Episode
+├── Level           [objective tracker, loads nivel_N.xml]
+├── Map             [isometric TMX tile map, multi-layer]
+├── ArgentineTeam   [player forces]
+│   └── Groups → Units
+├── EnemyTeam       [AI forces]
+│   └── Groups → Units
+└── IA              [enemy decision-making]
 ```
 
-Battle lifecycle: `CARGANDO → MOSTRAR_INTRODUCCION → JUGANDO → GANO/PERDIO`
+Battle lifecycle: `LOADING → SHOW_INTRO → PLAYING → WON/LOST`
 
 ### Unit System
 
-`Unidad` has stats (health, attack, resistance, visibility, aim, range, speed) and states: `OCIO`, `MOVIENDO`, `MURIENDO`, `ATACANDO`, `PERSIGUIENDO_UNIDAD`, `MUERTO`, `PATRULLANDO`, `SANANDO`.
+`Unit` has stats (health, attack, resistance, visibility, aim, range, speed) and states: `IDLE`, `MOVING`, `DYING`, `ATTACKING`, `CHASING`, `DEAD`, `PATROLLING`, `HEALING`.
 
-`Grupo` wraps a squad of units. `Orden` is a single command. `Objetivo` is a stack of orders.
+`Group` wraps a squad of units. `Command` is a single order. `Objective` is a stack of commands.
 
 **Combat notes:**
-- Damage is always `m_puntosDeAtaque` — no accuracy roll. `m_punteria` is loaded from CSV but was never used in the original C# attack logic.
-- Enemy units without a group (`IA`) are set to `PATRULLANDO` state on load and wander randomly between `RANDOM_PATRULLA_MIN=8` and `RANDOM_PATRULLA_MAX=16` tiles from their base position.
-- `ContraAtacar` (counter-attack): when a unit enters `ATACANDO`, it notifies the target to counter-attack if idle. Not yet ported to Swift.
-- `EstadoLogo.iniciar()` is never called — the first state is set directly via `setearEstado()`, bypassing `iniciar()`. Sound and init code must go in `GameFrame.iniciarJuego()`.
+- Damage is always `attackPoints` — no accuracy roll. `aim` is loaded from CSV but was never used in the original C# attack logic.
+- Enemy units without a group (`IA`) are set to `PATROLLING` on load and wander randomly between `RANDOM_PATRULLA_MIN=8` and `RANDOM_PATRULLA_MAX=16` tiles from their spawn position.
+- Counter-attack (`contraAtacar`): when a unit enters `ATTACKING`, it notifies the target to counter-attack if idle. **Not yet ported to Swift.**
 
 ### Rendering (`Video`)
 
-`Video` wraps SpriteKit, presenting an SDL-compatible API to the rest of the game. It owns a `SKNode` canvas that is fully redrawn each frame. Coordinate origin is bottom-left `(0,0)` at 1024×768.
+`Video` wraps SpriteKit with an SDL-style API. It owns a `SKNode` canvas that is fully rebuilt each frame (all nodes removed in `clear()`, re-added in `draw()`). Coordinate origin is bottom-left `(0,0)` at `Video.width × Video.height` (1024×768).
 
-Input from `NSEvent` flows through `GameScene` into `Mouse` and `Teclado` singletons.
+Screen dimensions live on `Video` as `Video.width` / `Video.height` — do not add a separate constants file for these.
+
+Input from `NSEvent` flows through `GameScene` into `Mouse` and `Keyboard` singletons.
 
 ### Pathfinding
 
@@ -76,40 +79,82 @@ Input from `NSEvent` flows through `GameScene` into `Mouse` and `Teclado` single
 
 ### Resources
 
-`AdministradorDeRecursos` (singleton) loads and caches all assets from `data/res.xml`:
-- Images, fonts, sprites, animation CSVs, unit type templates
-- `Res` contains generated integer constants for resource indices
-- `Texto` loads localised strings from `data/strings.xml`
+`ResourceManager` (singleton, `static let shared`) loads and caches all assets from `data/res.xml`:
+- Images → `Surface` (wraps `SKTexture`)
+- Fonts → `GameFont`
+- Sprites → `Sprite` (collection of `Animation` objects)
+- Animation metadata → `Animation` (sprite sheet controller)
+- Unit type templates → `Unit`
+
+`Res` contains integer constants for all resource indices (images, sounds, strings, animations, tiles).
+
+`GameText` loads localised strings from `data/strings.xml`.
+
+### res.xml Parsing — Critical Gotcha
+
+`res.xml` uses **Spanish element names** that must match exactly in the XML parsers:
+- `<unidad>` (not `<unit>`) — unit file references
+- `<animacion>` (not `<animation>`) — animation definitions in `<anims>`
+
+Translating these element name strings will silently break loading (no compile error).
+
+## Swiftify Progress
+
+The codebase has been progressively Swiftified from the C# port style. Completed:
+1. `m_` prefix removal from all private properties
+2. Singleton pattern: `static let shared = Foo()` (was lazy `private static var instance`)
+3. Setter methods → `didSet` observers (Tileset, Menu)
+4. `NSObject` removed from `ResourceManager` (conformance was unused)
+5. Column-alignment padding spaces removed throughout
+6. Argument labels added to game-logic functions (removing `_` suppression)
+7. C# XML doc comments restored as Swift `///` comments in English
+
+In progress / not yet done:
+- `throws` instead of `Bool` returns
+- `struct` for value types (`Tile`, etc.)
+- `Int16` → `Int` in Tileset/Map
+- Raw `Int` constants → typed Swift enums
 
 ## Conventions
 
-**Language:** All code, comments, and identifiers are in Spanish.
+**Language:** All code, comments, and identifiers are in English. `res.xml` and data files remain in Spanish — do not translate XML element/attribute names.
 
-**Key vocabulary:**
-| Spanish | English |
+**Key vocabulary (C# → Swift):**
+| C# (Spanish) | Swift (English) |
 |---|---|
-| `Unidad` | Unit (soldier) |
-| `Grupo` | Group / Squad |
-| `Mapa` | Map |
-| `Orden` | Order / Command |
-| `Objetivo` | Objective |
-| `Bando` | Side / Faction |
-| `Nivel` | Level |
-| `Episodio` | Battle session |
-| `Estado` | State |
-| `Instancia` | Singleton accessor |
+| `Unidad` | `Unit` |
+| `Grupo` | `Group` |
+| `Mapa` | `Map` |
+| `Orden` | `Command` |
+| `Objetivo` | `Objective` |
+| `Bando` | Team (Argentine/Enemy) |
+| `Nivel` | `Level` |
+| `Episodio` | `Episode` |
+| `Estado` | `State` |
+| `MaquinaDeEstados` | `StateMachine` |
+| `Superficie` | `Surface` |
+| `Fuente` | `GameFont` |
+| `Texto` | `GameText` |
 
-**Member naming:** private members prefixed `m_` (carried over from C# original).
+**Singletons:** accessed via `Foo.shared` (e.g., `ResourceManager.shared`, `Log.shared`, `PathFinder.shared`).
 
-**Singletons:** accessed via `Foo.Instancia` (e.g., `PathFinder.Instancia`, `Log.Instancia`).
+**SourceKit false positives:** Xcode's indexer frequently shows "Cannot find type X in scope" errors after edits. These are **always** false positives in this project — a clean `xcodebuild` produces zero errors. Do not act on SourceKit diagnostics without verifying with a real build.
+
+## Known Dead Code
+
+- `Button.setHeight` / `Button.setWidth` — never called
+- `Video.refresh()` — SpriteKit no-op stub
+- `Objective.imagePath` — write-only, never read
+- 56 sprite animation direction variants (`_NE`, `_E`, `_SE`, etc.) — units only face North; multi-direction was never completed
+- Various `Res` string constants for unimplemented features: credits screen, save/load, multi-level battles
 
 ## Data Files (`data/`)
 
 | Path | Purpose |
 |---|---|
-| `res.xml` | Resource manifest (all asset paths) |
-| `strings.xml` | Localised text |
-| `nivel/nivel_N.xml` | Level definitions (objectives, units, orders) |
+| `res.xml` | Resource manifest (all asset paths, sprite/animation definitions) |
+| `strings.xml` | Localised text strings |
+| `nivel/nivel_N.xml` | Level definitions (objectives, units, starting orders) |
 | `unidades/*.csv` | Unit animation frame data |
 | `imagenes/` | PNG sprites and UI assets |
 | `fuentes/` | TTF font files |
