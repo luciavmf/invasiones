@@ -25,9 +25,9 @@ class ConfirmationMenu: GUIBox {
     // MARK: - Initializer
     init(_ lbl: Int, _ boton1: Int, _ boton2: Int) {
         leftButton = Button(label: boton1, font: nil)
-        leftButton.setPosition(0, 0, 0)
+        leftButton.setPosition(x: 0, y: 0, anchor: 0)
         rightButton = Button(label: boton2, font: nil)
-        rightButton.setPosition(200, 200, 0)
+        rightButton.setPosition(x: 200, y: 200, anchor: 0)
         super.init()
         label = lbl
         width = Definitions.CONFIRMATION_WIDTH
@@ -36,22 +36,22 @@ class ConfirmationMenu: GUIBox {
 
     // MARK: - GUIBox overrides
 
-    override func setPosition(_ x: Int, _ y: Int, _ anchor: Int) {
+    override func setPosition(x: Int, y: Int, anchor: Int) {
         posX = x
         posY = y
         if (anchor & Surface.centerHorizontal) != 0 { posX += (Video.width >> 1) - (width >> 1) }
         if (anchor & Surface.centerVertical) != 0 { posY += (Video.height >> 1) - (height >> 1) }
 
         leftButton.setPosition(
-            posX + Button.OFFSET_LIMITE_PANTALLA,
-            posY + height - leftButton.height - Button.OFFSET_LIMITE_PANTALLA,
-            0
+            x: posX + Button.OFFSET_LIMITE_PANTALLA,
+            y: posY + height - leftButton.height - Button.OFFSET_LIMITE_PANTALLA,
+            anchor: 0
         )
 
         rightButton.setPosition(
-            posX + width - rightButton.width - Button.OFFSET_LIMITE_PANTALLA,
-            posY + height  - rightButton.height  - Button.OFFSET_LIMITE_PANTALLA,
-            0
+            x: posX + width - rightButton.width - Button.OFFSET_LIMITE_PANTALLA,
+            y: posY + height  - rightButton.height  - Button.OFFSET_LIMITE_PANTALLA,
+            anchor: 0
         )
     }
 

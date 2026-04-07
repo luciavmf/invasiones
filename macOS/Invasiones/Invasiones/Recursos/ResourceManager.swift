@@ -332,7 +332,7 @@ private class SpritesXMLParser: NSObject, XMLParserDelegate {
                 let spr = Sprite()
                 spr.reserveSlots(animations.count)
                 for (i, anim) in animations.enumerated() {
-                    spr.addAnimation(i, anim)
+                    spr.addAnimation(i: i, anim: anim)
                 }
                 spr.load()
                 sprites[spriteIdx] = spr

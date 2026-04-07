@@ -74,7 +74,7 @@ class Episode {
     // MARK: - Initializer
     init() {
         gameOverMenu = ConfirmationMenu(Res.STR_CONTINUARJUEGO, Res.STR_NO, Res.STR_SI)
-        gameOverMenu.setPosition(0, 0, Surface.centerVertical | Surface.centerHorizontal)
+        gameOverMenu.setPosition(x: 0, y: 0, anchor: Surface.centerVertical | Surface.centerHorizontal)
     }
 
     deinit { dispose() }
@@ -135,7 +135,7 @@ class Episode {
             updatePlayingState()
             setNewObjective()
             Sound.shared.stop(Res.SFX_SPLASH)
-            Sound.shared.play(Res.SFX_BATALLA, -1)
+            Sound.shared.play(id: Res.SFX_BATALLA, loop: -1)
             setState(.SHOW_INTRO)
         }
     }
@@ -236,7 +236,7 @@ class Episode {
 
     private func updateShowIntroState() {
         if count == 0 {
-            button?.setPosition(0, Definitions.OBJECTIVES_BUTTON_Y, Surface.centerHorizontal)
+            button?.setPosition(x: 0, y: Definitions.OBJECTIVES_BUTTON_Y, anchor: Surface.centerHorizontal)
         }
         count += 1
         if button?.update() != 0 {
@@ -296,8 +296,8 @@ class Episode {
 
     private func updateShowObjectiveState() {
         if count == 0 {
-            acceptButton?.setPosition(0, Episode.OBJECTIVES_BOX_BUTTON_Y,
-                                           Surface.centerHorizontal | Surface.centerVertical)
+            acceptButton?.setPosition(x: 0, y: Episode.OBJECTIVES_BOX_BUTTON_Y,
+                                      anchor: Surface.centerHorizontal | Surface.centerVertical)
         }
         count += 1
         if acceptButton?.update() != 0 {
@@ -380,7 +380,7 @@ class Episode {
     private func drawPlayingState(_ g: Video) {
         g.fillRect(Definitions.COLOR_BLACK)
 
-        if let map = map { map.drawLayer(g, map.TERRAIN_LAYER) }
+        if let map = map { map.drawLayer(g: g, layer: map.TERRAIN_LAYER) }
 
         dibujarObjetos(g)
 
@@ -420,7 +420,7 @@ class Episode {
         guard let map = map, let camera = camera, let player = player else { return }
 
         let oldClip = g.getClip()
-        g.setClip(camera.startX, camera.startY, camera.width, camera.height)
+        g.setClip(x: camera.startX, y: camera.startY, w: camera.width, h: camera.height)
 
         let rect = player.getPaintCoordinates()
         var XX = rect.x
@@ -437,7 +437,7 @@ class Episode {
             while tileX <= endI && j >= 0 {
                 if i >= 0 && i < map.physicalMapHeight && j < map.physicalMapWidth {
                     if map.visibleTilesLayer[i][j] == 0 {
-                        map.drawSmallTile(g, i, j, true)
+                        map.drawSmallTile(g: g, i: i, j: j, semiTransparente: true)
                     }
                 }
                 tileX += 1; i += 1; j -= 1
@@ -447,14 +447,14 @@ class Episode {
             else       { YY += 1; toggle = true  }
         }
 
-        g.setClip(oldClip.x, oldClip.y, oldClip.w, oldClip.h)
+        g.setClip(x: oldClip.x, y: oldClip.y, w: oldClip.w, h: oldClip.h)
     }
 
     private func dibujarObjetos(_ g: Video) {
         guard let map = map, let camera = camera, let player = player else { return }
 
         let oldClip = g.getClip()
-        g.setClip(camera.startX, camera.startY, camera.width, camera.height)
+        g.setClip(x: camera.startX, y: camera.startY, w: camera.width, h: camera.height)
 
         let rect = player.getPaintCoordinates()
         var XX = rect.x
@@ -485,7 +485,7 @@ class Episode {
         // Fueguitos del jugador se dibujan encima (delegado a ArgentineFaction via Player)
         // player.Dibujar(g) — in the original it drew fire effects; delegated if needed
 
-        g.setClip(oldClip.x, oldClip.y, oldClip.w, oldClip.h)
+        g.setClip(x: oldClip.x, y: oldClip.y, w: oldClip.w, h: oldClip.h)
     }
 
     // MARK: - WON state

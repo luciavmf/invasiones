@@ -31,10 +31,10 @@ class GameState: State {
         gameMenu = Menu(image: nil, itemCount: 2, x: 0, y: 0,
                               anchor: Surface.centerHorizontal | Surface.centerVertical)
         gameMenu?.font = ResourceManager.shared.fonts[Definitions.FONT_MENU]
-        gameMenu?.addItem(MENU_ITEM.CONTINUAR.rawValue,
-                                    Res.STR_MENU_CONTINUAR, Menu.ITEM_VISIBLE)
-        gameMenu?.addItem(MENU_ITEM.QUIT.rawValue,
-                                    Res.STR_MENU_SALIR, Menu.ITEM_VISIBLE)
+        gameMenu?.addItem(index: MENU_ITEM.CONTINUAR.rawValue,
+                          stringId: Res.STR_MENU_CONTINUAR, flag: Menu.ITEM_VISIBLE)
+        gameMenu?.addItem(index: MENU_ITEM.QUIT.rawValue,
+                          stringId: Res.STR_MENU_SALIR, flag: Menu.ITEM_VISIBLE)
     }
 
     override func update() {
@@ -47,13 +47,13 @@ class GameState: State {
 
             button = Button(label: Res.STR_BOTON_MENU_DEL_JUEGO, font: nil)
             if let b = button {
-                b.setPosition(Video.width - b.width - Button.OFFSET_LIMITE_PANTALLA,
-                                 Button.OFFSET_LIMITE_PANTALLA, 0)
+                b.setPosition(x: Video.width - b.width - Button.OFFSET_LIMITE_PANTALLA,
+                              y: Button.OFFSET_LIMITE_PANTALLA, anchor: 0)
             }
 
             confirmMenu = ConfirmationMenu(Res.STR_CONFIRMACION_SALIR,
                                                       Res.STR_NO, Res.STR_SI)
-            confirmMenu?.setPosition(0, 0, Surface.centerVertical | Surface.centerHorizontal)
+            confirmMenu?.setPosition(x: 0, y: 0, anchor: Surface.centerVertical | Surface.centerHorizontal)
 
         case .PLAYING:
             episode?.update()

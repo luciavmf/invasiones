@@ -28,9 +28,9 @@ class Tips: GUIBox {
         super.init()
 
         tipButton.setPosition(
-            Video.width - tipButton.width - 20,
-            Video.height  - 90 - tipButton.height,
-            0)
+            x: Video.width - tipButton.width - 20,
+            y: Video.height  - 90 - tipButton.height,
+            anchor: 0)
 
         width = Definitions.TIPS_WIDTH
         height = Definitions.TIPS_HEIGHT
@@ -43,7 +43,7 @@ class Tips: GUIBox {
 
     // MARK: - GUIBox
 
-    override func setPosition(_ x: Int, _ y: Int, _ anchor: Int) {
+    override func setPosition(x: Int, y: Int, anchor: Int) {
         posX = x
         posY = y
         if (anchor & Surface.centerHorizontal) != 0 { posX += (Video.width >> 1) - (width >> 1) }

@@ -57,7 +57,7 @@ class MapObject {
             frameWidth = img.width
         }
         physicalTilePos = (i, j)
-        let p = tileToWorld(i, j)
+        let p = tileToWorld(i: i, j: j)
         worldPos = p
     }
 
@@ -86,7 +86,7 @@ class MapObject {
     }
 
     /// Transforms tile (i, j) into (x, y) position in the flat world.
-    func tileToWorld(_ i: Int, _ j: Int) -> (x: Int, y: Int) {
+    func tileToWorld(i: Int, j: Int) -> (x: Int, y: Int) {
         guard let map = MapObject.map else { return (0, 0) }
         let x = ((i - j) * map.tileWidth / 2) >> 1
         let y = ((i + j) * map.tileHeight  / 2) >> 1
@@ -97,16 +97,16 @@ class MapObject {
     /// - Parameters:
     ///   - i: New tile column.
     ///   - j: New tile row.
-    func setTilePosition(_ i: Int, _ j: Int) {
+    func setTilePosition(i: Int, j: Int) {
         physicalTilePos = (i, j)
-        let p = tileToWorld(i, j)
+        let p = tileToWorld(i: i, j: j)
         worldPos = p
         updateScreenPos()
     }
 
     // Initializes x, y from the current tile position (called when creating the unit).
     func initializeXY() {
-        let p = tileToWorld(physicalTilePos.x, physicalTilePos.y)
+        let p = tileToWorld(i: physicalTilePos.x, j: physicalTilePos.y)
         worldPos = p
         updateScreenPos()
     }

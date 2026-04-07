@@ -71,7 +71,7 @@ class Animation {
 
         // Each copy needs its own Surface to have its own current texture.
         self.image = ResourceManager.shared.getCopyOfImage(imagePath)
-        setAnimation(0)
+        setAnimation(anim: 0)
     }
 
     // MARK: - Methods
@@ -100,7 +100,7 @@ class Animation {
         frameCount = frameWidth > 0 ? img.width / frameWidth : 1
         animationCount = frameHeight > 0 ? img.height / frameHeight : 1
 
-        img.setClip(0, currentAnimation * frameHeight, frameWidth, frameHeight)
+        img.setClip(x: 0, y: currentAnimation * frameHeight, w: frameWidth, h: frameHeight)
         return true
     }
 
@@ -119,19 +119,19 @@ class Animation {
     func setFrame(_ p: Int) {
         guard p >= 0, p < frameCount else { return }
         currentFrame = p
-        image?.setClip(currentFrame * frameWidth, currentAnimation * frameHeight,
-                             frameWidth, frameHeight)
+        image?.setClip(x: currentFrame * frameWidth, y: currentAnimation * frameHeight,
+                       w: frameWidth, h: frameHeight)
     }
 
     @discardableResult
-    func setAnimation(_ anim: Int) -> Bool {
+    func setAnimation(anim: Int) -> Bool {
         guard anim != currentAnimation else { return false }
-        guard anim >= 0, anim <= animationCount else { return false }
+        guard animationCount > 0, anim >= 0, anim < animationCount else { return false }
 
         currentAnimation = anim
         currentFrame = 0
-        image?.setClip(currentFrame * frameWidth, currentAnimation * frameHeight,
-                             frameWidth, frameHeight)
+        image?.setClip(x: currentFrame * frameWidth, y: currentAnimation * frameHeight,
+                       w: frameWidth, h: frameHeight)
         animDone = false
         return true
     }
@@ -151,14 +151,14 @@ class Animation {
                     animDone = true
                 }
             }
-            image?.setClip(currentFrame * frameWidth, currentAnimation * frameHeight,
-                                 frameWidth, frameHeight)
+            image?.setClip(x: currentFrame * frameWidth, y: currentAnimation * frameHeight,
+                           w: frameWidth, h: frameHeight)
             currentFrame += 1
             currentTicks = 0
         }
     }
 
-    func draw(_ g: Video, _ x: Int, _ y: Int, _ anchor: Int) {
+    func draw(g: Video, x: Int, y: Int, anchor: Int) {
         var px = x, py = y
         if (anchor & Surface.centerVertical) != 0 { py += Video.height  / 2 - frameHeight  / 2 }
         if (anchor & Surface.centerHorizontal) != 0 { px += Video.width / 2 - frameWidth / 2 }

@@ -133,7 +133,7 @@ class Group {
 
     /// Orders all units in the group to attack the given enemy unit.
     func attack(enemy: Unit) {
-        units.forEach { $0.attack(enemy) }
+        units.forEach { $0.attack(enemy: enemy) }
     }
 
     /// Orders the group to move to the nearest walkable tile near (x, y) and then heal.
@@ -143,8 +143,8 @@ class Group {
 
         guard let map = Group.map, let cmd = commander else { return }
         let p = map.getLineOfSightPosition(
-            x, cmd.physicalTilePos.x,
-            y, cmd.physicalTilePos.y)
+            x1: x, x2: cmd.physicalTilePos.x,
+            y1: y, y2: cmd.physicalTilePos.y)
         if p.x == -1 {
             Log.shared.debug("Group: No se puede mandar a heal.")
             return
@@ -213,7 +213,7 @@ class Group {
             receivedCommand = ia.nextCommand()
         }
         if let ord = receivedCommand, ord.id == .MOVE {
-            setObjectiveCommand(.MOVE, ord.point.x, ord.point.y)
+            setObjectiveCommand(type: .MOVE, x: ord.point.x, y: ord.point.y)
             move(x: ord.point.x, y: ord.point.y)
         }
     }
@@ -225,7 +225,7 @@ class Group {
         guard let ord = receivedCommand,
               ord.id == .MOVE || ord.id == .HEAL else { return }
 
-        commander?.move(targetTile.x, targetTile.y)
+        commander?.move(x: targetTile.x, y: targetTile.y)
         if commander?.pathToFollow == nil {
             setState(.waitingCommand)
             return
@@ -235,9 +235,9 @@ class Group {
 
         if let path = commander?.pathToFollow {
             for unit in units {
-                unit.calculatePathAtDistance(path,
-                                               unit.formationOffset.x,
-                                               unit.formationOffset.y)
+                unit.calculatePathAtDistance(commanderPath: path,
+                                             offsetX: unit.formationOffset.x,
+                                             offsetY: unit.formationOffset.y)
             }
         }
     }
@@ -317,10 +317,10 @@ class Group {
         // but keep the same unit index so it is retried at the next walkable position.
         while placed < units.count && index < units.count {
             if units[index] !== cmd {
-                if map.isWalkable(x + i, y + j) {
+                if map.isWalkable(x: x + i, y: y + j) {
                     units[index].formationOffset = (i, j)
-                    units[index].move(x + i, y + j)
-                    units[index].setObjectiveCommand(objectiveCommand)
+                    units[index].move(x: x + i, y: y + j)
+                    units[index].setObjectiveCommand(ord: objectiveCommand)
                     placed += 1
                     index += 1  // only advance when placed
                 }
@@ -345,7 +345,7 @@ class Group {
         }
     }
 
-    private func setObjectiveCommand(_ type: Command.TYPE, _ x: Int, _ y: Int) {
+    private func setObjectiveCommand(type: Command.TYPE, x: Int, y: Int) {
         objectiveCommand = Command(type, x, y)
     }
 }

@@ -49,8 +49,8 @@ class GameFrame {
         video = Video(escena: escena)
 
         Mouse.shared.positionCursor(
-            CGFloat(Program.SCREEN_WIDTH) / 2,
-            CGFloat(Program.SCREEN_HEIGHT) / 2
+            x: CGFloat(Program.SCREEN_WIDTH) / 2,
+            y: CGFloat(Program.SCREEN_HEIGHT) / 2
         )
         Mouse.shared.hideCursor()
 
@@ -63,13 +63,13 @@ class GameFrame {
         Sound.shared.loadAllSounds()
 
         stateMachine = StateMachine()
-        stateMachine.addState(.LOGO, LogoState(stateMachine))
-        stateMachine.addState(.MAIN_MENU, MainMenuState(stateMachine))
-        stateMachine.addState(.GAME, GameState(stateMachine))
-        stateMachine.addState(.END, nil)
-        stateMachine.addState(.HELP, HelpState(stateMachine))
-        stateMachine.addState(.OPTIONS, OptionsState(stateMachine))
-        stateMachine.addState(.QUIT, ExitState(stateMachine))
+        stateMachine.addState(key: .LOGO, state: LogoState(stateMachine))
+        stateMachine.addState(key: .MAIN_MENU, state: MainMenuState(stateMachine))
+        stateMachine.addState(key: .GAME, state: GameState(stateMachine))
+        stateMachine.addState(key: .END, state: nil)
+        stateMachine.addState(key: .HELP, state: HelpState(stateMachine))
+        stateMachine.addState(key: .OPTIONS, state: OptionsState(stateMachine))
+        stateMachine.addState(key: .QUIT, state: ExitState(stateMachine))
 
         stateMachine.setState(.LOGO)
         stateMachine.update() // triggers start() on the first state

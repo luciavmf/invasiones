@@ -48,9 +48,9 @@ class Hud {
         posY = Video.height - (image?.height ?? 0)
         tipsWindow = Tips()
         tipsWindow.setPosition(
-            ((Video.width - tipsWindow.width) / 2) + 175,
-            posY - tipsWindow.height - 75,
-            0)
+            x: ((Video.width - tipsWindow.width) / 2) + 175,
+            y: posY - tipsWindow.height - 75,
+            anchor: 0)
     }
 
     // MARK: - Update

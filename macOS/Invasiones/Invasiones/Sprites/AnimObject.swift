@@ -20,7 +20,7 @@ class AnimObject: MapObject {
         super.init()
 
         physicalTilePos = (i, j)
-        let p = tileToWorld(i, j)
+        let p = tileToWorld(i: i, j: j)
         worldPos = p
 
         animation.load()
@@ -45,18 +45,18 @@ class AnimObject: MapObject {
     override func draw(_ g: Video) {
         guard let map = MapObject.map else { return }
         if worldPos.x == -1 || worldPos.y == -1 { return }
-        animation.draw(g, x + map.tileWidth / 2, y + map.tileHeight / 2, 0)
+        animation.draw(g: g, x: x + map.tileWidth / 2, y: y + map.tileHeight / 2, anchor: 0)
     }
 
     // MARK: - Own methods
 
-    func setAnimation(_ anim: Int) {
-        animation.setAnimation(anim)
+    func setAnimation(anim: Int) {
+        animation.setAnimation(anim: anim)
     }
 
-    func setPosition(_ i: Int, _ j: Int) {
+    func setPosition(i: Int, j: Int) {
         physicalTilePos = (i, j)
-        let p = tileToWorld(i, j)
+        let p = tileToWorld(i: i, j: j)
         worldPos = p
         worldPos.x -= animation.offsets.x
         worldPos.y -= animation.offsets.y

@@ -32,18 +32,24 @@ class HelpState: State {
 
         button = Button(label: Res.STR_BOTON_MENU, font: fnt)
         button?.setPosition(
-            Video.width - (button?.width ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
-            Video.height - (button?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA, 0)
+            x: Video.width - (button?.width ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            y: Video.height - (button?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            anchor: 0
+        )
 
         nextButton = Button(label: Res.STR_SIGUIENTE, font: fnt)
         nextButton?.setPosition(
-            Video.width - (nextButton?.width ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
-            Video.height - (nextButton?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA, 0)
+            x: Video.width - (nextButton?.width ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            y: Video.height - (nextButton?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            anchor: 0
+        )
 
         backButton = Button(label: Res.STR_ATRAS, font: fnt)
         backButton?.setPosition(
-            Video.width - (nextButton?.width ?? 0) * 2 - Button.OFFSET_LIMITE_PANTALLA,
-            Video.height - (nextButton?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA, 0)
+            x: Video.width - (nextButton?.width ?? 0) * 2 - Button.OFFSET_LIMITE_PANTALLA,
+            y: Video.height - (nextButton?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            anchor: 0
+        )
 
         substate = .SELECCIONAR
         loadScreenshot(substate)
@@ -90,7 +96,7 @@ class HelpState: State {
                        0, Definitions.HELP_TEXT_Y, Surface.centerHorizontal)
         }
 
-        currentScreenshot?.draw(g, 0, 150, Surface.centerHorizontal | Surface.centerVertical)
+        currentScreenshot?.draw(g: g, x: 0, y: 150, anchor: Surface.centerHorizontal | Surface.centerVertical)
 
         if substate != .SELECCIONAR { backButton?.draw(g) }
         if substate != .GANAR {

@@ -33,18 +33,14 @@ class PathFinder {
     private let TIMEOUT_SECS:   Double = 4.5
 
     // MARK: - Singleton
-    private static var _instance: PathFinder?
 
-    static var instance: PathFinder {
-        if _instance == nil { _instance = PathFinder() }
-        return _instance!
-    }
+    static let shared: PathFinder = PathFinder()
 
     // MARK: - Declarations
     private var physicalTiles: [[Int16]] = []
     private weak var map: Map?
 
-    private init() {}
+    private init() { }
 
     // MARK: - Methods
 
@@ -56,13 +52,13 @@ class PathFinder {
     }
 
     /// Returns the shortest path (stack of (i,j) points) or nil if none exists.
-    func findShortestPath(_ startI: Int, _ startJ: Int,
-                          _ targetI: Int, _ targetJ: Int) -> [(i: Int, j: Int)]? {
+    func findShortestPath(startI: Int, startJ: Int,
+                         targetI: Int, targetJ: Int) -> [(i: Int, j: Int)]? {
         guard let map = self.map, !physicalTiles.isEmpty else {
             Log.shared.warn("PathFinder: map not loaded.")
             return nil
         }
-        guard map.isWalkable(targetI, targetJ) else {
+        guard map.isWalkable(x: targetI, y: targetJ) else {
             Log.shared.debug("PathFinder: target position not walkable.")
             return nil
         }
@@ -90,7 +86,7 @@ class PathFinder {
                 return reconstructPath(from: best, closed: closed)
             }
 
-            addChildren(best, open: &open, closed: closed, target: target, map: map)
+            addChildren(parent: best, open: &open, closed: closed, target: target, map: map)
             closed.append(best)
         }
         return nil
@@ -98,23 +94,23 @@ class PathFinder {
 
     // MARK: - Private helpers
 
-    private func addChildren(_ parent: Node, open: inout [Node],
-                              closed: [Node], target: Node, map: Map) {
-        let up = openNode(parent, parent.i - 1, parent.j, COST_STRAIGHT, &open, closed, target, map)
-        let right = openNode(parent, parent.i, parent.j + 1, COST_STRAIGHT, &open, closed, target, map)
-        let down = openNode(parent, parent.i + 1, parent.j, COST_STRAIGHT, &open, closed, target, map)
-        let left = openNode(parent, parent.i, parent.j - 1, COST_STRAIGHT, &open, closed, target, map)
-        if up    && right { openNode(parent, parent.i - 1, parent.j + 1, COST_DIAGONAL, &open, closed, target, map) }
-        if right && down  { openNode(parent, parent.i + 1, parent.j + 1, COST_DIAGONAL, &open, closed, target, map) }
-        if down  && left  { openNode(parent, parent.i + 1, parent.j - 1, COST_DIAGONAL, &open, closed, target, map) }
-        if left  && up    { openNode(parent, parent.i - 1, parent.j - 1, COST_DIAGONAL, &open, closed, target, map) }
+    private func addChildren(parent: Node, open: inout [Node],
+                             closed: [Node], target: Node, map: Map) {
+        let up = openNode(parent: parent, i: parent.i - 1, j: parent.j, cost: COST_STRAIGHT, open: &open, closed: closed, target: target, map: map)
+        let right = openNode(parent: parent, i: parent.i, j: parent.j + 1, cost: COST_STRAIGHT, open: &open, closed: closed, target: target, map: map)
+        let down = openNode(parent: parent, i: parent.i + 1, j: parent.j, cost: COST_STRAIGHT, open: &open, closed: closed, target: target, map: map)
+        let left = openNode(parent: parent, i: parent.i, j: parent.j - 1, cost: COST_STRAIGHT, open: &open, closed: closed, target: target, map: map)
+        if up    && right { openNode(parent: parent, i: parent.i - 1, j: parent.j + 1, cost: COST_DIAGONAL, open: &open, closed: closed, target: target, map: map) }
+        if right && down  { openNode(parent: parent, i: parent.i + 1, j: parent.j + 1, cost: COST_DIAGONAL, open: &open, closed: closed, target: target, map: map) }
+        if down  && left  { openNode(parent: parent, i: parent.i + 1, j: parent.j - 1, cost: COST_DIAGONAL, open: &open, closed: closed, target: target, map: map) }
+        if left  && up    { openNode(parent: parent, i: parent.i - 1, j: parent.j - 1, cost: COST_DIAGONAL, open: &open, closed: closed, target: target, map: map) }
     }
 
     @discardableResult
-    private func openNode(_ parent: Node, _ i: Int, _ j: Int, _ cost: Int,
-                           _ open: inout [Node], _ closed: [Node],
-                           _ target: Node, _ map: Map) -> Bool {
-        guard map.isWalkable(i, j) else { return false }
+    private func openNode(parent: Node, i: Int, j: Int, cost: Int,
+                          open: inout [Node], closed: [Node],
+                          target: Node, map: Map) -> Bool {
+        guard map.isWalkable(x: i, y: j) else { return false }
 
         let child = Node(i, j)
         guard !closed.contains(child) else { return true }

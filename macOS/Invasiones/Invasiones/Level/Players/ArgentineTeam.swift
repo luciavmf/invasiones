@@ -74,7 +74,7 @@ class ArgentineTeam: Player {
                       let tile = tilesetUnidades.tiles[localId],
                       tile.id == Int16(Res.TILE_UNIDADES_ID_PATRICIO) else { continue }
 
-                let list = placeUnits(Res.UNIDAD_PATRICIO, tile.count, i << 1, j << 1)
+                let list = placeUnits(type: Res.UNIDAD_PATRICIO, count: tile.count, x: i << 1, y: j << 1)
 
                 if list.count > 1 {
                     if groups == nil { groups = [] }
@@ -104,8 +104,7 @@ class ArgentineTeam: Player {
         // Draw orientation arrow only if objective is off-screen
         guard command != nil, orientationArrow != nil else { return }
         guard !isObjectiveVisible() else { return }
-        orientationArrow?.draw(g, arrowPos.x,
-                                     arrowPos.y, 0)
+        orientationArrow?.draw(g: g, x: arrowPos.x, y: arrowPos.y, anchor: 0)
     }
 
     // MARK: - Rendering coordinates for Episode
@@ -117,7 +116,7 @@ class ArgentineTeam: Player {
         guard let cam = MapObject.camera else {
             return (0, 0, map.physicalMapHeight, map.physicalMapWidth)
         }
-        let p = calculateFirstTileToDraw(cam.X, cam.Y)
+        let p = calculateFirstTileToDraw(x: cam.X, y: cam.Y)
         let tw = map.physicalTileWidth > 0 ? map.physicalTileWidth : 1
         let th = map.physicalTileHeight > 0 ? map.physicalTileHeight : 1
         let w = (cam.width - cam.startX) / tw + 23
@@ -232,7 +231,7 @@ class ArgentineTeam: Player {
             arrowPos.y = camera.height - fh + OFFSET
         }
 
-        flecha.setAnimation(dir.rawValue)
+        flecha.setAnimation(anim: dir.rawValue)
     }
 
     private func isObjectiveVisible() -> Bool {
@@ -301,7 +300,7 @@ class ArgentineTeam: Player {
 
             let tile = map.smallTileUnderMouse
 
-            if map.isWalkable(tile.x, tile.y) {
+            if map.isWalkable(x: tile.x, y: tile.y) {
                 // There is an enemy unit under the mouse → attack
                 if let unitUnderMouse = unitUnderMouse,
                    unitUnderMouse.faction == .ENEMY,
@@ -309,17 +308,17 @@ class ArgentineTeam: Player {
                     if let group = selectedGroup {
                         group.attack(enemy: unitUnderMouse)
                     } else {
-                        selectedUnit?.attack(unitUnderMouse)
+                        selectedUnit?.attack(enemy: unitUnderMouse)
                     }
                 } else {
                     // Mover
                     if let group = selectedGroup {
                         group.move(x: tile.x, y: tile.y)
                     } else {
-                        selectedUnit?.move(tile.x, tile.y)
+                        selectedUnit?.move(x: tile.x, y: tile.y)
                     }
                     count = 0
-                    arrowObj?.setTilePosition(tile.x, tile.y)
+                    arrowObj?.setTilePosition(i: tile.x, j: tile.y)
                 }
             } else {
                 // Non-walkable tile: check if it's the infirmary
@@ -342,7 +341,7 @@ class ArgentineTeam: Player {
                     group.heal(x: tile.x, y: tile.y)
                 } else if let unit = selectedUnit,
                           unit.health < unit.resistancePoints {
-                    unit.heal(tile.x, tile.y)
+                    unit.heal(x: tile.x, y: tile.y)
                 }
             }
         }
@@ -478,12 +477,12 @@ class ArgentineTeam: Player {
 
         for unit in units where unit.faction == .ARGENTINE {
             _ = unit.selectIfInRect(
-                Int(up.origin.x), Int(up.origin.y),
-                Int(up.width),    Int(up.height))
+                x: Int(up.origin.x), y: Int(up.origin.y),
+                w: Int(up.width),    h: Int(up.height))
         }
     }
 
-    private func calculateFirstTileToDraw(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
+    private func calculateFirstTileToDraw(x: Int, y: Int) -> (x: Int, y: Int) {
         let th = map.tileHeight > 0 ? map.tileHeight / 2 : 1
         let tw = map.tileWidth > 0 ? map.tileWidth / 2 : 1
         let a = -y / th

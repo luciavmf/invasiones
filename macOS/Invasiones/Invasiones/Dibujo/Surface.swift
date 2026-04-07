@@ -77,14 +77,14 @@ class Surface {
     }
 
     /// Stores the alpha level (0–255); applied to the node when drawing.
-    func setAlpha(_ alpha: Int) {
+    func setAlpha(alpha: Int) {
         currentAlpha = CGFloat(max(0, min(alpha, 255))) / 255.0
     }
 
     /// Returns the pixel colour at (x, y) as an RGB Int.
     /// Used for isometric tile detection under the mouse.
     /// Requires access to raw image data — stub for now.
-    func pixelColor(_ x: Int, _ y: Int) -> Int {
+    func pixelColor(x: Int, y: Int) -> Int {
         guard let image = NSImage(named: "") else { return 0 }
         _ = image  // suprime warning
         // TODO: implementar lectura de pixel real desde NSImage si se necesita hit-testing preciso.
@@ -94,7 +94,7 @@ class Surface {
     /// Sets the active sub-texture (equivalent to SDL_SetClipRect on the surface).
     /// x, y: clip origin in pixels of the full texture (top-left).
     /// w, h: clip size in pixels.
-    func setClip(_ x: Int, _ y: Int, _ w: Int, _ h: Int) {
+    func setClip(x: Int, y: Int, w: Int, h: Int) {
         guard let tex = texture else { return }
         let texW = tex.size().width
         let texH = tex.size().height

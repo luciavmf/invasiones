@@ -47,13 +47,13 @@ class EnemyTeam: Player {
                       let tile = ts.tiles[localId],
                       tile.id == Int16(Res.TILE_UNIDADES_ID_INGLES) else { continue }
 
-                let list = placeUnits(Res.UNIDAD_INGLES, tile.count, i << 1, j << 1)
+                let list = placeUnits(type: Res.UNIDAD_INGLES, count: tile.count, x: i << 1, y: j << 1)
 
                 if list.count > 1 {
                     if groups == nil { groups = [] }
                     let newGroup = Group(list)
                     let ia = IA()
-                    ia.load(i, j, levelIndex)
+                    ia.load(x: i, y: j, levelIndex: levelIndex)
                     newGroup.setAI(ia)
                     groups!.append(newGroup)
                 } else {

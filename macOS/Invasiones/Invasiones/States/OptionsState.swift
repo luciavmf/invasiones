@@ -15,8 +15,9 @@ class OptionsState: State {
         background = ResourceManager.shared.getImage(Res.IMG_FONDO)
         button = Button(label: Res.STR_BOTON_MENU, font: nil)
         button?.setPosition(
-            Video.width - (button?.width ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
-            Video.height - (button?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA, 0)
+            x: Video.width - (button?.width ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            y: Video.height - (button?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            anchor: 0)
     }
 
     override func update() {
