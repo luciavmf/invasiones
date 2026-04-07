@@ -18,17 +18,17 @@ class GameFrame {
 
     // MARK: - State enum (equivalent to GameFrame.STATE in C#)
     /// All top-level game screens.
-    enum STATE {
-        case INVALID
-        case END
-        case LOGO
-        case GAME
-        case HELP
-        case MAIN_MENU
-        case INTRO_CONSEQUENCES
-        case CREDITS
-        case OPTIONS
-        case QUIT
+    enum State {
+        case invalid
+        case end
+        case logo
+        case game
+        case help
+        case mainMenu
+        case introConsequences
+        case credits
+        case options
+        case quit
     }
 
     // MARK: - Declarations
@@ -67,22 +67,22 @@ class GameFrame {
         Sound.shared.loadAllSounds()
 
         stateMachine = StateMachine()
-        stateMachine.addState(key: .LOGO, state: LogoState(stateMachine))
-        stateMachine.addState(key: .MAIN_MENU, state: MainMenuState(stateMachine))
-        stateMachine.addState(key: .GAME, state: GameState(stateMachine))
-        stateMachine.addState(key: .END, state: nil)
-        stateMachine.addState(key: .HELP, state: HelpState(stateMachine))
-        stateMachine.addState(key: .OPTIONS, state: OptionsState(stateMachine))
-        stateMachine.addState(key: .QUIT, state: ExitState(stateMachine))
+        stateMachine.addState(key: .logo, state: LogoState(stateMachine))
+        stateMachine.addState(key: .mainMenu, state: MainMenuState(stateMachine))
+        stateMachine.addState(key: .game, state: GameState(stateMachine))
+        stateMachine.addState(key: .end, state: nil)
+        stateMachine.addState(key: .help, state: HelpState(stateMachine))
+        stateMachine.addState(key: .options, state: OptionsState(stateMachine))
+        stateMachine.addState(key: .quit, state: ExitState(stateMachine))
 
-        stateMachine.setState(.LOGO)
+        stateMachine.setState(.logo)
         stateMachine.update() // triggers start() on the first state
     }
 
     // MARK: - Loop (called by GameScene.update every frame)
     /// Advances mouse state and ticks the state machine. Exits the app if the END state is reached.
     func update() {
-        guard stateMachine.currentState != .END else {
+        guard stateMachine.currentState != .end else {
             quitApp()
             return
         }

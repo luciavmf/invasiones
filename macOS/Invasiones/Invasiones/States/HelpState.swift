@@ -12,13 +12,13 @@ import Foundation
 class HelpState: State {
 
     // MARK: - Sub-states
-    private enum SUBESTADO: Int {
-        case SELECCIONAR = 0, MOVE, ATTACK, OBJETIVO, SCROLL, HUD, HEAL, TIPS, GANAR
-        static let TOTAL = 9
+    private enum Substate: Int {
+        case select = 0, move, attack, objective, scroll, hud, heal, tips, win
+        static let total = 9
     }
 
     // MARK: - Declarations
-    private var substate: SUBESTADO = .SELECCIONAR
+    private var substate: Substate = .select
     private var backButton: Button?
     private var nextButton: Button?
     private var currentScreenshot: Animation?
@@ -28,7 +28,7 @@ class HelpState: State {
     override func start() {
         background = ResourceManager.shared.getImage(Res.IMG_FONDO)
 
-        let fnt = ResourceManager.shared.fonts[Definitions.FNT.SANS18.rawValue]
+        let fnt = ResourceManager.shared.fonts[FontIndex.sans18.rawValue]
 
         button = Button(label: Res.STR_BOTON_MENU, font: fnt)
         button?.setPosition(
@@ -51,24 +51,24 @@ class HelpState: State {
             anchor: 0
         )
 
-        substate = .SELECCIONAR
+        substate = .select
         loadScreenshot(substate)
     }
 
     override func update() {
         if button?.update() != 0 {
             let next = substate.rawValue + 1
-            if next > SUBESTADO.GANAR.rawValue {
-                stateMachine.setNextState(.MAIN_MENU)
-            } else if let next = SUBESTADO(rawValue: next) {
+            if next > Substate.win.rawValue {
+                stateMachine.setNextState(.mainMenu)
+            } else if let next = Substate(rawValue: next) {
                 substate = next
                 loadScreenshot(next)
             }
         }
 
-        if backButton?.update() != 0, substate != .SELECCIONAR {
+        if backButton?.update() != 0, substate != .select {
             let prev = substate.rawValue - 1
-            if let prev = SUBESTADO(rawValue: prev) {
+            if let prev = Substate(rawValue: prev) {
                 substate = prev
                 loadScreenshot(prev)
             }
@@ -84,7 +84,7 @@ class HelpState: State {
                        Definitions.COLOR_TITLE)
         g.write(Res.STR_MENU_AYUDA, 0, Definitions.TITLE_Y, Surface.centerHorizontal)
 
-        if substate.rawValue < SUBESTADO.TOTAL {
+        if substate.rawValue < Substate.total {
             g.setFont(ResourceManager.shared.fonts[Definitions.FONT_HELP_TITLE],
                            Definitions.GUI_COLOR_TEXT)
             g.write(Res.STR_MENU_AYUDA_TEXTO_SELECCIONAR_01 + substate.rawValue * 2,
@@ -98,8 +98,8 @@ class HelpState: State {
 
         currentScreenshot?.draw(g: g, x: 0, y: 150, anchor: Surface.centerHorizontal | Surface.centerVertical)
 
-        if substate != .SELECCIONAR { backButton?.draw(g) }
-        if substate != .GANAR {
+        if substate != .select { backButton?.draw(g) }
+        if substate != .win {
             nextButton?.draw(g)
         } else {
             button?.draw(g)
@@ -110,7 +110,7 @@ class HelpState: State {
 
     // MARK: - Private
 
-    private func loadScreenshot(_ sub: SUBESTADO) {
+    private func loadScreenshot(_ sub: Substate) {
         let animIdx = Res.ANIM_AYUDA_SELECCION + sub.rawValue
         let anims = ResourceManager.shared.animations
         guard animIdx < anims.count, let anim = anims[animIdx] else {

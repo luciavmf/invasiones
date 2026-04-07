@@ -119,21 +119,21 @@ class ResourceManager {
     func loadFonts() throws {
         guard fonts.isEmpty else { return }
 
-        fonts = Array(repeating: nil, count: Definitions.FNT.TOTAL.rawValue)
+        fonts = Array(repeating: nil, count: FontIndex.total.rawValue)
 
-        fonts[Definitions.FNT.SANS12.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 12)
-        fonts[Definitions.FNT.SANS14.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 14)
-        fonts[Definitions.FNT.SANS18.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 18)
-        fonts[Definitions.FNT.SANS20.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 20)
-        fonts[Definitions.FNT.SANS24.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 24)
-        fonts[Definitions.FNT.SANS28.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 28)
-        fonts[Definitions.FNT.LBLACK12.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 12)
-        fonts[Definitions.FNT.LBLACK14.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 14)
-        fonts[Definitions.FNT.LBLACK18.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 18)
-        fonts[Definitions.FNT.LBLACK20.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 20)
-        fonts[Definitions.FNT.LBLACK28.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 28)
+        fonts[FontIndex.sans12.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 12)
+        fonts[FontIndex.sans14.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 14)
+        fonts[FontIndex.sans18.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 18)
+        fonts[FontIndex.sans20.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 20)
+        fonts[FontIndex.sans24.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 24)
+        fonts[FontIndex.sans28.rawValue] = GameFont(fontId: Res.FNT_SANS, size: 28)
+        fonts[FontIndex.lblack12.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 12)
+        fonts[FontIndex.lblack14.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 14)
+        fonts[FontIndex.lblack18.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 18)
+        fonts[FontIndex.lblack20.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 20)
+        fonts[FontIndex.lblack28.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 28)
 
-        if fonts[Definitions.FNT.SANS12.rawValue] == nil {
+        if fonts[FontIndex.sans12.rawValue] == nil {
             throw GameError.invalidResource("No se pudo cargar la fuente SANS12.")
         }
     }

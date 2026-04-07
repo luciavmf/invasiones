@@ -13,20 +13,20 @@ import Foundation
 struct Command {
 
     /// The type of order that can be issued to a unit or group.
-    enum TYPE: Int {
-        case INVALID = -1
-        case TAKE_OBJECT = 0
-        case MOVE
-        case ATTACK
-        case PATROL
-        case HEAL
-        case TRIGGER
-        case KILL
+    enum Kind: Int {
+        case invalid = -1
+        case takeObject = 0
+        case move
+        case attack
+        case patrol
+        case heal
+        case trigger
+        case kill
     }
 
     // MARK: - Declarations
     /// The command type identifier.
-    private(set) var id: TYPE
+    private(set) var id: Kind
     /// The tile position where the command must be fulfilled.
     private(set) var point: (x: Int, y: Int)
     /// The image of the object to pick up (only for TAKE_OBJECT commands).
@@ -43,21 +43,21 @@ struct Command {
     ///   - type: The command type.
     ///   - x: Tile x coordinate where the command must be fulfilled.
     ///   - y: Tile y coordinate where the command must be fulfilled.
-    init(_ type: TYPE, _ x: Int, _ y: Int) {
-        id = type
+    init(_ kind: Kind, _ x: Int, _ y: Int) {
+        id = kind
         point = (x, y)
     }
 
     /// Creates a KILL command with a square kill zone of the given half-width.
-    init(_ type: TYPE, _ x: Int, _ y: Int, _ widthParam: Int) {
-        id = type
+    init(_ kind: Kind, _ x: Int, _ y: Int, _ widthParam: Int) {
+        id = kind
         point = (x, y)
         width = widthParam
     }
 
     /// Creates a TAKE_OBJECT command that loads the image to collect from a path.
-    init(_ type: TYPE, _ x: Int, _ y: Int, _ path: String) {
-        id = type
+    init(_ kind: Kind, _ x: Int, _ y: Int, _ path: String) {
+        id = kind
         point = (x, y)
         if let p = Utils.getPath(path) {
             image = ResourceManager.shared.getImage(p)
@@ -68,8 +68,8 @@ struct Command {
     }
 
     /// Creates a TRIGGER command with an animation to display at the trigger point.
-    init(_ type: TYPE, _ x: Int, _ y: Int, _ anim: AnimObject?) {
-        id = type
+    init(_ kind: Kind, _ x: Int, _ y: Int, _ anim: AnimObject?) {
+        id = kind
         point = (x, y)
         animation = anim
     }

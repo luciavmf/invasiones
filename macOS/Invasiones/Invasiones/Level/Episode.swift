@@ -17,11 +17,11 @@ class Episode {
 
     // MARK: - Enums
     /// The factions a unit can belong to.
-    enum BANDO { case ENEMY, ARGENTINE }
+    enum Faction { case enemy, argentine }
 
     /// The states the battle can be in.
-    enum STATE: Int {
-        case END = -1, LOADING, PLAYING, SHOW_INTRO, SHOW_OBJECTIVES, WON, LOST
+    enum State: Int {
+        case end = -1, loading, playing, showIntro, showObjectives, won, lost
     }
 
     // MARK: - Constants
@@ -50,7 +50,7 @@ class Episode {
     private var enemy: EnemyTeam?
     private var player: ArgentineTeam?
     private var map: Map?
-    private var stateValue: STATE = .LOADING
+    private var stateValue: State = .loading
     private var hud: Hud?
     /// General-purpose frame counter used by multiple states.
     private var count: Int = 0
@@ -69,7 +69,7 @@ class Episode {
     private var cheatObjetivoIndice: Int = 0
 
     // MARK: - Properties
-    var state: STATE { stateValue }
+    var state: State { stateValue }
 
     // MARK: - Initializer
     init() {
@@ -87,7 +87,7 @@ class Episode {
 
     /// Starts the battle by entering the loading state.
     func start() {
-        setState(.LOADING)
+        setState(.loading)
     }
 
     /// Saves the current battle (stub — not implemented).
@@ -102,13 +102,13 @@ class Episode {
     @discardableResult
     func update() -> Bool {
         switch stateValue {
-        case .LOADING:              updateLoadingState()
-        case .SHOW_INTRO:  updateShowIntroState()
-        case .SHOW_OBJECTIVES:     updateShowObjectiveState()
-        case .PLAYING:               updatePlayingState()
-        case .WON:                  updateWonState()
-        case .LOST:                updateLostState()
-        case .END:                   break
+        case .loading:              updateLoadingState()
+        case .showIntro:  updateShowIntroState()
+        case .showObjectives:     updateShowObjectiveState()
+        case .playing:               updatePlayingState()
+        case .won:                  updateWonState()
+        case .lost:                updateLostState()
+        case .end:                   break
         }
         return false
     }
@@ -117,13 +117,13 @@ class Episode {
 
     func draw(_ g: Video) {
         switch stateValue {
-        case .LOADING:             drawLoadingState(g)
-        case .SHOW_OBJECTIVES:    drawShowObjectiveState(g)
-        case .PLAYING:              drawPlayingState(g)
-        case .SHOW_INTRO: drawShowIntroState(g)
-        case .WON:                 drawWonState(g)
-        case .LOST:               drawLostState(g)
-        case .END:                  break
+        case .loading:             drawLoadingState(g)
+        case .showObjectives:    drawShowObjectiveState(g)
+        case .playing:              drawPlayingState(g)
+        case .showIntro: drawShowIntroState(g)
+        case .won:                 drawWonState(g)
+        case .lost:               drawLostState(g)
+        case .end:                  break
         }
         g.setColor(Definitions.COLOR_WHITE)
     }
@@ -137,7 +137,7 @@ class Episode {
                 setNewObjective()
                 Sound.shared.stop(Res.SFX_SPLASH)
                 Sound.shared.play(id: Res.SFX_BATALLA, loop: -1)
-                setState(.SHOW_INTRO)
+                setState(.showIntro)
             }
         } catch {
             Log.shared.error(error.localizedDescription)
@@ -189,8 +189,9 @@ class Episode {
             self.levelIndex = levelIndex
             hud = Hud()
             let hudAlto = hud?.height ?? 0
-            camera = Camera(x: 0, y: 0, height: Video.height - hudAlto)
-            map = Map(camera: camera!)
+            let camera = Camera(x: 0, y: 0, height: Video.height - hudAlto)
+            self.camera = camera
+            map = Map(camera: camera)
 
         } else if count == 1 {
             guard let map = map else { count += 1; return false }
@@ -246,7 +247,7 @@ class Episode {
         if button?.update() != 0 {
             currentPage += 1
             if currentPage == Definitions.PAGES_PER_INTRO - 1 {
-                setState(.PLAYING)
+                setState(.playing)
             }
         }
     }
@@ -259,7 +260,7 @@ class Episode {
 
         if (currentLevel?.currentBattleIndex ?? 0) != currentBattle {
             Log.shared.debug("Pase del nivelllllllll")
-            setState(.SHOW_INTRO)
+            setState(.showIntro)
         }
         showObjectivePopup = true
         objectiveShowCount = 0
@@ -267,7 +268,7 @@ class Episode {
         player?.setObjective(objective)
 
         if objective == nil {
-            setState(.WON)
+            setState(.won)
         }
     }
 
@@ -307,7 +308,7 @@ class Episode {
         if acceptButton?.update() != 0 {
             currentPage += 1
             if currentPage == Definitions.PAGES_PER_INTRO {
-                setState(.PLAYING)
+                setState(.playing)
                 showObjectivePopup = false
                 showObjectiveReminder = true
             }
@@ -370,7 +371,7 @@ class Episode {
 
     private func checkGameOver() {
         if (player?.unitCount ?? 1) == 0 {
-            setState(.LOST)
+            setState(.lost)
         }
     }
 
@@ -396,7 +397,7 @@ class Episode {
 
         if showObjectivePopup &&
            objectiveShowCount > Definitions.OBJECTIVE_SHOW_START_COUNT {
-            setState(.SHOW_OBJECTIVES)
+            setState(.showObjectives)
         } else if showObjectiveReminder &&
                   objectiveShowCount > Definitions.OBJECTIVE_SHOW_START_COUNT {
             let hudAlto = hud?.height ?? 0
@@ -496,7 +497,7 @@ class Episode {
 
     private func updateWonState() {
         if button?.update() != 0 {
-            setState(.END)
+            setState(.end)
         }
     }
 
@@ -516,10 +517,10 @@ class Episode {
 
         let result = gameOverMenu.update()
         if result == ConfirmationMenu.Selection.left.rawValue {
-            setState(.END)
+            setState(.end)
         }
         if result == ConfirmationMenu.Selection.right.rawValue {
-            setState(.LOADING)
+            setState(.loading)
         }
     }
 
@@ -547,7 +548,7 @@ class Episode {
         } else if teclas.contains(Keyboard.KEY_X) && cheatGanarIndice == 3 {
             cheatGanarIndice += 1
         } else if teclas.contains(Keyboard.KEY_W) && cheatGanarIndice == 4 {
-            setState(.WON); cheatGanarIndice = 0
+            setState(.won); cheatGanarIndice = 0
         } else if teclas.contains(Keyboard.KEY_P) && cheatPerderIndice == 0 {
             cheatPerderIndice += 1
         } else if teclas.contains(Keyboard.KEY_E) && cheatPerderIndice == 1 {
@@ -557,7 +558,7 @@ class Episode {
         } else if teclas.contains(Keyboard.KEY_X) && cheatPerderIndice == 3 {
             cheatPerderIndice += 1
         } else if teclas.contains(Keyboard.KEY_W) && cheatPerderIndice == 4 {
-            setState(.LOST); cheatPerderIndice = 0
+            setState(.lost); cheatPerderIndice = 0
         } else if teclas.contains(Keyboard.KEY_O) && cheatObjetivoIndice == 0 {
             cheatObjetivoIndice += 1
         } else if teclas.contains(Keyboard.KEY_B) && cheatObjetivoIndice == 1 {
@@ -580,10 +581,10 @@ class Episode {
 
     // MARK: - Private
 
-    private func setState(_ state: STATE) {
+    private func setState(_ state: State) {
         count = 0
         stateValue = state
         currentPage = 0
-        if state == .SHOW_OBJECTIVES { currentPage = 2 }
+        if state == .showObjectives { currentPage = 2 }
     }
 }

@@ -101,13 +101,13 @@ private class IAXMLDelegate: NSObject, XMLParserDelegate {
         } else if inBattle {
             let iVal = (Int(a["i"] ?? "0") ?? 0) << 1
             let jVal = (Int(a["j"] ?? "0") ?? 0) << 1
-            let type: Command.TYPE
+            let type: Command.Kind
             switch name {
-            case "llegar": type = .MOVE
-            case "patrol": type = .PATROL
-            default: type = .INVALID
+            case "llegar": type = .move
+            case "patrol": type = .patrol
+            default: type = .invalid
             }
-            if type != .INVALID {
+            if type != .invalid {
                 current.append(Command(type, iVal, jVal))
             }
         }

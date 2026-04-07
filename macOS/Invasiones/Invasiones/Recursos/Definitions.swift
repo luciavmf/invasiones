@@ -9,6 +9,28 @@
 
 import Foundation
 
+/// Font slot indices into `ResourceManager.fonts`.
+enum FontIndex: Int {
+    case sans12 = 0
+    case sans14
+    case sans18
+    case sans20
+    case sans24
+    case sans28
+    case lblack12
+    case lblack14
+    case lblack18
+    case lblack20
+    case lblack28
+    case total
+}
+
+/// Eight compass directions used for unit sprite animation.
+enum Direction: Int {
+    case north = 0, northEast, east, southEast, south, southWest, west, northWest
+    static let count = 8
+}
+
 enum Definitions {
 
     // MARK: - Cheats
@@ -67,37 +89,16 @@ enum Definitions {
     static let TOTAL_TICKS_TO_OBJECTIVE = 50
 
     // MARK: - Fonts
-    enum FNT: Int {
-        case SANS12 = 0
-        case SANS14
-        case SANS18
-        case SANS20
-        case SANS24
-        case SANS28
-        case LBLACK12
-        case LBLACK14
-        case LBLACK18
-        case LBLACK20
-        case LBLACK28
-        case TOTAL
-    }
-
-    static let FONT_OBJECTIVES_TITLE = FNT.LBLACK28.rawValue
-    static let FONT_TITLE = FNT.LBLACK28.rawValue
-    static let FONT_HELP_TITLE = FNT.SANS24.rawValue
-    static let FONT_HELP = FNT.SANS18.rawValue
-    static let FONT_MENU = FNT.SANS20.rawValue
-    static let FONT_BUTTON = FNT.SANS14.rawValue
-    static let FONT_OBJECTIVES_REMINDER = FNT.SANS14.rawValue
-    static let FONT_OBJECTIVES = FNT.SANS20.rawValue
-    static let FONT_WIN = FNT.LBLACK28.rawValue
+    static let FONT_OBJECTIVES_TITLE = FontIndex.lblack28.rawValue
+    static let FONT_TITLE = FontIndex.lblack28.rawValue
+    static let FONT_HELP_TITLE = FontIndex.sans24.rawValue
+    static let FONT_HELP = FontIndex.sans18.rawValue
+    static let FONT_MENU = FontIndex.sans20.rawValue
+    static let FONT_BUTTON = FontIndex.sans14.rawValue
+    static let FONT_OBJECTIVES_REMINDER = FontIndex.sans14.rawValue
+    static let FONT_OBJECTIVES = FontIndex.sans20.rawValue
+    static let FONT_WIN = FontIndex.lblack28.rawValue
 
     static let COLOR_OBJECTIVES_FONT = COLOR_WHITE
     static let COLOR_WIN_TEXT = COLOR_WHITE
-
-    // MARK: - Sprite directions (8 directions)
-    enum DIRECTION: Int {
-        case N = 0, NE, E, SE, S, SO, O, NO
-        static let DIRECTION_COUNT = 8
-    }
 }

@@ -16,16 +16,16 @@ class EnemyTeam: Player {
     // MARK: - Initializer
     override init(map: Map, camera: Camera, objectsToDraw: ObjectTable, hud: Hud) {
         super.init(map: map, camera: camera, objectsToDraw: objectsToDraw, hud: hud)
-        faction = .ENEMY
+        faction = .enemy
     }
 
     // MARK: - Override
 
     override func update() {
         switch stateValue {
-        case .START:   stateValue = .LOADING
-        case .LOADING: stateValue = .GAME
-        case .GAME:    updateGameplayState()
+        case .start:   stateValue = .loading
+        case .loading: stateValue = .game
+        case .game:    updateGameplayState()
         }
     }
 

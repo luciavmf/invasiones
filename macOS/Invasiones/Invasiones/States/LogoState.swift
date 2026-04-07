@@ -39,7 +39,7 @@ class LogoState: State {
             logo = ResourceManager.shared.getAlphaImage(Res.IMG_LOGO)
             alpha = 10
         } else if count > LOGO_INICIO_CNT + LOGO_TIEMPO_CNT {
-            stateMachine.setNextState(.MAIN_MENU)
+            stateMachine.setNextState(.mainMenu)
         }
         count += 1
     }
