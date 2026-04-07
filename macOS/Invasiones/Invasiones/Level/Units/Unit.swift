@@ -35,21 +35,21 @@ class Unit: MapObject {
 
     // MARK: - Enums
     /// States in which a unit can exist.
-    enum STATE {
-        case IDLE, MOVING, DYING, ATACANDO, PURSUING_UNIT, DEAD, PATROLLING, HEALING
+    enum State {
+        case idle, moving, dying, attacking, pursuingUnit, dead, patrolling, healing
     }
 
-    /// Sub-states used within the MOVING state.
-    enum SUBESTADO {
-        case INCREMENTAR_PASO, ESQUIVAR_UNIDAD, ALCANZAR_PASO, TERMINO_DE_DAR_PASO
+    /// Sub-states used within the moving state.
+    enum Substep {
+        case incrementStep, dodgeUnit, reachStep, completedStep
     }
 
     // MARK: - Attributes
     /// The unit type index (e.g. UNIDAD_PATRICIO or UNIDAD_INGLES).
     private var type: Int = 0
-    private var substate: SUBESTADO = .INCREMENTAR_PASO
+    private var substate: Substep = .incrementStep
     /// The faction this unit belongs to.
-    var faction: Episode.BANDO = .ENEMY
+    var faction: Episode.Faction = .enemy
     /// The unit currently being evaded after a collision.
     private(set) var unitToEvade: Unit?
     /// Current health points.
@@ -68,8 +68,8 @@ class Unit: MapObject {
     private var currentSpeed: (x: Int, y: Int) = (2, 2)
     private var defaultSpeedVec: (x: Int, y: Int) = (2, 2)
     private var enemy: Unit?
-    private var stateValue: STATE = .IDLE
-    private var nextStateValue: STATE = .IDLE
+    private var stateValue: State = .idle
+    private var nextStateValue: State = .idle
     private var direction: Int = 0  // 0=N, 1=NE, 2=E, 3=SE, 4=S, 5=SO, 6=O, 7=NO
     /// The remaining path to follow, stored as a stack (popLast = next step).
     private(set) var pathToFollow: [(i: Int, j: Int)]? = nil
@@ -110,7 +110,7 @@ class Unit: MapObject {
 
     // MARK: - Public properties
 
-    var currentState: STATE { stateValue }
+    var currentState: State { stateValue }
     /// The attack range of the unit in tiles.
     var range: Int { attackRange }
     /// The current movement speed vector.
@@ -163,27 +163,27 @@ class Unit: MapObject {
     /// Updates the unit. Returns true if it moved on the physical map.
     @discardableResult
     override func update() -> Bool {
-        guard stateValue != .DEAD else { return false }
+        guard stateValue != .dead else { return false }
 
         var movedOnMap = false
         completedOrder = false
 
         switch stateValue {
-        case .IDLE:
+        case .idle:
             updateIdleAnimation()
-        case .MOVING:
+        case .moving:
             movedOnMap = updateMovingState()
-        case .PATROLLING:
+        case .patrolling:
             movedOnMap = updatePatrollingState()
-        case .PURSUING_UNIT:
+        case .pursuingUnit:
             updatePursuingUnitState()
-        case .ATACANDO:
+        case .attacking:
             updateAttackingState()
-        case .DYING:
+        case .dying:
             updateDyingState()
-        case .DEAD:
+        case .dead:
             break
-        case .HEALING:
+        case .healing:
             updateHealingState()
         }
 
@@ -217,9 +217,9 @@ class Unit: MapObject {
 
     /// Orders the unit to move to tile (x, y), computing a path via A*.
     func move(x: Int, y: Int) {
-        command = Command(.MOVE, x, y)
-        setState(.MOVING)
-        nextStateValue = .IDLE
+        command = Command(.move, x, y)
+        setState(.moving)
+        nextStateValue = .idle
 
         let path = PathFinder.shared.findShortestPath(
             startI: physicalTilePos.x, startJ: physicalTilePos.y, targetI: x, targetJ: y)
@@ -228,18 +228,18 @@ class Unit: MapObject {
             // First element is destination, last is origin. Used as a stack (popLast = next step).
             pathToFollow = Array(c.dropLast())   // quita el nodo start (último = origen)
         } else {
-            setState(.IDLE)
+            setState(.idle)
             pathToFollow = nil
             return
         }
 
-        substate = .INCREMENTAR_PASO
+        substate = .incrementStep
     }
 
     /// Puts the unit into patrol mode, wandering randomly around its starting tile.
     func patrol() {
-        setState(.PATROLLING)
-        nextStateValue = .PATROLLING
+        setState(.patrolling)
+        nextStateValue = .patrolling
         patrolPosition = physicalTilePos
         pathToFollow = findRandomPatrolPath(
             i: physicalTilePos.x, j: physicalTilePos.y)
@@ -249,12 +249,12 @@ class Unit: MapObject {
     func attack(enemy: Unit) {
         self.enemy = enemy
         targetPos = (-1, -1)
-        setState(.PURSUING_UNIT)
+        setState(.pursuingUnit)
     }
 
     /// Halts the unit immediately, clearing its path and returning it to idle.
     func stop() {
-        setState(.IDLE)
+        setState(.idle)
         pathToFollow = nil
     }
 
@@ -266,7 +266,7 @@ class Unit: MapObject {
 
     /// Puts the unit into the healing state so it regenerates health over time.
     func recoverHealth() {
-        setState(.HEALING)
+        setState(.healing)
     }
 
     // MARK: - Collision and evasion
@@ -281,17 +281,17 @@ class Unit: MapObject {
     /// Triggers the evasion sub-state so the unit recalculates its path around `other`.
     func evadeUnit(other: Unit, visible: [Unit]?) {
         unitToEvade = other
-        substate = .ESQUIVAR_UNIDAD
+        substate = .dodgeUnit
     }
 
     // MARK: - Queries
 
     /// Returns `true` if the unit is dead or in the dying animation.
-    func isDead() -> Bool { stateValue == .DEAD || stateValue == .DYING }
+    func isDead() -> Bool { stateValue == .dead || stateValue == .dying }
 
     /// Returns `true` if the unit is in any active movement state (moving, patrolling, or pursuing).
     func isMoving() -> Bool {
-        return stateValue == .MOVING || stateValue == .PATROLLING || stateValue == .PURSUING_UNIT
+        return stateValue == .moving || stateValue == .patrolling || stateValue == .pursuingUnit
     }
 
     /// Returns `true` if the unit's screen position falls within the camera's visible area.
@@ -352,8 +352,8 @@ class Unit: MapObject {
                                  offsetX: Int, offsetY: Int) {
         guard let map = MapObject.map else { return }
 
-        setState(.MOVING)
-        nextStateValue = .IDLE
+        setState(.moving)
+        nextStateValue = .idle
 
         // Build offset copy of commander's path.
         // commanderPath: [0]=destination, [last]=first step (Swift format).
@@ -408,7 +408,7 @@ class Unit: MapObject {
 
         // pathList is first-step→destination; store as Swift path array ([0]=destination, [last]=first-step)
         pathToFollow = pathList.reversed()
-        substate = .INCREMENTAR_PASO
+        substate = .incrementStep
     }
 
     private func findNextValidPosition(_ list: [(i: Int, j: Int)], from start: Int) -> Int? {
@@ -456,7 +456,7 @@ class Unit: MapObject {
 
     /// Orders the unit to move toward the infirmary at (x, y) and then heal.
     func heal(x: Int, y: Int) {
-        command = Command(.HEAL, x, y)
+        command = Command(.heal, x, y)
 
         guard let map = MapObject.map else { return }
         let p = map.getLineOfSightPosition(x1: x, x2: physicalTilePos.x, y1: y, y2: physicalTilePos.y)
@@ -468,8 +468,8 @@ class Unit: MapObject {
     }
 
     private func setHealing(x: Int, y: Int) {
-        setState(.MOVING)
-        nextStateValue = .HEALING
+        setState(.moving)
+        nextStateValue = .healing
 
         let path = PathFinder.shared.findShortestPath(
             startI: physicalTilePos.x, startJ: physicalTilePos.y, targetI: x, targetJ: y)
@@ -478,11 +478,11 @@ class Unit: MapObject {
             pathToFollow = Array(c.dropLast())
         } else {
             Log.shared.debug("No se encontro el path para heal...")
-            setState(.IDLE)
+            setState(.idle)
             pathToFollow = nil
             return
         }
-        substate = .INCREMENTAR_PASO
+        substate = .incrementStep
     }
 
     // MARK: - Selección por arrastre de mouse (rectangle)
@@ -504,25 +504,25 @@ class Unit: MapObject {
 
     // MARK: - Private
 
-    private func setState(_ e: STATE) {
+    private func setState(_ e: State) {
         stateValue = e
         count = 0
-        if e == .IDLE {
+        if e == .idle {
             pathToFollow = nil
         }
-        if e == .ATACANDO {
+        if e == .attacking {
             enemy?.counterAttack(self)
         }
     }
 
     /// Called when this unit starts being attacked. If idle and in range, counter-attacks.
     func counterAttack(_ attacker: Unit) {
-        guard stateValue == .IDLE else { return }
+        guard stateValue == .idle else { return }
         Log.shared.debug("Me atacan, contraataco.")
         enemy = attacker
         if calculateDistance(toI: attacker.physicalTilePos.x, toJ: attacker.physicalTilePos.y) < Double(attackRange) {
             aimAtUnit(attacker)
-            setState(.ATACANDO)
+            setState(.attacking)
         }
     }
 
@@ -539,13 +539,13 @@ class Unit: MapObject {
 
     private func firstAnimation() -> Int {
         switch stateValue {
-        case .IDLE, .HEALING:
+        case .idle, .healing:
             return type == 0 ? Res.SPR_ANIM_PATRICIO_QUIETO_N : Res.SPR_ANIM_INGLES_QUIETO_N
-        case .MOVING, .PURSUING_UNIT, .PATROLLING:
+        case .moving, .pursuingUnit, .patrolling:
             return type == 0 ? Res.SPR_ANIM_PATRICIO_CAMINA_N : Res.SPR_ANIM_INGLES_CAMINA_N
-        case .DYING, .DEAD:
+        case .dying, .dead:
             return type == 0 ? Res.SPR_ANIM_PATRICIO_MUERE_N : Res.SPR_ANIM_INGLES_MUERE_N
-        case .ATACANDO:
+        case .attacking:
             return type == 0 ? Res.SPR_ANIM_PATRICIO_ATACA_N : Res.SPR_ANIM_INGLES_ATACA_N
         }
     }
@@ -565,7 +565,7 @@ class Unit: MapObject {
 
     private func moverse() -> Bool {
         switch substate {
-        case .INCREMENTAR_PASO:
+        case .incrementStep:
             guard let path = pathToFollow, !path.isEmpty else {
                 setState(nextStateValue)
                 pathToFollow = nil
@@ -574,11 +574,11 @@ class Unit: MapObject {
             nextTile = (path.last!.i, path.last!.j)
             pathToFollow!.removeLast()
             nextStep = tileToWorld(i: nextTile.x, j: nextTile.y)
-            substate = .ALCANZAR_PASO
+            substate = .reachStep
 
-        case .ESQUIVAR_UNIDAD:
+        case .dodgeUnit:
             recalculateNextStep()
-            substate = .ALCANZAR_PASO
+            substate = .reachStep
             return true
 
         default: break
@@ -598,7 +598,7 @@ class Unit: MapObject {
             let prevTile = physicalTilePos
             previousTile = prevTile
             physicalTilePos = nextTile
-            substate = .INCREMENTAR_PASO
+            substate = .incrementStep
             return true
         }
         return false
@@ -718,12 +718,12 @@ class Unit: MapObject {
 
     private func updatePursuingUnitState() {
         guard let enemy = enemy else {
-            setState(.IDLE)
+            setState(.idle)
             return
         }
         if enemy.isDead() {
             self.enemy = nil
-            setState(.IDLE)
+            setState(.idle)
             return
         }
 
@@ -732,7 +732,7 @@ class Unit: MapObject {
         if dist <= Double(attackRange) {
             // In range: attack
             aimAtUnit(enemy)
-            setState(.ATACANDO)
+            setState(.attacking)
         } else {
             // Move closer
             if pathToFollow == nil || targetPos != enemy.physicalTilePos {
@@ -750,12 +750,12 @@ class Unit: MapObject {
 
     private func updateAttackingState() {
         guard let enemy = enemy else {
-            setState(.IDLE)
+            setState(.idle)
             return
         }
         if enemy.isDead() {
             self.enemy = nil
-            setState(.IDLE)
+            setState(.idle)
             return
         }
 
@@ -776,7 +776,7 @@ class Unit: MapObject {
         // Resume pursuit if it moved away
         let dist = calculateDistance(toI: enemy.physicalTilePos.x, toJ: enemy.physicalTilePos.y)
         if dist > Double(attackRange) {
-            setState(.PURSUING_UNIT)
+            setState(.pursuingUnit)
         }
     }
 
@@ -808,7 +808,7 @@ class Unit: MapObject {
     /// Transitions the unit into the dying state and plays the death sound.
     func morir() {
         Log.shared.debug("Me mori.")
-        setState(.DYING)
+        setState(.dying)
         enemy = nil
         if type == Res.UNIDAD_PATRICIO {
             Sound.shared.play(id: Res.SFX_MUERTE_PATRICIO, loop: 0)
@@ -830,7 +830,7 @@ class Unit: MapObject {
 
         count += 1
         if count >= CUENTA_FRAME_MUERTO {
-            setState(.DEAD)
+            setState(.dead)
         }
     }
 
@@ -848,7 +848,7 @@ class Unit: MapObject {
             health = min(health + recoveryPoints, resistancePoints)
         }
         if health >= resistancePoints {
-            setState(.IDLE)
+            setState(.idle)
         }
     }
 
@@ -916,7 +916,7 @@ class Unit: MapObject {
 
     private func checkOrderCompleted() {
         guard let ord = objectiveCommand else { return }
-        if ord.id == .MOVE || ord.id == .TAKE_OBJECT {
+        if ord.id == .move || ord.id == .takeObject {
             if completedMoveObjective() {
                 completedOrder = true
             }

@@ -121,7 +121,7 @@ class Group {
 
     /// Orders the group to move to tile (x, y), entering the formation-grouping phase first.
     func move(x: Int, y: Int) {
-        receivedCommand = Command(.MOVE, x, y)
+        receivedCommand = Command(.move, x, y)
         setState(.grouping)
         targetTile = (x, y)
 
@@ -138,7 +138,7 @@ class Group {
 
     /// Orders the group to move to the nearest walkable tile near (x, y) and then heal.
     func heal(x: Int, y: Int) {
-        receivedCommand = Command(.HEAL, x, y)
+        receivedCommand = Command(.heal, x, y)
         if commander == nil { setAuxCommander() }
 
         guard let map = Group.map, let cmd = commander else { return }
@@ -203,7 +203,7 @@ class Group {
 
     private func setHealing(x: Int, y: Int) {
         move(x: x, y: y)
-        receivedCommand = Command(.HEAL, x, y)
+        receivedCommand = Command(.heal, x, y)
         nextStateValue = .healing
     }
 
@@ -212,18 +212,18 @@ class Group {
         if receivedCommand == nil {
             receivedCommand = ia.nextCommand()
         }
-        if let ord = receivedCommand, ord.id == .MOVE {
-            setObjectiveCommand(type: .MOVE, x: ord.point.x, y: ord.point.y)
+        if let ord = receivedCommand, ord.id == .move {
+            setObjectiveCommand(type: .move, x: ord.point.x, y: ord.point.y)
             move(x: ord.point.x, y: ord.point.y)
         }
     }
 
     private func updateGroupingState() {
-        let allIdle = units.allSatisfy { $0.currentState == .IDLE }
+        let allIdle = units.allSatisfy { $0.currentState == .idle }
         guard allIdle else { return }
 
         guard let ord = receivedCommand,
-              ord.id == .MOVE || ord.id == .HEAL else { return }
+              ord.id == .move || ord.id == .heal else { return }
 
         commander?.move(x: targetTile.x, y: targetTile.y)
         if commander?.pathToFollow == nil {
@@ -243,13 +243,13 @@ class Group {
     }
 
     private func updateMovingState() {
-        let isHealOrder = receivedCommand?.id == .HEAL
+        let isHealOrder = receivedCommand?.id == .heal
         let allIdle = units.allSatisfy {
-            $0.currentState == .IDLE || (isHealOrder && $0.currentState == .HEALING)
+            $0.currentState == .idle || (isHealOrder && $0.currentState == .healing)
         }
 
         if isHealOrder {
-            for unit in units where unit.currentState == .IDLE {
+            for unit in units where unit.currentState == .idle {
                 if unit.health != unit.resistancePoints {
                     unit.recoverHealth()
                 }
@@ -274,7 +274,7 @@ class Group {
         avgHealth = 0
         for unit in units {
             avgHealth += unit.health
-            if ord.id == .MOVE, unit.completedMoveObjective() {
+            if ord.id == .move, unit.completedMoveObjective() {
                 completedOrder = true
             }
         }
@@ -345,7 +345,7 @@ class Group {
         }
     }
 
-    private func setObjectiveCommand(type: Command.TYPE, x: Int, y: Int) {
+    private func setObjectiveCommand(type: Command.Kind, x: Int, y: Int) {
         objectiveCommand = Command(type, x, y)
     }
 }

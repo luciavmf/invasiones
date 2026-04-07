@@ -22,7 +22,7 @@ class OptionsState: State {
 
     override func update() {
         if button?.update() != 0 {
-            stateMachine.setNextState(.MAIN_MENU)
+            stateMachine.setNextState(.mainMenu)
         }
     }
 

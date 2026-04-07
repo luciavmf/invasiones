@@ -22,10 +22,10 @@ class ExitState: State {
     override func update() {
         guard let result = confirmMenu?.update() else { return }
         if result == ConfirmationMenu.Selection.right.rawValue {
-            stateMachine.setState(.END)
+            stateMachine.setState(.end)
         }
         if result == ConfirmationMenu.Selection.left.rawValue {
-            stateMachine.setNextState(.MAIN_MENU)
+            stateMachine.setNextState(.mainMenu)
         }
     }
 

@@ -69,12 +69,12 @@ class Hud {
         }
         tipsWindow.draw(g)
 
-        g.setFont(ResourceManager.shared.fonts[Definitions.FNT.SANS12.rawValue],
+        g.setFont(ResourceManager.shared.fonts[FontIndex.sans12.rawValue],
                        Definitions.COLOR_BLACK)
         g.write("\(enemyCount)", Hud.ATTRS_ENEMY_COUNT_X, posY + Hud.ATTRS_COUNT_Y, 0)
         g.write("\(argentineCount)", Hud.ATTRS_ARGENTINE_COUNT_X, posY + Hud.ATTRS_COUNT_Y, 0)
 
-        g.setFont(ResourceManager.shared.fonts[Definitions.FNT.SANS12.rawValue],
+        g.setFont(ResourceManager.shared.fonts[FontIndex.sans12.rawValue],
                        Definitions.COLOR_WHITE)
 
         guard let uni = unitToShow else { return }

@@ -29,7 +29,7 @@ class ArgentineTeam: Player {
     // MARK: - Initializer
     override init(map: Map, camera: Camera, objectsToDraw: ObjectTable, hud: Hud) {
         super.init(map: map, camera: camera, objectsToDraw: objectsToDraw, hud: hud)
-        faction = .ARGENTINE
+        faction = .argentine
         Group.map = map
 
         let anims = ResourceManager.shared.animations
@@ -47,9 +47,9 @@ class ArgentineTeam: Player {
 
     override func update() {
         switch stateValue {
-        case .START:   stateValue = .LOADING
-        case .LOADING: stateValue = .GAME
-        case .GAME:    updateGameplayState()
+        case .start:   stateValue = .loading
+        case .loading: stateValue = .game
+        case .game:    updateGameplayState()
         }
     }
 
@@ -88,7 +88,7 @@ class ArgentineTeam: Player {
 
     /// Draws the objective ring, the collectible object, fire effects, the destination arrow, and the orientation arrow.
     func drawOrientationArrow(_ g: Video) {
-        guard stateValue == .GAME else { return }
+        guard stateValue == .game else { return }
 
         // Draw objective ring, object to grab, and fire effects
         ring?.draw(g)
@@ -198,15 +198,15 @@ class ArgentineTeam: Player {
         let factor = 360.0 / 8
         let half = 360.0 / 16
 
-        let dir: Definitions.DIRECTION
-        if      (degrees >= 0 && degrees < half) || degrees > 360 - half { dir = .E  }
-        else if degrees >= half          && degrees < half + factor      { dir = .NE }
-        else if degrees >= half + factor && degrees < half + factor * 2  { dir = .N  }
-        else if degrees >= half + factor * 2 && degrees < half + factor * 3 { dir = .NO }
-        else if degrees >= half + factor * 3 && degrees < half + factor * 4 { dir = .O  }
-        else if degrees >= half + factor * 4 && degrees < half + factor * 5 { dir = .SO }
-        else if degrees >= half + factor * 5 && degrees < half + factor * 6 { dir = .S  }
-        else                                                                 { dir = .SE }
+        let dir: Direction
+        if      (degrees >= 0 && degrees < half) || degrees > 360 - half { dir = .east      }
+        else if degrees >= half          && degrees < half + factor      { dir = .northEast  }
+        else if degrees >= half + factor && degrees < half + factor * 2  { dir = .north      }
+        else if degrees >= half + factor * 2 && degrees < half + factor * 3 { dir = .northWest }
+        else if degrees >= half + factor * 3 && degrees < half + factor * 4 { dir = .west      }
+        else if degrees >= half + factor * 4 && degrees < half + factor * 5 { dir = .southWest }
+        else if degrees >= half + factor * 5 && degrees < half + factor * 6 { dir = .south     }
+        else                                                                 { dir = .southEast }
 
         let OFFSET = -20
         let fw = flecha.frameWidth
@@ -272,7 +272,7 @@ class ArgentineTeam: Player {
     private func checkUnitOrders() {
         // Left click on an Argentine unit: select it
         if Mouse.shared.pressedButtons.contains(Mouse.BUTTON_LEFT) {
-            if let unitUnderMouse = unitUnderMouse, unitUnderMouse.faction == .ARGENTINE {
+            if let unitUnderMouse = unitUnderMouse, unitUnderMouse.faction == .argentine {
                 let up = Mouse.shared.dragRect
                 let isDragging = Mouse.shared.isDragging()
                     && Int(up.width) >= 4 && Int(up.height) >= 4
@@ -302,7 +302,7 @@ class ArgentineTeam: Player {
             if map.isWalkable(x: tile.x, y: tile.y) {
                 // There is an enemy unit under the mouse → attack
                 if let unitUnderMouse = unitUnderMouse,
-                   unitUnderMouse.faction == .ENEMY,
+                   unitUnderMouse.faction == .enemy,
                    !unitUnderMouse.isDead() {
                     if let group = selectedGroup {
                         group.attack(enemy: unitUnderMouse)
@@ -373,9 +373,10 @@ class ArgentineTeam: Player {
                 }
             }
 
-            selectedGroup = Group(selectedUnits)
-            selectedGroup?.isSelected = true
-            groups!.append(selectedGroup!)
+            let group = Group(selectedUnits)
+            group.isSelected = true
+            selectedGroup = group
+            groups?.append(group)
         } else {
             selectedUnit = selectedUnits[0]
         }
@@ -416,7 +417,7 @@ class ArgentineTeam: Player {
 
         guard selectedUnit != nil || selectedGroup != nil else { return }
 
-        if let unitUnderMouse = unitUnderMouse, unitUnderMouse.faction == .ENEMY {
+        if let unitUnderMouse = unitUnderMouse, unitUnderMouse.faction == .enemy {
             Mouse.shared.setCursor(
                 ResourceManager.shared.getImage(Res.IMG_CURSOR_ESPADA))
         }
@@ -451,7 +452,7 @@ class ArgentineTeam: Player {
     private func updateObjectives() {
         guard someoneCompletedOrder else { return }
 
-        if command?.id == .TAKE_OBJECT {
+        if command?.id == .takeObject {
             objectToTake = nil
         }
 
@@ -474,7 +475,7 @@ class ArgentineTeam: Player {
 
         guard selectedUnit == nil && selectedGroup == nil else { return }
 
-        for unit in units where unit.faction == .ARGENTINE {
+        for unit in units where unit.faction == .argentine {
             _ = unit.selectIfInRect(
                 x: Int(up.origin.x), y: Int(up.origin.y),
                 w: Int(up.width),    h: Int(up.height))

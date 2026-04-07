@@ -14,36 +14,36 @@ import Foundation
 class GameState: State {
 
     // MARK: - Enums
-    private enum STATE { case START, WON, LOST, MENU, PLAYING, CONFIRMACION }
-    private enum MENU_ITEM: Int { case CONTINUAR = 0, QUIT = 1 }
+    private enum State { case start, won, lost, menu, playing, confirmacion }
+    private enum MenuItem: Int { case continuar = 0, quit = 1 }
 
     // MARK: - Declarations
     private var episode: Episode?
     private var gameMenu: Menu?
     private var confirmMenu: ConfirmationMenu?
-    private var stateValue: STATE = .START
+    private var stateValue: State = .start
 
     // MARK: - State overrides
 
     override func start() {
-        stateValue = .START
+        stateValue = .start
 
         gameMenu = Menu(image: nil, itemCount: 2, x: 0, y: 0,
                               anchor: Surface.centerHorizontal | Surface.centerVertical)
         gameMenu?.font = ResourceManager.shared.fonts[Definitions.FONT_MENU]
-        gameMenu?.addItem(index: MENU_ITEM.CONTINUAR.rawValue,
+        gameMenu?.addItem(index: MenuItem.continuar.rawValue,
                           stringId: Res.STR_MENU_CONTINUAR, flag: Menu.ITEM_VISIBLE)
-        gameMenu?.addItem(index: MENU_ITEM.QUIT.rawValue,
+        gameMenu?.addItem(index: MenuItem.quit.rawValue,
                           stringId: Res.STR_MENU_SALIR, flag: Menu.ITEM_VISIBLE)
     }
 
     override func update() {
         switch stateValue {
 
-        case .START:
+        case .start:
             episode = Episode()
             episode?.start()
-            stateValue = .PLAYING
+            stateValue = .playing
 
             button = Button(label: Res.STR_BOTON_MENU_DEL_JUEGO, font: nil)
             if let b = button {
@@ -55,37 +55,37 @@ class GameState: State {
                                                       Res.STR_NO, Res.STR_SI)
             confirmMenu?.setPosition(x: 0, y: 0, anchor: Surface.centerVertical | Surface.centerHorizontal)
 
-        case .PLAYING:
+        case .playing:
             episode?.update()
-            if episode?.state == .PLAYING {
+            if episode?.state == .playing {
                 if button?.update() != 0 {
-                    setState(.MENU)
+                    setState(.menu)
                 }
             }
-            if episode?.state == .END {
-                stateMachine.setNextState(.MAIN_MENU)
+            if episode?.state == .end {
+                stateMachine.setNextState(.mainMenu)
             }
 
-        case .MENU:
+        case .menu:
             if let item = gameMenu?.update() {
-                switch MENU_ITEM(rawValue: item) {
-                case .CONTINUAR: setState(.PLAYING)
-                case .QUIT:     setState(.CONFIRMACION)
+                switch MenuItem(rawValue: item) {
+                case .continuar: setState(.playing)
+                case .quit:     setState(.confirmacion)
                 case .none:      break
                 }
             }
 
-        case .CONFIRMACION:
+        case .confirmacion:
             if let result = confirmMenu?.update() {
                 if result == ConfirmationMenu.Selection.left.rawValue {
-                    setState(.PLAYING)
+                    setState(.playing)
                 }
                 if result == ConfirmationMenu.Selection.right.rawValue {
-                    stateMachine.setNextState(.MAIN_MENU)
+                    stateMachine.setNextState(.mainMenu)
                 }
             }
 
-        case .WON, .LOST:
+        case .won, .lost:
             break
         }
     }
@@ -93,13 +93,13 @@ class GameState: State {
     override func draw(_ g: Video) {
         switch stateValue {
 
-        case .PLAYING:
+        case .playing:
             episode?.draw(g)
-            if episode?.state == .PLAYING {
+            if episode?.state == .playing {
                 button?.draw(g)
             }
 
-        case .MENU:
+        case .menu:
             episode?.draw(g)
             gameMenu?.draw(g)
             g.setFont(ResourceManager.shared.fonts[Definitions.FONT_TITLE],
@@ -107,7 +107,7 @@ class GameState: State {
             g.write(Res.STR_JUEGO_PAUSADO, 0, Definitions.GAME_PAUSED_Y,
                        Surface.centerVertical | Surface.centerHorizontal)
 
-        case .CONFIRMACION:
+        case .confirmacion:
             episode?.draw(g)
             confirmMenu?.draw(g)
 
@@ -120,7 +120,7 @@ class GameState: State {
 
     // MARK: - Private
 
-    private func setState(_ state: STATE) {
+    private func setState(_ state: State) {
         stateValue = state
     }
 }

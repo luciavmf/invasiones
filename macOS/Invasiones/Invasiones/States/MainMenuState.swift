@@ -20,10 +20,10 @@ class MainMenuState: State {
     private let INCREMENTO_MENU_Y = 5
 
     // MARK: - Menu items
-    private enum ITEM: Int {
-        case NEW_GAME = 0
-        case HELP = 1
-        case QUIT = 2
+    private enum Item: Int {
+        case newGame = 0
+        case help = 1
+        case quit = 2
     }
 
     // MARK: - Declarations
@@ -56,9 +56,9 @@ class MainMenuState: State {
                         y: Video.height - Definitions.MAIN_MENU_Y_OFFSET,
                         anchor: Surface.centerHorizontal)
 
-        newMenu.addItem(index: ITEM.NEW_GAME.rawValue, stringId: Res.STR_MENU_NUEVO_JUEGO, flag: Menu.ITEM_VISIBLE)
-        newMenu.addItem(index: ITEM.HELP.rawValue, stringId: Res.STR_MENU_AYUDA, flag: Menu.ITEM_VISIBLE)
-        newMenu.addItem(index: ITEM.QUIT.rawValue, stringId: Res.STR_MENU_SALIR, flag: Menu.ITEM_VISIBLE)
+        newMenu.addItem(index: Item.newGame.rawValue, stringId: Res.STR_MENU_NUEVO_JUEGO, flag: Menu.ITEM_VISIBLE)
+        newMenu.addItem(index: Item.help.rawValue, stringId: Res.STR_MENU_AYUDA, flag: Menu.ITEM_VISIBLE)
+        newMenu.addItem(index: Item.quit.rawValue, stringId: Res.STR_MENU_SALIR, flag: Menu.ITEM_VISIBLE)
 
         if firstBuild {
             firstBuild = false
@@ -88,12 +88,12 @@ class MainMenuState: State {
         selectedItem = menu.update()
 
         switch selectedItem {
-        case ITEM.NEW_GAME.rawValue:
-            stateMachine.setNextState(.GAME)
-        case ITEM.HELP.rawValue:
-            stateMachine.setNextState(.HELP)
-        case ITEM.QUIT.rawValue:
-            stateMachine.setNextState(.QUIT)
+        case Item.newGame.rawValue:
+            stateMachine.setNextState(.game)
+        case Item.help.rawValue:
+            stateMachine.setNextState(.help)
+        case Item.quit.rawValue:
+            stateMachine.setNextState(.quit)
         default:
             break
         }

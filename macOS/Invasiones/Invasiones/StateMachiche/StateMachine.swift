@@ -16,16 +16,16 @@ class StateMachine {
     /// The current active state object.
     private var currentStateObj: State?
     /// The key of the current state.
-    private(set) var currentState: GameFrame.STATE = .INVALID
+    private(set) var currentState: GameFrame.State = .invalid
     /// The previous state.
     private var prevState: State?
     /// The next state, queued for transition.
     private var nextState: State?
     /// The key of the next state.
-    private var nextStateKey: GameFrame.STATE = .INVALID
+    private var nextStateKey: GameFrame.State = .invalid
 
     /// Dictionary of all registered states.
-    private var allStates: [GameFrame.STATE: State?] = [:]
+    private var allStates: [GameFrame.State: State?] = [:]
 
     // MARK: - Initializer
     init() {}
@@ -40,12 +40,12 @@ class StateMachine {
 
     // MARK: - Methods
     /// Registers a state in the machine.
-    func addState(key: GameFrame.STATE, state: State?) {
+    func addState(key: GameFrame.State, state: State?) {
         allStates[key] = state
     }
 
     /// Queues the next state to transition into on the next update() call.
-    func setNextState(_ key: GameFrame.STATE) {
+    func setNextState(_ key: GameFrame.State) {
         guard allStates.keys.contains(key) else {
             Log.shared.error("La maquina de estados no contiene la clave \(key)")
             return
@@ -55,7 +55,7 @@ class StateMachine {
     }
 
     /// Immediately switches to the given state (without calling salir/start).
-    func setState(_ key: GameFrame.STATE) {
+    func setState(_ key: GameFrame.State) {
         prevState = currentStateObj
         currentStateObj = allStates[key] ?? nil
         currentState = key
@@ -69,7 +69,7 @@ class StateMachine {
             currentState = nextStateKey
 
             nextState = nil
-            nextStateKey = .INVALID
+            nextStateKey = .invalid
 
             prevState?.exit()
             currentStateObj?.start()

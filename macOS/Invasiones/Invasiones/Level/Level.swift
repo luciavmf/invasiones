@@ -139,18 +139,18 @@ private class NivelXMLDelegate: NSObject, XMLParserDelegate {
             guard inObjective else { return }
             let iVal = (Int(a["i"] ?? "0") ?? 0) << 1
             let jVal = (Int(a["j"] ?? "0") ?? 0) << 1
-            let type: Command.TYPE
+            let type: Command.Kind
             switch name {
-            case "tomar":   type = .TAKE_OBJECT
-            case "llegar":  type = .MOVE
-            case "trigger": type = .TRIGGER
-            case "matar":   type = .KILL
-            default:        type = .INVALID
+            case "tomar":   type = .takeObject
+            case "llegar":  type = .move
+            case "trigger": type = .trigger
+            case "matar":   type = .kill
+            default:        type = .invalid
             }
             let ord: Command
-            if type == .TAKE_OBJECT, let img = a["imagen"] {
+            if type == .takeObject, let img = a["imagen"] {
                 ord = Command(type, iVal, jVal, img)
-            } else if type == .TRIGGER, let t = a["tipo"] {
+            } else if type == .trigger, let t = a["tipo"] {
                 let animIdx: Int
                 switch t {
                 case "fuego1": animIdx = Res.ANIM_FUEGO_1
@@ -164,7 +164,7 @@ private class NivelXMLDelegate: NSObject, XMLParserDelegate {
                 } else {
                     ord = Command(type, iVal, jVal)
                 }
-            } else if type == .KILL, let anchoStr = a["ancho"] {
+            } else if type == .kill, let anchoStr = a["ancho"] {
                 ord = Command(type, iVal, jVal, (Int(anchoStr) ?? 0) << 1)
             } else {
                 ord = Command(type, iVal, jVal)

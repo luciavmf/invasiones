@@ -15,13 +15,13 @@ import Foundation
 class Player {
 
     // MARK: - Enums
-    enum STATE { case START, LOADING, GAME }
+    enum State { case start, loading, game }
 
     // MARK: - Protected attributes
     /// Whether the player has completed the current objective.
     var objectiveCompleted: Bool = false
     /// The faction this player controls.
-    var faction: Episode.BANDO = .ARGENTINE
+    var faction: Episode.Faction = .argentine
     /// Set to true when at least one unit completed its order in the current frame.
     var someoneCompletedOrder: Bool = false
     /// Animated ring displayed at the current order target position.
@@ -33,7 +33,7 @@ class Player {
     var objectsToDraw: ObjectTable     // [physicalMapHeight][physicalMapWidth]
     var map: Map
     var groups: [Group]? = nil
-    var stateValue: STATE = .START
+    var stateValue: State = .start
     var camera: Camera
     var selectedUnits: [Unit] = []
     var deadUnits: [Unit]? = nil
@@ -75,7 +75,7 @@ class Player {
         command = objective?.nextCommand()
 
         if let ord = command {
-            if ord.id == .TAKE_OBJECT, let img = ord.image {
+            if ord.id == .takeObject, let img = ord.image {
                 objectToTake = MapObject(sup: img, i: ord.point.x, j: ord.point.y)
             }
             ring?.setPosition(i: ord.point.x, j: ord.point.y)
@@ -94,7 +94,7 @@ class Player {
             objectiveCompleted = true
         } else {
             // Automatically process TRIGGERs
-            while let ord = command, ord.id == .TRIGGER {
+            while let ord = command, ord.id == .trigger {
                 if fireEffects == nil { fireEffects = [] }
                 if let anim = ord.animation {
                     fireEffects!.append(anim)
@@ -148,11 +148,11 @@ class Player {
                 checkCollisions(unit)
             }
 
-            if unit.currentState == .IDLE || unit.currentState == .PATROLLING {
+            if unit.currentState == .idle || unit.currentState == .patrolling {
                 attackVisibleUnits(unit)
             }
 
-            if unit.currentState == .DEAD {
+            if unit.currentState == .dead {
                 if deadUnits == nil { deadUnits = [] }
                 deadUnits!.append(unit)
             }
@@ -161,7 +161,7 @@ class Player {
         }
 
         // Check KILL order
-        if let ord = command, ord.id == .KILL {
+        if let ord = command, ord.id == .kill {
             someoneCompletedOrder = true
             let iStart = ord.point.x - ord.width
             let iEnd = ord.point.x + ord.width
@@ -172,7 +172,7 @@ class Player {
                 for j in jStart..<jEnd {
                     guard i >= 0, j >= 0, i < objectsToDraw.tabla.count,
                           j < objectsToDraw.tabla[i].count else { continue }
-                    if let u = objectsToDraw.tabla[i][j] as? Unit, u.faction == .ENEMY {
+                    if let u = objectsToDraw.tabla[i][j] as? Unit, u.faction == .enemy {
                         someoneCompletedOrder = false
                     }
                 }
@@ -244,7 +244,7 @@ class Player {
                     visible!.append(other)
                 }
 
-                if esVisible && unit.faction == .ARGENTINE {
+                if esVisible && unit.faction == .argentine {
                     map.visibleTilesLayer[i][j] = Map.TILE_VISIBLE
                 }
             }
