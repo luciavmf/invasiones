@@ -23,7 +23,7 @@ class Ring: MapObject {
         let p = tileToWorld(i: i, j: j)
         worldPos = p
 
-        animacion.load()
+        try? animacion.load()
         updateScreenPos()
 
         worldPos.x -= animacion.offsets.x

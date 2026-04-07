@@ -131,12 +131,16 @@ class Episode {
     // MARK: - LOADING state
 
     private func updateLoadingState() {
-        if loadLevel(0) {
-            updatePlayingState()
-            setNewObjective()
-            Sound.shared.stop(Res.SFX_SPLASH)
-            Sound.shared.play(id: Res.SFX_BATALLA, loop: -1)
-            setState(.SHOW_INTRO)
+        do {
+            if try loadLevel(0) {
+                updatePlayingState()
+                setNewObjective()
+                Sound.shared.stop(Res.SFX_SPLASH)
+                Sound.shared.play(id: Res.SFX_BATALLA, loop: -1)
+                setState(.SHOW_INTRO)
+            }
+        } catch {
+            Log.shared.error(error.localizedDescription)
         }
     }
 
@@ -150,8 +154,8 @@ class Episode {
 
     private func loadSprites() {
         let sprs = ResourceManager.shared.sprites
-        if Res.SPR_PATRICIO < sprs.count { sprs[Res.SPR_PATRICIO]?.load() }
-        if Res.SPR_INGLES   < sprs.count { sprs[Res.SPR_INGLES]?.load()   }
+        if Res.SPR_PATRICIO < sprs.count { try? sprs[Res.SPR_PATRICIO]?.load() }
+        if Res.SPR_INGLES   < sprs.count { try? sprs[Res.SPR_INGLES]?.load()   }
     }
 
     private func loadPaintObjects() -> Bool {
@@ -180,7 +184,7 @@ class Episode {
         return true
     }
 
-    private func loadLevel(_ levelIndex: Int) -> Bool {
+    private func loadLevel(_ levelIndex: Int) throws -> Bool {
         if count == 0 {
             self.levelIndex = levelIndex
             hud = Hud()
@@ -190,7 +194,7 @@ class Episode {
 
         } else if count == 1 {
             guard let map = map else { count += 1; return false }
-            if !map.load(Res.MAP_NIVEL1 + levelIndex) { return false }
+            try map.load(Res.MAP_NIVEL1 + levelIndex)
 
             MapObject.map = map
             MapObject.camera = camera
@@ -220,10 +224,10 @@ class Episode {
                                      objectsToDraw: objectsToDraw, hud: hud)
 
         } else if count == 6 {
-            if !(player?.loadUnits(levelIndex) ?? true) { return false }
+            try player?.loadUnits(levelIndex)
 
         } else if count == 10 {
-            if !(enemy?.loadUnits(levelIndex) ?? true) { return false }
+            try enemy?.loadUnits(levelIndex)
             count += 1
             return true
         }

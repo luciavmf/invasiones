@@ -19,14 +19,11 @@ class GameText: NSObject, XMLParserDelegate {
     private static var s_strings: [String]?
 
     /// Loads the basic strings required to run the application from strings.xml.
-    /// - Returns: `true` on success, `false` on any file or parse error.
-    @discardableResult
-    static func loadStrings() -> Bool {
+    static func loadStrings() throws {
         s_strings = Array(repeating: "", count: Res.STR_COUNT)
 
         guard let path = Utils.getPath(Program.STRINGS_XML_FILE) else {
-            Log.shared.error("No se encuentra el archivo \(Program.STRINGS_XML_FILE).")
-            return false
+            throw GameError.fileNotFound("No se encuentra el archivo \(Program.STRINGS_XML_FILE).")
         }
 
         let parser = GameText()
@@ -35,18 +32,16 @@ class GameText: NSObject, XMLParserDelegate {
         let ok = xmlParser?.parse() ?? false
 
         if !ok {
-            Log.shared.error("Error al leer el archivo \(Program.STRINGS_XML_FILE).")
-            return false
+            throw GameError.parsingFailed("Error al leer el archivo \(Program.STRINGS_XML_FILE).")
         }
 
         s_strings = parser.parsedStrings
-        return true
     }
 
     /// Returns the cached strings array, loading it on first access.
     static var Strings: [String] {
         if s_strings == nil {
-            GameText.loadStrings()
+            try? GameText.loadStrings()
         }
         return s_strings ?? []
     }

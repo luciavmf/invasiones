@@ -60,7 +60,7 @@ class Player {
     // MARK: - Abstract methods (deben ser sobreescritos)
     func update() { fatalError("update() must be overridden") }
 
-    func loadUnits(_ levelIndex: Int) -> Bool { fatalError("loadUnits must be overridden") }
+    func loadUnits(_ levelIndex: Int) throws { fatalError("loadUnits must be overridden") }
 
     // MARK: - Objective completion
     /// - Returns: `true` if the player has fulfilled the current objective.

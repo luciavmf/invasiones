@@ -117,7 +117,7 @@ class HelpState: State {
             currentScreenshot = nil
             return
         }
-        anim.load()
+        try? anim.load()
         anim.play()
         anim.loop = true
         currentScreenshot = anim

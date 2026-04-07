@@ -29,11 +29,11 @@ class EnemyTeam: Player {
         }
     }
 
-    override func loadUnits(_ levelIndex: Int) -> Bool {
+    override func loadUnits(_ levelIndex: Int) throws {
         guard let tilesetUnidades = map.tilesets.first(where: {
             $0?.id == Int16(Res.TLS_UNIDADES)
-        }) else { return true }
-        guard let ts = tilesetUnidades else { return true }
+        }) else { return }
+        guard let ts = tilesetUnidades else { return }
 
         units = []
 
@@ -61,7 +61,6 @@ class EnemyTeam: Player {
                 }
             }
         }
-        return true
     }
 
     // MARK: - Private

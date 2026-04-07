@@ -44,11 +44,12 @@ class PathFinder {
 
     // MARK: - Methods
 
-    func loadMap(_ map: Map) -> Bool {
-        guard !map.physicalTilesLayer.isEmpty else { return false }
+    func loadMap(_ map: Map) throws {
+        guard !map.physicalTilesLayer.isEmpty else {
+            throw GameError.invalidResource("PathFinder: el mapa no tiene capa física.")
+        }
         physicalTiles = map.physicalTilesLayer
         self.map = map
-        return true
     }
 
     /// Returns the shortest path (stack of (i,j) points) or nil if none exists.
