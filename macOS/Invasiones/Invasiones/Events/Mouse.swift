@@ -109,7 +109,7 @@ class Mouse {
         cursorSurface = sup
     }
 
-    func positionCursor(_ x: CGFloat, _ y: CGFloat) {
+    func positionCursor(x: CGFloat, y: CGFloat) {
         _x = max(0, min(x, CGFloat(Program.SCREEN_WIDTH)))
         _y = max(0, min(y, CGFloat(Program.SCREEN_HEIGHT)))
     }

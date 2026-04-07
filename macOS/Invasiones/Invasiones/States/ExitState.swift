@@ -16,7 +16,7 @@ class ExitState: State {
     override func start() {
         background = ResourceManager.shared.getImage(Res.IMG_SPLASH)
         confirmMenu = ConfirmationMenu(Res.STR_CONFIRMACION_SALIR, Res.STR_NO, Res.STR_SI)
-        confirmMenu?.setPosition(0, 0, Surface.centerVertical | Surface.centerHorizontal)
+        confirmMenu?.setPosition(x: 0, y: 0, anchor: Surface.centerVertical | Surface.centerHorizontal)
     }
 
     override func update() {

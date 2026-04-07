@@ -95,7 +95,7 @@ class Menu: GUIBox {
         return itemSeleccionado
     }
 
-    override func setPosition(_ x: Int, _ y: Int, _ anch: Int) {
+    override func setPosition(x: Int, y: Int, anchor anch: Int) {
         originalX = x
         posX = x
         originalY = y
@@ -113,7 +113,7 @@ class Menu: GUIBox {
     }
 
     @discardableResult
-    func addItem(_ index: Int, _ stringId: Int, _ flag: Int) -> Bool {
+    func addItem(index: Int, stringId: Int, flag: Int) -> Bool {
         guard index <= Menu.MAX_ITEM_COUNT - 1 else { return false }
 
         if itemCount == index {

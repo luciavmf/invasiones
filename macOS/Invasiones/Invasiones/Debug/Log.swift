@@ -41,7 +41,7 @@ class Log {
     }
 
     // MARK: - Methods
-    private func log(_ level: String, _ message: String) {
+    private func log(level: String, message: String) {
         guard Log.enabled else { return }
 #if DEBUG
         let timestamp = DateFormatter.localizedString(from: Date(), dateStyle: .short, timeStyle: .medium)
@@ -54,19 +54,19 @@ class Log {
     }
 
     func debug(_ message: String) {
-        log("DEBUG", message)
+        log(level: "DEBUG", message: message)
     }
 
     func info(_ message: String) {
-        log("INFO",  message)
+        log(level: "INFO",  message: message)
     }
 
     func warn(_ message: String) {
-        log("WARN",  message)
+        log(level: "WARN",  message: message)
     }
 
     func error(_ message: String) {
-        log("ERROR", message)
+        log(level: "ERROR", message: message)
     }
 
     func error(_ error: Error) {

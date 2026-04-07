@@ -209,20 +209,20 @@ class Unit: MapObject {
                                y + SELECCION_Y,
                                SELECCION_ANCHO - barAncho, 3)
         }
-        sprite?.draw(g, x - (sprite?.frameAncho ?? 0) / 2,
-                           y - (sprite?.frameAlto ?? 0))
+        sprite?.draw(g: g, x: x - (sprite?.frameAncho ?? 0) / 2,
+                     y: y - (sprite?.frameAlto ?? 0))
     }
 
     // MARK: - Public orders
 
     /// Orders the unit to move to tile (x, y), computing a path via A*.
-    func move(_ x: Int, _ y: Int) {
+    func move(x: Int, y: Int) {
         command = Command(.MOVE, x, y)
         setState(.MOVING)
         nextStateValue = .IDLE
 
-        let path = PathFinder.instance.findShortestPath(
-            physicalTilePos.x, physicalTilePos.y, x, y)
+        let path = PathFinder.shared.findShortestPath(
+            startI: physicalTilePos.x, startJ: physicalTilePos.y, targetI: x, targetJ: y)
 
         if let c = path, !c.isEmpty {
             // First element is destination, last is origin. Used as a stack (popLast = next step).
@@ -242,11 +242,11 @@ class Unit: MapObject {
         nextStateValue = .PATROLLING
         patrolPosition = physicalTilePos
         pathToFollow = findRandomPatrolPath(
-            physicalTilePos.x, physicalTilePos.y)
+            i: physicalTilePos.x, j: physicalTilePos.y)
     }
 
     /// Orders the unit to pursue and attack the given enemy unit.
-    func attack(_ enemy: Unit) {
+    func attack(enemy: Unit) {
         self.enemy = enemy
         targetPos = (-1, -1)
         setState(.PURSUING_UNIT)
@@ -259,7 +259,7 @@ class Unit: MapObject {
     }
 
     /// Sets the objective-level command used to determine whether the unit has fulfilled its mission.
-    func setObjectiveCommand(_ ord: Command?) {
+    func setObjectiveCommand(ord: Command?) {
         completedOrder = false
         objectiveCommand = ord
     }
@@ -279,7 +279,7 @@ class Unit: MapObject {
     }
 
     /// Triggers the evasion sub-state so the unit recalculates its path around `other`.
-    func evadeUnit(_ other: Unit, _ visible: [Unit]?) {
+    func evadeUnit(other: Unit, visible: [Unit]?) {
         unitToEvade = other
         substate = .ESQUIVAR_UNIDAD
     }
@@ -302,7 +302,7 @@ class Unit: MapObject {
     }
 
     /// Calculates the Euclidean distance in tile units from this unit to tile (toI, toJ).
-    func calculateDistance(_ toI: Int, _ toJ: Int) -> Double {
+    func calculateDistance(toI: Int, toJ: Int) -> Double {
         let di = Double(physicalTilePos.x - toI)
         let dj = Double(physicalTilePos.y - toJ)
         return sqrt(di * di + dj * dj)
@@ -311,7 +311,7 @@ class Unit: MapObject {
     /// Returns `true` if the unit is close enough to its objective tile to count the MOVE order as fulfilled.
     func completedMoveObjective() -> Bool {
         guard let ord = objectiveCommand else { return false }
-        let dist = calculateDistance(ord.point.x, ord.point.y)
+        let dist = calculateDistance(toI: ord.point.x, toJ: ord.point.y)
         return dist <= Double(CANTIDAD_MINIMA_TILES_ORD_MOVER)
     }
 
@@ -348,8 +348,8 @@ class Unit: MapObject {
     ///   - commanderPath: The path the group commander is following.
     ///   - offsetX: Formation tile offset along the i axis.
     ///   - offsetY: Formation tile offset along the j axis.
-    func calculatePathAtDistance(_ commanderPath: [(i: Int, j: Int)],
-                                  _ offsetX: Int, _ offsetY: Int) {
+    func calculatePathAtDistance(commanderPath: [(i: Int, j: Int)],
+                                 offsetX: Int, offsetY: Int) {
         guard let map = MapObject.map else { return }
 
         setState(.MOVING)
@@ -365,7 +365,7 @@ class Unit: MapObject {
 
         while idx < pathCopy.count {
             let point = pathCopy[idx]
-            if !map.isWalkable(point.i, point.j) {
+            if !map.isWalkable(x: point.i, y: point.j) {
                 if idx > 0 {
                     let prevIdx = idx - 1
                     guard let nextValidIdx = findNextValidPosition(pathCopy, from: idx) else {
@@ -375,9 +375,9 @@ class Unit: MapObject {
                     }
                     idx = nextValidIdx
 
-                    var newPath = PathFinder.instance.findShortestPath(
-                        pathCopy[prevIdx].i, pathCopy[prevIdx].j,
-                        pathCopy[idx].i,      pathCopy[idx].j)
+                    var newPath = PathFinder.shared.findShortestPath(
+                        startI: pathCopy[prevIdx].i, startJ: pathCopy[prevIdx].j,
+                        targetI: pathCopy[idx].i,    targetJ: pathCopy[idx].j)
 
                     if newPath == nil {
                         guard let prevValidIdx = findPrevValidPosition(pathCopy, from: nextValidIdx) else {
@@ -386,9 +386,9 @@ class Unit: MapObject {
                             return
                         }
                         idx = prevValidIdx
-                        newPath = PathFinder.instance.findShortestPath(
-                            pathCopy[prevIdx].i, pathCopy[prevIdx].j,
-                            pathCopy[idx].i,      pathCopy[idx].j)
+                        newPath = PathFinder.shared.findShortestPath(
+                            startI: pathCopy[prevIdx].i, startJ: pathCopy[prevIdx].j,
+                            targetI: pathCopy[idx].i,    targetJ: pathCopy[idx].j)
                     }
 
                     guard let segment = newPath else {
@@ -414,18 +414,18 @@ class Unit: MapObject {
     private func findNextValidPosition(_ list: [(i: Int, j: Int)], from start: Int) -> Int? {
         guard let map = MapObject.map else { return nil }
         var idx = start
-        while idx < list.count, !map.isWalkable(list[idx].i, list[idx].j) {
+        while idx < list.count, !map.isWalkable(x: list[idx].i, y: list[idx].j) {
             idx += 1
         }
         if idx >= list.count { return nil }
         // Skip up to two extra steps, same as C# logic
         if idx < list.count - 1 {
             let next = list[idx + 1]
-            if map.isWalkable(next.i, next.j) {
+            if map.isWalkable(x: next.i, y: next.j) {
                 idx += 1
                 if idx < list.count - 1 {
                     let next2 = list[idx + 1]
-                    if map.isWalkable(next2.i, next2.j) {
+                    if map.isWalkable(x: next2.i, y: next2.j) {
                         idx += 1
                     }
                 }
@@ -437,7 +437,7 @@ class Unit: MapObject {
     private func findPrevValidPosition(_ list: [(i: Int, j: Int)], from start: Int) -> Int? {
         guard let map = MapObject.map else { return nil }
         var idx = start
-        while idx >= 0, !map.isWalkable(list[idx].i, list[idx].j) {
+        while idx >= 0, !map.isWalkable(x: list[idx].i, y: list[idx].j) {
             idx -= 1
         }
         if idx < 0 { return nil }
@@ -455,24 +455,24 @@ class Unit: MapObject {
     }
 
     /// Orders the unit to move toward the infirmary at (x, y) and then heal.
-    func heal(_ x: Int, _ y: Int) {
+    func heal(x: Int, y: Int) {
         command = Command(.HEAL, x, y)
 
         guard let map = MapObject.map else { return }
-        let p = map.getLineOfSightPosition(x, physicalTilePos.x, y, physicalTilePos.y)
+        let p = map.getLineOfSightPosition(x1: x, x2: physicalTilePos.x, y1: y, y2: physicalTilePos.y)
         if p.x == -1 {
             Log.shared.debug("No se la puede mandar a heal.")
             return
         }
-        setHealing(p.x, p.y)
+        setHealing(x: p.x, y: p.y)
     }
 
-    private func setHealing(_ x: Int, _ y: Int) {
+    private func setHealing(x: Int, y: Int) {
         setState(.MOVING)
         nextStateValue = .HEALING
 
-        let path = PathFinder.instance.findShortestPath(
-            physicalTilePos.x, physicalTilePos.y, x, y)
+        let path = PathFinder.shared.findShortestPath(
+            startI: physicalTilePos.x, startJ: physicalTilePos.y, targetI: x, targetJ: y)
 
         if let c = path, !c.isEmpty {
             pathToFollow = Array(c.dropLast())
@@ -488,7 +488,7 @@ class Unit: MapObject {
     // MARK: - Selección por arrastre de mouse (rectangle)
     /// Selects the unit if its sprite overlaps the drag-selection rectangle.
     /// - Returns: `true` if the unit was selected.
-    func selectIfInRect(_ x: Int, _ y: Int, _ w: Int, _ h: Int) -> Bool {
+    func selectIfInRect(x: Int, y: Int, w: Int, h: Int) -> Bool {
         let fw = sprite?.frameAncho ?? (frameWidth > 0 ? frameWidth : 20)
         let fh = sprite?.frameAlto  ?? (frameHeight  > 0 ? frameHeight  : 30)
         // In Swift, x = sprite horizontal center, y = sprite bottom.
@@ -520,7 +520,7 @@ class Unit: MapObject {
         guard stateValue == .IDLE else { return }
         Log.shared.debug("Me atacan, contraataco.")
         enemy = attacker
-        if calculateDistance(attacker.physicalTilePos.x, attacker.physicalTilePos.y) < Double(attackRange) {
+        if calculateDistance(toI: attacker.physicalTilePos.x, toJ: attacker.physicalTilePos.y) < Double(attackRange) {
             aimAtUnit(attacker)
             setState(.ATACANDO)
         }
@@ -529,7 +529,7 @@ class Unit: MapObject {
     private func updateIdleAnimation() {
         sprite?.update()
         let anim = firstAnimation() + direction
-        sprite?.setAnimation(anim)
+        sprite?.setAnimation(anim: anim)
         sprite?.play()
     }
 
@@ -558,7 +558,7 @@ class Unit: MapObject {
 
     private func updatePatrollingState() -> Bool {
         if pathToFollow == nil {
-            pathToFollow = findRandomPatrolPath(physicalTilePos.x, physicalTilePos.y)
+            pathToFollow = findRandomPatrolPath(i: physicalTilePos.x, j: physicalTilePos.y)
         }
         return moverse()
     }
@@ -573,7 +573,7 @@ class Unit: MapObject {
             }
             nextTile = (path.last!.i, path.last!.j)
             pathToFollow!.removeLast()
-            nextStep = tileToWorld(nextTile.x, nextTile.y)
+            nextStep = tileToWorld(i: nextTile.x, j: nextTile.y)
             substate = .ALCANZAR_PASO
 
         case .ESQUIVAR_UNIDAD:
@@ -584,12 +584,12 @@ class Unit: MapObject {
         default: break
         }
 
-        let dir = getDirection(nextStep.x, nextStep.y)
+        let dir = getDirection(targetX: nextStep.x, targetY: nextStep.y)
         if dir != -1 { direction = dir }
 
         // Update walking animation
         let anim = firstAnimation() + direction
-        sprite?.setAnimation(anim)
+        sprite?.setAnimation(anim: anim)
         sprite?.play()
 
         let arrived = moveToNextStep()
@@ -633,7 +633,7 @@ class Unit: MapObject {
 
     private func recalculateNextStep() {
         // Snap back to the current tile (undo partial movement toward the blocked step).
-        worldPos = tileToWorld(physicalTilePos.x, physicalTilePos.y)
+        worldPos = tileToWorld(i: physicalTilePos.x, j: physicalTilePos.y)
         unitToEvade = nil
 
         guard pathToFollow != nil, !pathToFollow!.isEmpty else {
@@ -644,9 +644,9 @@ class Unit: MapObject {
         // Pop the tile we were heading to (now blocked) and find a detour.
         var nextTileIJ = pathToFollow!.removeLast()
 
-        var newPath = PathFinder.instance.findShortestPath(
-            physicalTilePos.x, physicalTilePos.y,
-            nextTileIJ.i, nextTileIJ.j)
+        var newPath = PathFinder.shared.findShortestPath(
+            startI: physicalTilePos.x, startJ: physicalTilePos.y,
+            targetI: nextTileIJ.i, targetJ: nextTileIJ.j)
 
         // If no path, keep popping further waypoints until one is reachable.
         while newPath == nil {
@@ -656,16 +656,16 @@ class Unit: MapObject {
                 return
             }
             nextTileIJ = pathToFollow!.removeLast()
-            newPath = PathFinder.instance.findShortestPath(
-                physicalTilePos.x, physicalTilePos.y,
-                nextTileIJ.i, nextTileIJ.j)
+            newPath = PathFinder.shared.findShortestPath(
+                startI: physicalTilePos.x, startJ: physicalTilePos.y,
+                targetI: nextTileIJ.i, targetJ: nextTileIJ.j)
         }
 
         // newPath: [last] = first step toward nextTileIJ, [0] = nextTileIJ.
         var detour = newPath!
         let primerPaso = detour.removeLast()          // consume first step
         nextTile = (primerPaso.i, primerPaso.j)
-        nextStep = tileToWorld(nextTile.x, nextTile.y)
+        nextStep = tileToWorld(i: nextTile.x, j: nextTile.y)
 
         // Prepend remaining detour steps before the original remaining path
         // (equivalent to PathFinder.AdherirCamino in C#).
@@ -674,10 +674,10 @@ class Unit: MapObject {
 
     private func setLastPosition() {
         nextTile = physicalTilePos
-        nextStep = tileToWorld(nextTile.x, nextTile.y)
+        nextStep = tileToWorld(i: nextTile.x, j: nextTile.y)
     }
 
-    private func getDirection(_ targetX: Int, _ targetY: Int) -> Int {
+    private func getDirection(targetX: Int, targetY: Int) -> Int {
         let dx = targetX - worldPos.x
         let dy = targetY - worldPos.y
         if dx == 0 && dy == 0 { return -1 }
@@ -693,7 +693,7 @@ class Unit: MapObject {
 
     // MARK: - Patrolling
 
-    private func findRandomPatrolPath(_ i: Int, _ j: Int) -> [(i: Int, j: Int)]? {
+    private func findRandomPatrolPath(i: Int, j: Int) -> [(i: Int, j: Int)]? {
         guard let map = MapObject.map else { return nil }
         let range = PATROL_RANDOM_MAX - PATROL_RANDOM_MIN
         // Mirror original C#: loop until a valid path is found.
@@ -708,8 +708,8 @@ class Unit: MapObject {
             let signoJ = Bool.random() ? 1 : -1
             let destI = patrolPosition.x + signoI * offI
             let destJ = patrolPosition.y + signoJ * offJ
-            guard map.isWalkable(destI, destJ) else { continue }
-            path = PathFinder.instance.findShortestPath(i, j, destI, destJ)
+            guard map.isWalkable(x: destI, y: destJ) else { continue }
+            path = PathFinder.shared.findShortestPath(startI: i, startJ: j, targetI: destI, targetJ: destJ)
         }
         return path
     }
@@ -727,7 +727,7 @@ class Unit: MapObject {
             return
         }
 
-        let dist = calculateDistance(enemy.physicalTilePos.x, enemy.physicalTilePos.y)
+        let dist = calculateDistance(toI: enemy.physicalTilePos.x, toJ: enemy.physicalTilePos.y)
 
         if dist <= Double(attackRange) {
             // In range: attack
@@ -737,14 +737,14 @@ class Unit: MapObject {
             // Move closer
             if pathToFollow == nil || targetPos != enemy.physicalTilePos {
                 targetPos = enemy.physicalTilePos
-                move(enemy.physicalTilePos.x, enemy.physicalTilePos.y)
+                move(x: enemy.physicalTilePos.x, y: enemy.physicalTilePos.y)
             } else {
                 _ = moverse()
             }
         }
 
         let anim = firstAnimation() + direction
-        sprite?.setAnimation(anim)
+        sprite?.setAnimation(anim: anim)
         sprite?.play()
     }
 
@@ -761,7 +761,7 @@ class Unit: MapObject {
 
         count += 1
         let anim = firstAnimation() + direction
-        sprite?.setAnimation(anim)
+        sprite?.setAnimation(anim: anim)
         sprite?.play()
 
         if count >= attackInterval {
@@ -774,7 +774,7 @@ class Unit: MapObject {
         }
 
         // Resume pursuit if it moved away
-        let dist = calculateDistance(enemy.physicalTilePos.x, enemy.physicalTilePos.y)
+        let dist = calculateDistance(toI: enemy.physicalTilePos.x, toJ: enemy.physicalTilePos.y)
         if dist > Double(attackRange) {
             setState(.PURSUING_UNIT)
         }
@@ -811,14 +811,14 @@ class Unit: MapObject {
         setState(.DYING)
         enemy = nil
         if type == Res.UNIDAD_PATRICIO {
-            Sound.shared.play(Res.SFX_MUERTE_PATRICIO, 0)
+            Sound.shared.play(id: Res.SFX_MUERTE_PATRICIO, loop: 0)
         }
     }
 
     private func updateDyingState() {
         if count == 0 {
             let anim = firstAnimation() + direction
-            sprite?.setAnimation(anim)
+            sprite?.setAnimation(anim: anim)
             sprite?.loop = false
             sprite?.play()
         }
@@ -836,7 +836,7 @@ class Unit: MapObject {
 
     private func playShotSound() {
         let sfx = type == 0 ? Res.SFX_DISPARO_PATRICIO : Res.SFX_DISPARO_INGLES
-        Sound.shared.play(sfx, 0)
+        Sound.shared.play(id: sfx, loop: 0)
     }
 
     // MARK: - Healing

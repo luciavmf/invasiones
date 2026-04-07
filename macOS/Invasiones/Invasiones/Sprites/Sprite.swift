@@ -47,7 +47,7 @@ class Sprite {
     }
 
     @discardableResult
-    func setAnimation(_ anim: Int) -> Bool {
+    func setAnimation(anim: Int) -> Bool {
         guard anim != currentAnimId else { return false }
         currentAnimId = anim
 
@@ -63,12 +63,12 @@ class Sprite {
             prevAnimCount += animObj.animationCount
         }
 
-        currentAnim?.setAnimation(anim - offset)
+        currentAnim?.setAnimation(anim: anim - offset)
         return true
     }
 
     @discardableResult
-    func addAnimation(_ i: Int, _ anim: Animation) -> Bool {
+    func addAnimation(i: Int, anim: Animation) -> Bool {
         guard !animations.isEmpty else {
             Log.shared.error("No se carga la unit: la cantidad de animaciones no está seteada.")
             return false
@@ -86,7 +86,7 @@ class Sprite {
         animations = Array(repeating: nil, count: count)
     }
 
-    func draw(_ g: Video, _ x: Int, _ y: Int) {
+    func draw(g: Video, x: Int, y: Int) {
         guard let img = currentAnim?.image else { return }
         g.draw(img, x, y, 0)
     }

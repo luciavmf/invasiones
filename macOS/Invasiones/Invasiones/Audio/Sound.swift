@@ -44,7 +44,7 @@ class Sound {
     }
 
     @discardableResult
-    func play(_ id: Int, _ loop: Int) -> Bool {
+    func play(id: Int, loop: Int) -> Bool {
         guard id >= 0, id < Res.SND_COUNT + Res.SFX_COUNT else {
             Log.shared.warn("No se puede play el sonido \(id): no existe.")
             return false
@@ -98,7 +98,7 @@ class Sound {
         musicPlayer?.stop(); currentMusic = -1
     }
 
-    func setVolume(_ id: Int, _ volume: Int) {
+    func setVolume(id: Int, volume: Int) {
         let v = Float(max(0, min(volume, 128))) / 128.0
         if id == -1 {
             sfxPlayers.compactMap { $0 }.forEach { $0.volume = v }

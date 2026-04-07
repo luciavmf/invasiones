@@ -118,15 +118,15 @@ class Map {
 
     /// Draws layer `layer` onto the given Video using the current camera.
     @discardableResult
-    func drawLayer(_ g: Video, _ layer: Int) -> Bool {
+    func drawLayer(g: Video, layer: Int) -> Bool {
         guard layer < maxLayers, layer >= 0 else { return false }
         guard mapLoaded else { return false }
 
         let oldClip = g.getClip()
-        g.setClip(camera.startX, camera.startY, camera.width, camera.height)
+        g.setClip(x: camera.startX, y: camera.startY, w: camera.width, h: camera.height)
 
         var toggle = true
-        let p = calculateFirstTileToDraw(camera.X, camera.Y)
+        let p = calculateFirstTileToDraw(x: camera.X, y: camera.Y)
         var XX = p.x, YY = p.y
 
         var startPosX = camera.startX + (((XX - YY) * tileWidth) >> 1) + camera.X
@@ -157,7 +157,7 @@ class Map {
             }
         }
 
-        g.setClip(oldClip.x, oldClip.y, oldClip.w, oldClip.h)
+        g.setClip(x: oldClip.x, y: oldClip.y, w: oldClip.w, h: oldClip.h)
         return true
     }
 
@@ -165,7 +165,7 @@ class Map {
 
     /// Draws a small tile (physical map) at the corresponding isometric position.
     /// If `semiTransparente` is true, draws the semi-transparent grey tile (fog-of-war).
-    func drawSmallTile(_ g: Video, _ i: Int, _ j: Int, _ semiTransparente: Bool) {
+    func drawSmallTile(g: Video, i: Int, j: Int, semiTransparente: Bool) {
         guard i >= 0, j >= 0, i < physicalHeight, j < physicalWidth else { return }
 
         let posX = camera.startX + (((i - j) * tileWidth / 2) >> 1) + camera.X + tileWidth / 4
@@ -189,11 +189,11 @@ class Map {
 
         if mx < camera.border {
             if camera.X + camera.speed <= (width * tileWidth) / 2 {
-                let p = calculateFirstTileToDraw(camera.X, camera.Y)
+                let p = calculateFirstTileToDraw(x: camera.X, y: camera.Y)
                 if p.x < -13 {
                     camera.Y -= camera.speed / 2
                 } else {
-                    let p2 = calculateFirstTileToDraw(camera.X, camera.Y - camera.height)
+                    let p2 = calculateFirstTileToDraw(x: camera.X, y: camera.Y - camera.height)
                     if p2.y > height + 13 { camera.Y += camera.speed / 2 }
                 }
                 camera.X += camera.speed
@@ -203,12 +203,12 @@ class Map {
         if my > camera.height - camera.border {
             if (camera.Y - camera.speed) >= (camera.height - height * tileHeight) &&
                camera.Y - camera.speed <= 0 {
-                let p = calculateFirstTileToDraw(camera.X, camera.Y - camera.height)
+                let p = calculateFirstTileToDraw(x: camera.X, y: camera.Y - camera.height)
                 if p.y > height + 13 {
                     camera.Y -= camera.speed / 2
                     camera.X -= camera.speed
                 } else {
-                    let p2 = calculateFirstTileToDraw(camera.X - camera.width, camera.Y - camera.height)
+                    let p2 = calculateFirstTileToDraw(x: camera.X - camera.width, y: camera.Y - camera.height)
                     if p2.x > width + 13 {
                         camera.Y -= camera.speed / 2
                         camera.X += camera.speed
@@ -221,12 +221,12 @@ class Map {
 
         if my < camera.border {
             if camera.Y + camera.speed <= 0 {
-                let p = calculateFirstTileToDraw(camera.X, camera.Y)
+                let p = calculateFirstTileToDraw(x: camera.X, y: camera.Y)
                 if p.x < -13 {
                     camera.X -= camera.speed
                     camera.Y += camera.speed / 2
                 } else {
-                    let p2 = calculateFirstTileToDraw(camera.X - camera.width, camera.Y)
+                    let p2 = calculateFirstTileToDraw(x: camera.X - camera.width, y: camera.Y)
                     if p2.y < -13 {
                         camera.X += camera.speed
                         camera.Y += camera.speed / 2
@@ -238,14 +238,14 @@ class Map {
         }
 
         if mx > camera.width - camera.border {
-            let p = calculateFirstTileToDraw(camera.X - camera.width, camera.Y)
+            let p = calculateFirstTileToDraw(x: camera.X - camera.width, y: camera.Y)
             if (camera.X - camera.width - camera.speed + tileWidth)
                 >= -(width * tileWidth) / 2 ||
                (camera.X - camera.speed) > 0 {
                 if p.y < -13 {
                     camera.Y -= camera.speed / 2
                 } else {
-                    let p2 = calculateFirstTileToDraw(camera.X - camera.width, camera.Y - camera.height)
+                    let p2 = calculateFirstTileToDraw(x: camera.X - camera.width, y: camera.Y - camera.height)
                     if p2.x > height + 13 { camera.Y += camera.speed / 2 }
                 }
                 camera.X -= camera.speed
@@ -267,7 +267,7 @@ class Map {
         return result
     }
 
-    func isWalkable(_ x: Int, _ y: Int) -> Bool {
+    func isWalkable(x: Int, y: Int) -> Bool {
         guard x >= 0, y >= 0,
               x < width * 2, y < height * 2,
               x < physicalTilesLayer.count,
@@ -279,18 +279,18 @@ class Map {
     /// Walks from (x1,y1) toward (x2,y2) along the Bresenham-style parametric line and
     /// returns the first walkable tile it encounters (port of C# ObtenerPosicionEnLineaDeVision).
     /// Returns (-1,-1) if no walkable tile is found.
-    func getLineOfSightPosition(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> (x: Int, y: Int) {
+    func getLineOfSightPosition(x1: Int, x2: Int, y1: Int, y2: Int) -> (x: Int, y: Int) {
         var col = Float(x1)
         var row = Float(y1)
 
-        let rowSlope = getRowSlope(x1, x2, y1, y2)
-        let colSlope = getColumnSlope(x1, x2, y1, y2)
+        let rowSlope = getRowSlope(x1: x1, x2: x2, y1: y1, y2: y2)
+        let colSlope = getColumnSlope(x1: x1, x2: x2, y1: y1, y2: y2)
 
         if abs(rowSlope) == 1.0 {
             while Int(row.rounded(.down)) != y2 {
                 let ci = Int(col.rounded(.down))
                 let fi = Int(row.rounded(.down))
-                if isWalkable(ci, fi) { return (ci, fi) }
+                if isWalkable(x: ci, y: fi) { return (ci, fi) }
                 row += rowSlope
                 col += colSlope
             }
@@ -298,7 +298,7 @@ class Map {
             while Int(col.rounded(.down)) != x2 {
                 let ci = Int(col.rounded(.down))
                 let fi = Int(row.rounded(.down))
-                if isWalkable(ci, fi) { return (ci, fi) }
+                if isWalkable(x: ci, y: fi) { return (ci, fi) }
                 row += rowSlope
                 col += colSlope
             }
@@ -306,7 +306,7 @@ class Map {
         return (-1, -1)
     }
 
-    private func getRowSlope(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> Float {
+    private func getRowSlope(x1: Int, x2: Int, y1: Int, y2: Int) -> Float {
         if abs(y2 - y1) > abs(x2 - x1) {
             return y2 > y1 ? 1 : -1
         } else {
@@ -315,7 +315,7 @@ class Map {
         }
     }
 
-    private func getColumnSlope(_ x1: Int, _ x2: Int, _ y1: Int, _ y2: Int) -> Float {
+    private func getColumnSlope(x1: Int, x2: Int, y1: Int, y2: Int) -> Float {
         if abs(x2 - x1) > abs(y2 - y1) {
             return x2 > x1 ? 1 : -1
         } else {
@@ -324,7 +324,7 @@ class Map {
         }
     }
 
-    func invalidateTile(_ x: Int, _ y: Int) {
+    func invalidateTile(x: Int, y: Int) {
         guard x >= 0, y >= 0,
               x + 1 < width * 2,
               y + 1 < height * 2 else { return }
@@ -337,7 +337,7 @@ class Map {
 
     // MARK: - Private
 
-    private func calculateFirstTileToDraw(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
+    private func calculateFirstTileToDraw(x: Int, y: Int) -> (x: Int, y: Int) {
         let a = tileHeight > 0 ? -y / tileHeight : 0
         var b = tileWidth > 0 ? x / tileWidth : 0
         if x > 0 { b += 1 }
@@ -346,11 +346,11 @@ class Map {
 
     private func updateMouseCoords() {
         guard mapLoaded else { return }
-        let p = tilePositionFromXY(Int(Mouse.shared.X), Int(Mouse.shared.Y))
+        let p = tilePositionFromXY(x: Int(Mouse.shared.X), y: Int(Mouse.shared.Y))
         tileUnderMouse = p
     }
 
-    private func tilePositionFromXY(_ x: Int, _ y: Int) -> (x: Int, y: Int) {
+    private func tilePositionFromXY(x: Int, y: Int) -> (x: Int, y: Int) {
         guard tileHeight > 0, tileWidth > 0 else { return (0, 0) }
         // Logical tile coords (for tileUnderMouse — buildings, obstacles)
         let a = (y - camera.Y - camera.startY) / tileHeight
@@ -455,12 +455,12 @@ class Map {
                 }
             }
         }
-        _ = PathFinder.instance.loadMap(self)
+        _ = PathFinder.shared.loadMap(self)
     }
 
     // MARK: - Helpers called from delegates
 
-    fileprivate func addLayerName(_ name: String, _ index: Int) {
+    fileprivate func addLayerName(name: String, index: Int) {
         layerNames[name] = index
         switch name.trimmingCharacters(in: .whitespaces).lowercased() {
         case "obstaculos":          OBSTACLES_LAYER = index
@@ -608,7 +608,7 @@ private class LayerDelegate: NSObject, XMLParserDelegate {
                             idx += 4
                         }
                     }
-                    m.addLayerName(layerName, m.height == 0 ? 0 : layerIndex)
+                    m.addLayerName(name: layerName, index: m.height == 0 ? 0 : layerIndex)
                     m.addLayer(tiles)
                     layerIndex += 1
                 }

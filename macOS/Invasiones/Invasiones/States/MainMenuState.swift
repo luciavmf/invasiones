@@ -56,22 +56,22 @@ class MainMenuState: State {
                         y: Video.height - Definitions.MAIN_MENU_Y_OFFSET,
                         anchor: Surface.centerHorizontal)
 
-        newMenu.addItem(ITEM.NEW_GAME.rawValue, Res.STR_MENU_NUEVO_JUEGO, Menu.ITEM_VISIBLE)
-        newMenu.addItem(ITEM.HELP.rawValue, Res.STR_MENU_AYUDA, Menu.ITEM_VISIBLE)
-        newMenu.addItem(ITEM.QUIT.rawValue, Res.STR_MENU_SALIR, Menu.ITEM_VISIBLE)
+        newMenu.addItem(index: ITEM.NEW_GAME.rawValue, stringId: Res.STR_MENU_NUEVO_JUEGO, flag: Menu.ITEM_VISIBLE)
+        newMenu.addItem(index: ITEM.HELP.rawValue, stringId: Res.STR_MENU_AYUDA, flag: Menu.ITEM_VISIBLE)
+        newMenu.addItem(index: ITEM.QUIT.rawValue, stringId: Res.STR_MENU_SALIR, flag: Menu.ITEM_VISIBLE)
 
         if firstBuild {
             firstBuild = false
             menuTargetY = Video.height - newMenu.height - Definitions.MAIN_MENU_Y_OFFSET
             posY              = Video.height + newMenu.height + Definitions.MAIN_MENU_Y_OFFSET
-            newMenu.setPosition(0, Video.height + 15, Surface.centerHorizontal)
+            newMenu.setPosition(x: 0, y: Video.height + 15, anchor: Surface.centerHorizontal)
         }
 
         newMenu.font = ResourceManager.shared.fonts[Definitions.FONT_MENU]
         menu = newMenu
 
         Sound.shared.stop(Res.SFX_BATALLA)
-        Sound.shared.play(Res.SFX_SPLASH, -1)
+        Sound.shared.play(id: Res.SFX_SPLASH, loop: -1)
     }
 
     override func update() {
@@ -82,7 +82,7 @@ class MainMenuState: State {
             if posY > menuTargetY {
                 posY -= INCREMENTO_MENU_Y
             }
-            menu.setPosition(0, posY, Surface.centerHorizontal)
+            menu.setPosition(x: 0, y: posY, anchor: Surface.centerHorizontal)
         }
 
         selectedItem = menu.update()

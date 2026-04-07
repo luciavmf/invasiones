@@ -39,7 +39,7 @@ class Button: GUIBox {
 
     // MARK: - Methods
 
-    override func setPosition(_ x: Int, _ y: Int, _ anchor: Int) {
+    override func setPosition(x: Int, y: Int, anchor: Int) {
         posX = x
         posY = y
         if (anchor & Surface.centerVertical) != 0 { posY += (Video.height >> 1) - (height >> 1) }

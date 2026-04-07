@@ -79,13 +79,13 @@ class Player {
                 if ord.id == .TAKE_OBJECT, let img = ord.image {
                     objectToTake = MapObject(sup: img, i: ord.point.x, j: ord.point.y)
                 }
-                ring?.setPosition(ord.point.x, ord.point.y)
+                ring?.setPosition(i: ord.point.x, j: ord.point.y)
             }
         } else {
             command = nil
         }
 
-        units.forEach { $0.setObjectiveCommand(command) }
+        units.forEach { $0.setObjectiveCommand(ord: command) }
     }
 
     /// Advances to the next command within the current objective.
@@ -102,29 +102,29 @@ class Player {
                 if fireEffects == nil { fireEffects = [] }
                 if let anim = ord.animation {
                     fireEffects!.append(anim)
-                    map.invalidateTile(ord.point.x, ord.point.y)
+                    map.invalidateTile(x: ord.point.x, y: ord.point.y)
 
                     let anim2 = AnimObject(Animation(copia: anim.animation),
                                           ord.animation!.physicalTilePos.x - 5,
                                           ord.animation!.physicalTilePos.y - 5)
                     fireEffects!.append(anim2)
-                    map.invalidateTile(anim.physicalTilePos.x - 5, anim.physicalTilePos.y - 5)
+                    map.invalidateTile(x: anim.physicalTilePos.x - 5, y: anim.physicalTilePos.y - 5)
 
                     let anim3 = AnimObject(Animation(copia: anim.animation),
                                           ord.animation!.physicalTilePos.x - 5,
                                           ord.animation!.physicalTilePos.y)
                     fireEffects!.append(anim3)
-                    map.invalidateTile(anim.physicalTilePos.x - 5, anim.physicalTilePos.y)
+                    map.invalidateTile(x: anim.physicalTilePos.x - 5, y: anim.physicalTilePos.y)
                 }
                 command = objective?.nextCommand()
                 if command == nil { objectiveCompleted = true }
             }
             if let ord = command {
-                ring?.setPosition(ord.point.x, ord.point.y)
+                ring?.setPosition(i: ord.point.x, j: ord.point.y)
             }
         }
 
-        units.forEach { $0.setObjectiveCommand(command) }
+        units.forEach { $0.setObjectiveCommand(ord: command) }
     }
 
     // MARK: - Unit update (shared)
@@ -221,7 +221,7 @@ class Player {
         collidingUnits = getUnitsToCollide(unit)
         for other in (collidingUnits ?? []) {
             if unit.hasCollision(other) {
-                unit.evadeUnit(other, visibleUnits)
+                unit.evadeUnit(other: other, visible: visibleUnits)
             }
         }
     }
@@ -239,7 +239,7 @@ class Player {
 
         for i in iStart..<iFin {
             for j in jStart..<jFin {
-                let dist = unit.calculateDistance(i, j)
+                let dist = unit.calculateDistance(toI: i, toJ: j)
                 guard dist <= Double(unit.visibility) else { continue }
 
                 if i < objectsToDraw.tabla.count, j < objectsToDraw.tabla[i].count,
@@ -268,8 +268,8 @@ class Player {
             for j in jStart..<jFin {
                 guard i < objectsToDraw.tabla.count, j < objectsToDraw.tabla[i].count,
                       let other = objectsToDraw.tabla[i][j] as? Unit, other !== unit else { continue }
-                let dist = other.calculateDistance(unit.physicalTilePos.x,
-                                                  unit.physicalTilePos.y)
+                let dist = other.calculateDistance(toI: unit.physicalTilePos.x,
+                                                   toJ: unit.physicalTilePos.y)
                 if dist <= Double(range) {
                     if nearby == nil { nearby = [] }
                     nearby!.append(other)
@@ -283,7 +283,7 @@ class Player {
         guard let visible = visibleUnits else { return }
         for enemy in visible {
             if enemy.faction != faction, !enemy.isDead() {
-                unit.attack(enemy)
+                unit.attack(enemy: enemy)
             }
         }
     }
@@ -295,7 +295,7 @@ class Player {
     ///   - x: Target tile column (physical grid).
     ///   - y: Target tile row (physical grid).
     /// - Returns: The list of placed units.
-    func placeUnits(_ type: Int, _ count: Int, _ x: Int, _ y: Int) -> [Unit] {
+    func placeUnits(type: Int, count: Int, x: Int, y: Int) -> [Unit] {
         guard count > 0 else {
             Log.shared.error("No se puede crear un group de cantidad 0.")
             return []
@@ -307,8 +307,8 @@ class Player {
         var placed = 0
 
         while placed < count {
-            if map.isWalkable(x + i, y + j) {
-                if let u = placeUnitInternal(type, x + i, y + j) {
+            if map.isWalkable(x: x + i, y: y + j) {
+                if let u = placeUnitInternal(type: type, i: x + i, j: y + j) {
                     group.append(u)
                 }
                 placed += 1
@@ -325,8 +325,8 @@ class Player {
         return group
     }
 
-    private func placeUnitInternal(_ type: Int, _ i: Int, _ j: Int) -> Unit? {
-        guard map.isWalkable(i, j) else {
+    private func placeUnitInternal(type: Int, i: Int, j: Int) -> Unit? {
+        guard map.isWalkable(x: i, y: j) else {
             Log.shared.debug("No se puede position la unit: tile no caminable.")
             return nil
         }

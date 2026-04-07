@@ -24,7 +24,7 @@ class GUIBox {
     init() {}
 
     // MARK: - Abstract methods
-    func setPosition(_ x: Int, _ y: Int, _ anchor: Int) {
+    func setPosition(x: Int, y: Int, anchor: Int) {
         fatalError("\(type(of: self)).setPosition must be overridden")
     }
 

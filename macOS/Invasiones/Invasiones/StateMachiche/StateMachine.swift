@@ -40,7 +40,7 @@ class StateMachine {
 
     // MARK: - Methods
     /// Registers a state in the machine.
-    func addState(_ key: GameFrame.STATE, _ state: State?) {
+    func addState(key: GameFrame.STATE, state: State?) {
         allStates[key] = state
     }
 

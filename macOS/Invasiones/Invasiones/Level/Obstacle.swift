@@ -35,7 +35,7 @@ class Obstacle: MapObject {
         physicalTilePos = (i, j)
         image = tileset.image
 
-        let p = tileToWorld(i, j)
+        let p = tileToWorld(i: i, j: j)
         worldPos = p
 
         if tileset.id == Int16(Res.TLS_EDIFICIOS) ||
@@ -61,7 +61,7 @@ class Obstacle: MapObject {
 
     override func draw(_ g: Video) {
         guard let img = image, let map = MapObject.map else { return }
-        img.setClip(index * frameWidth, 0, frameWidth, frameHeight)
+        img.setClip(x: index * frameWidth, y: 0, w: frameWidth, h: frameHeight)
         if isBuilding {
             g.draw(img, x, y - frameHeight + map.tileHeight / 2, 0)
         } else {

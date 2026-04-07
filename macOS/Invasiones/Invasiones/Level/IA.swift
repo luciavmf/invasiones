@@ -39,7 +39,7 @@ class IA {
     ///   - x: The tile column where the group is placed.
     ///   - y: The tile row where the group is placed.
     ///   - levelIndex: The level number, used to locate the script file.
-    func load(_ x: Int, _ y: Int, _ levelIndex: Int) {
+    func load(x: Int, y: Int, levelIndex: Int) {
         let pathStr = Program.LEVEL_PATH + "/orden_nv\(levelIndex)_\(x)_\(y).xml"
         guard let path = Utils.getPath(pathStr) else {
             Log.shared.debug("IA: No se encuentra el archivo: \(pathStr)")

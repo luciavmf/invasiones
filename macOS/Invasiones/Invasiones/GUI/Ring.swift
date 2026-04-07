@@ -20,7 +20,7 @@ class Ring: MapObject {
         super.init()
 
         physicalTilePos = (i, j)
-        let p = tileToWorld(i, j)
+        let p = tileToWorld(i: i, j: j)
         worldPos = p
 
         animacion.load()
@@ -44,14 +44,14 @@ class Ring: MapObject {
 
     override func draw(_ g: Video) {
         guard let map = MapObject.map else { return }
-        animacion.draw(g, x + map.tileWidth / 2, y + map.tileHeight / 2, 0)
+        animacion.draw(g: g, x: x + map.tileWidth / 2, y: y + map.tileHeight / 2, anchor: 0)
     }
 
     // MARK: - Own methods
 
-    func setPosition(_ i: Int, _ j: Int) {
+    func setPosition(i: Int, j: Int) {
         physicalTilePos = (i, j)
-        let p = tileToWorld(i, j)
+        let p = tileToWorld(i: i, j: j)
         worldPos = p
         worldPos.x -= animacion.offsets.x
         worldPos.y -= animacion.offsets.y

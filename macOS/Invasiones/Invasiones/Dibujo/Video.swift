@@ -106,7 +106,7 @@ class Video {
 
     func getClip() -> (x: Int, y: Int, w: Int, h: Int) { (clipX, clipY, clipW, clipH) }
 
-    func setClip(_ x: Int, _ y: Int, _ w: Int, _ h: Int) {
+    func setClip(x: Int, y: Int, w: Int, h: Int) {
         clipX = x; clipY = y; clipW = w; clipH = h
     }
 
@@ -160,7 +160,7 @@ class Video {
 
     /// Fills a rectangle with the current colour, optional alpha and anchor.
     func fillRect(_ x: Int, _ y: Int, _ w: Int, _ h: Int,
-                          _ alpha: Int = 255, _ anchor: Int = 0) {
+                  _ alpha: Int = 255, _ anchor: Int = 0) {
         var px = x, py = y
         if (anchor & Surface.centerHorizontal) != 0 { px += Video.width / 2 - w / 2 }
         if (anchor & Surface.centerVertical) != 0 { py += Video.height  / 2 - h / 2 }
