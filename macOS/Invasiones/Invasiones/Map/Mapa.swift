@@ -468,9 +468,9 @@ class Map {
     fileprivate func addLayerName(name: String, index: Int) {
         layerNames[name] = index
         switch name.trimmingCharacters(in: .whitespaces).lowercased() {
-        case "obstaculos":          OBSTACLES_LAYER = index
-        case "terreno":             TERRAIN_LAYER    = index
-        case "unidades":            PLAYER_UNITS_LAYER = index
+        case "obstaculos": OBSTACLES_LAYER = index
+        case "terreno": TERRAIN_LAYER    = index
+        case "unidades": PLAYER_UNITS_LAYER = index
         case "posicion invalidada": INVALIDATED_POSITIONS_LAYER = index
         default: break
         }

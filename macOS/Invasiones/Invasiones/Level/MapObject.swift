@@ -21,21 +21,21 @@ class MapObject {
 
     // MARK: - Attributes
     /// The image (sprite sheet) used to draw this object.
-    var image:            Surface?
+    var image: Surface?
     /// Position in the flat (isometric-projected) world coordinate system.
-    var worldPos:         (x: Int, y: Int) = (0, 0)
+    var worldPos: (x: Int, y: Int) = (0, 0)
     /// Current tile position on the physical (2× resolution) grid.
-    var physicalTilePos:  (x: Int, y: Int) = (0, 0)
+    var physicalTilePos: (x: Int, y: Int) = (0, 0)
     /// The tile the object occupied on the previous frame (used to update the object map).
-    var previousTile:     (x: Int, y: Int) = (0, 0)
+    var previousTile: (x: Int, y: Int) = (0, 0)
     /// Width of a single animation frame in pixels.
-    var frameWidth:       Int = 0
+    var frameWidth: Int = 0
     /// Height of a single animation frame in pixels.
-    var frameHeight:      Int = 0
+    var frameHeight: Int = 0
     /// Screen x coordinate where this object will be drawn.
-    var x:                Int = 0
+    var x: Int = 0
     /// Screen y coordinate where this object will be drawn.
-    var y:                Int = 0
+    var y: Int = 0
 
     // MARK: - Public properties
     /// The flat world position (alias for worldPos).

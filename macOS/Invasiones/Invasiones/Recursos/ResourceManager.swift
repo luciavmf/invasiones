@@ -214,14 +214,14 @@ private class ResXMLParser: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, didStartElement name: String, namespaceURI: String?,
                 qualifiedName: String?, attributes: [String: String]) {
         switch name {
-        case "fuentes":   section = .fonts
-        case "imagenes":  section = .images
-        case "tilesets":  section = .tilesets
-        case "mapas":     section = .maps
-        case "sfx":       section = .sfx
-        case "unidades":  section = .units
-        case "anims":     section = .anims
-        case "musica":    break  // ignore music section (was commented out in the original)
+        case "fuentes": section = .fonts
+        case "imagenes": section = .images
+        case "tilesets": section = .tilesets
+        case "mapas": section = .maps
+        case "sfx": section = .sfx
+        case "unidades": section = .units
+        case "anims": section = .anims
+        case "musica": break  // ignore music section (was commented out in the original)
         case "res", "escenarios", "sonidos", "sprites", "sprite", "animpak",
              "animation", "image": break
         default:
@@ -249,13 +249,13 @@ private class ResXMLParser: NSObject, XMLParserDelegate {
             inLeafElement = false
         }
         switch name {
-        case "fuentes":  section = .none
+        case "fuentes": section = .none
         case "imagenes": section = .none
         case "tilesets": section = .none
-        case "mapas":    section = .none
-        case "sfx":      section = .none
+        case "mapas": section = .none
+        case "sfx": section = .none
         case "unidades": section = .none
-        case "anims":    section = .none
+        case "anims": section = .none
         default: break
         }
     }

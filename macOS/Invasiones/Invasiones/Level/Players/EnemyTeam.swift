@@ -23,9 +23,9 @@ class EnemyTeam: Player {
 
     override func update() {
         switch stateValue {
-        case .start:   stateValue = .loading
+        case .start: stateValue = .loading
         case .loading: stateValue = .game
-        case .game:    updateGameplayState()
+        case .game: updateGameplayState()
         }
     }
 

@@ -142,9 +142,9 @@ class Video {
         let paraStyle = NSMutableParagraphStyle()
         paraStyle.alignment = .center
         let attrs: [NSAttributedString.Key: Any] = [
-            .font:            nsFont,
+            .font: nsFont,
             .foregroundColor: fontColor,
-            .paragraphStyle:  paraStyle
+            .paragraphStyle: paraStyle
         ]
         label.attributedText = NSAttributedString(string: text, attributes: attrs)
         label.horizontalAlignmentMode = .center
