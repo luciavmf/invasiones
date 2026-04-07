@@ -12,11 +12,13 @@ import Foundation
 class Menu: GUIBox {
 
     // MARK: - Constants
-    static let MAX_ITEM_COUNT = 15
-    static let ITEM_VISIBLE = 1 << 1
-    static let ITEM_HIDDEN = 1 << 2
-    static let ITEM_HOVER = 1 << 3
-    static let ITEM_SELECTED = 1 << 4
+    enum Constants {
+        static let maxItemCount = 15
+        static let itemVisible = 1 << 1
+        static let itemHidden = 1 << 2
+        static let itemHover = 1 << 3
+        static let itemSelected = 1 << 4
+    }
 
     // MARK: - Declarations
     private var items: [Int]
@@ -30,7 +32,7 @@ class Menu: GUIBox {
 
     // MARK: - Initializer
     init(image img: Surface?, itemCount: Int, x: Int, y: Int, anchor anch: Int) {
-        items = Array(repeating: 0, count: Menu.MAX_ITEM_COUNT)
+        items = Array(repeating: 0, count: Constants.maxItemCount)
         originalX = x
         originalY = y
         anchor = anch
@@ -54,12 +56,12 @@ class Menu: GUIBox {
         var y = posY
         for i in 0..<itemCount {
             let flags = (items[i] & 0xFF00) >> 8
-            if flags != Menu.ITEM_HIDDEN {
-                if (flags & Menu.ITEM_HOVER) != 0 {
-                    g.setColor(Definitions.COLOR_BLACK)
+            if flags != Constants.itemHidden {
+                if (flags & Constants.itemHover) != 0 {
+                    g.setColor(GameColor.black)
                     g.fillRect(posX + 2, y, buttonWidth, buttonHeight)
                 }
-                g.setFont(font, Definitions.GUI_COLOR_TEXT)
+                g.setFont(font, UIColors.text)
                 g.write(items[i] & 0xFF,
                            posX - (Video.width >> 1) + (buttonWidth >> 1),
                            y   - (Video.height  >> 1) + (buttonHeight  >> 1),
@@ -76,17 +78,17 @@ class Menu: GUIBox {
 
         for i in 0..<itemCount {
             let flags = (items[i] & 0xFF00) >> 8
-            if flags != Menu.ITEM_HIDDEN {
+            if flags != Constants.itemHidden {
                 let mx = Int(Mouse.shared.X)
                 let my = Int(Mouse.shared.Y)
                 if mx > posX && mx < posX + buttonWidth && my > y && my < y + buttonHeight {
-                    items[i] |= (Menu.ITEM_HOVER << 8)
+                    items[i] |= (Constants.itemHover << 8)
                     if Mouse.shared.pressedButtons.contains(Mouse.BUTTON_LEFT) {
-                        items[i] |= (Menu.ITEM_SELECTED << 8)
+                        items[i] |= (Constants.itemSelected << 8)
                         itemSeleccionado = i
                     }
                 } else {
-                    items[i] &= ~(Menu.ITEM_HOVER << 8)
+                    items[i] &= ~(Constants.itemHover << 8)
                 }
                 y += lineSpacing + buttonHeight
             }
@@ -114,7 +116,7 @@ class Menu: GUIBox {
 
     @discardableResult
     func addItem(index: Int, stringId: Int, flag: Int) -> Bool {
-        guard index <= Menu.MAX_ITEM_COUNT - 1 else { return false }
+        guard index <= Constants.maxItemCount - 1 else { return false }
 
         if itemCount == index {
             itemCount += 1

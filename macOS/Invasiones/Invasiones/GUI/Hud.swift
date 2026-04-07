@@ -70,12 +70,12 @@ class Hud {
         tipsWindow.draw(g)
 
         g.setFont(ResourceManager.shared.fonts[FontIndex.sans12.rawValue],
-                       Definitions.COLOR_BLACK)
+                       GameColor.black)
         g.write("\(enemyCount)", Hud.ATTRS_ENEMY_COUNT_X, posY + Hud.ATTRS_COUNT_Y, 0)
         g.write("\(argentineCount)", Hud.ATTRS_ARGENTINE_COUNT_X, posY + Hud.ATTRS_COUNT_Y, 0)
 
         g.setFont(ResourceManager.shared.fonts[FontIndex.sans12.rawValue],
-                       Definitions.COLOR_WHITE)
+                       GameColor.white)
 
         guard let uni = unitToShow else { return }
 
@@ -84,7 +84,7 @@ class Hud {
         }
         g.write(uni.name, Hud.AVATAR_NAME_X, posY + Hud.AVATAR_NAME_Y, 0)
 
-        g.setColor(Definitions.COLOR_BLACK)
+        g.setColor(GameColor.black)
 
         let s = GameText.Strings
         g.write("\(s[safe: Res.STR_ALCANCE] ?? ""):\(uni.range)",

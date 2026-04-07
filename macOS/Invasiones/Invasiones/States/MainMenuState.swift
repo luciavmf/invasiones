@@ -15,15 +15,19 @@ class MainMenuState: State {
 
     // MARK: - Constants
     /// Number of ticks to wait before the menu starts sliding into view.
-    private let CUENTA_HASTA_MOSTRAR_MENU = 20
+    private let ticksUntilMenuAppears = 20
     /// Pixels the menu moves upward per tick during its entry animation.
-    private let INCREMENTO_MENU_Y = 5
+    private let menuSlideSpeed = 5
 
     // MARK: - Menu items
     private enum Item: Int {
         case newGame = 0
         case help = 1
         case quit = 2
+    }
+
+    private enum Constants {
+        static let mainMenuYOffset = 50
     }
 
     // MARK: - Declarations
@@ -53,21 +57,21 @@ class MainMenuState: State {
         let newMenu = Menu(image: nil,
                         itemCount: 3,
                         x: 0,
-                        y: Video.height - Definitions.MAIN_MENU_Y_OFFSET,
+                        y: Video.height - Constants.mainMenuYOffset,
                         anchor: Surface.centerHorizontal)
 
-        newMenu.addItem(index: Item.newGame.rawValue, stringId: Res.STR_MENU_NUEVO_JUEGO, flag: Menu.ITEM_VISIBLE)
-        newMenu.addItem(index: Item.help.rawValue, stringId: Res.STR_MENU_AYUDA, flag: Menu.ITEM_VISIBLE)
-        newMenu.addItem(index: Item.quit.rawValue, stringId: Res.STR_MENU_SALIR, flag: Menu.ITEM_VISIBLE)
+        newMenu.addItem(index: Item.newGame.rawValue, stringId: Res.STR_MENU_NUEVO_JUEGO, flag: Menu.Constants.itemVisible)
+        newMenu.addItem(index: Item.help.rawValue, stringId: Res.STR_MENU_AYUDA, flag: Menu.Constants.itemVisible)
+        newMenu.addItem(index: Item.quit.rawValue, stringId: Res.STR_MENU_SALIR, flag: Menu.Constants.itemVisible)
 
         if firstBuild {
             firstBuild = false
-            menuTargetY = Video.height - newMenu.height - Definitions.MAIN_MENU_Y_OFFSET
-            posY              = Video.height + newMenu.height + Definitions.MAIN_MENU_Y_OFFSET
+            menuTargetY = Video.height - newMenu.height - Constants.mainMenuYOffset
+            posY              = Video.height + newMenu.height + Constants.mainMenuYOffset
             newMenu.setPosition(x: 0, y: Video.height + 15, anchor: Surface.centerHorizontal)
         }
 
-        newMenu.font = ResourceManager.shared.fonts[Definitions.FONT_MENU]
+        newMenu.font = ResourceManager.shared.fonts[FontConstants.menuFont]
         menu = newMenu
 
         Sound.shared.stop(Res.SFX_BATALLA)
@@ -78,9 +82,9 @@ class MainMenuState: State {
         guard let menu = menu else { return }
 
         count += 1
-        if count > CUENTA_HASTA_MOSTRAR_MENU {
+        if count > ticksUntilMenuAppears {
             if posY > menuTargetY {
-                posY -= INCREMENTO_MENU_Y
+                posY -= menuSlideSpeed
             }
             menu.setPosition(x: 0, y: posY, anchor: Surface.centerHorizontal)
         }

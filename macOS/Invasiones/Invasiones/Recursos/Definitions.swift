@@ -31,74 +31,44 @@ enum Direction: Int {
     static let count = 8
 }
 
-enum Definitions {
+/// RGB hex colour constants used by the `Video` drawing API.
+enum GameColor {
+    static let gray        = 0xC8C8C8
+    static let red         = 0xFF0000
+    static let black       = 0x000000
+    static let white       = 0xFFFFFF
+    static let green       = 0x00FF00
+    static let blue        = 0x0000FF
+    static let cyan        = 0x00FFFF
+    static let magenta     = 0xFF00FF
+    static let transparent = magenta
+}
 
-    // MARK: - Cheats
-    static let CHEATS_ENABLED = true
+/// Colors used in the UI
+enum UIColors {
+    static let menus = GameColor.black
+    static let selection = GameColor.red
+    static let text = GameColor.white
+    static let alpha = 128
+    static let title = GameColor.white
+    static let objectivesText = GameColor.black
+}
 
-    // MARK: - Colors (RGB hex)
-    static let COLOR_GRAY = 0xC8C8C8
-    static let COLOR_RED = 0xFF0000
-    static let COLOR_BLACK = 0x000000
-    static let COLOR_WHITE = 0xFFFFFF
-    static let COLOR_GREEN = 0x00FF00
-    static let COLOR_BLUE = 0x0000FF
-    static let COLOR_CYAN = 0x00FFFF
-    static let COLOR_MAGENTA = 0xFF00FF
-    static let COLOR_TRANSPARENT = COLOR_MAGENTA
+/// Fonts used in the ui
+enum FontConstants {
+    static let titleFont = FontIndex.lblack28.rawValue
+    static let helpTitleFont = FontIndex.sans24.rawValue
+    static let helpFont = FontIndex.sans18.rawValue
+    static let menuFont = FontIndex.sans20.rawValue
+    static let buttonFont = FontIndex.sans14.rawValue
+    static let objectivesReminderFont = FontIndex.sans14.rawValue
+    static let objectivesFont = FontIndex.sans20.rawValue
+}
 
-    // MARK: - Layout
-    static let OBJECTIVES_OFFSET = 7
-    static let OBJECTIVES_WIDTH = 410
-    static let OBJECTIVES_HEIGHT = 22
-    static let LINE_SPACING = 5
-
-    static let COLOR_LOADING = COLOR_BLUE
-    static let COLOR_TITLE = COLOR_WHITE
-    static let COLOR_OBJECTIVES = COLOR_BLACK
-
-    static let OBJECTIVE_SHOW_START_COUNT = 50
-    static let OBJECTIVES_BUTTON_Y = 510
-    static let MAIN_MENU_Y_OFFSET = 50
-    static let OBJECTIVES_BORDER = 100
-    static let LOADING_Y = 200
-    static let HELP_TEXT_Y = 200
-    static let HELP_ITEM_Y = 150
-
+/// Layout
+enum Layout {
+    static let objectivesOffset = 7
+    static let objectivesHeight = 22
     /// Y position for all titles.
-    static let TITLE_Y = 30
-    static let GAME_PAUSED_Y = -200
-
-    // MARK: - GUI
-    static let GUI_COLOR_MENUS = COLOR_BLACK
-    static let GUI_COLOR_SELECTION = COLOR_RED
-    static let GUI_COLOR_TEXT = COLOR_WHITE
-    static let GUI_ALPHA = 128
-
-    static let OBJECTIVES_ALPHA = GUI_ALPHA
-    static let CONFIRMATION_ALPHA = 128
-    static let CONFIRMATION_WIDTH = 350
-    static let CONFIRMATION_HEIGHT = 150
-
-    static let TIPS_ALPHA = 100
-    static let TIPS_WIDTH = 450
-    static let TIPS_HEIGHT = 100
-
-    static let PRESS_CONTINUE_Y = 200
-    static let PAGES_PER_INTRO = 3
-    static let TOTAL_TICKS_TO_OBJECTIVE = 50
-
-    // MARK: - Fonts
-    static let FONT_OBJECTIVES_TITLE = FontIndex.lblack28.rawValue
-    static let FONT_TITLE = FontIndex.lblack28.rawValue
-    static let FONT_HELP_TITLE = FontIndex.sans24.rawValue
-    static let FONT_HELP = FontIndex.sans18.rawValue
-    static let FONT_MENU = FontIndex.sans20.rawValue
-    static let FONT_BUTTON = FontIndex.sans14.rawValue
-    static let FONT_OBJECTIVES_REMINDER = FontIndex.sans14.rawValue
-    static let FONT_OBJECTIVES = FontIndex.sans20.rawValue
-    static let FONT_WIN = FontIndex.lblack28.rawValue
-
-    static let COLOR_OBJECTIVES_FONT = COLOR_WHITE
-    static let COLOR_WIN_TEXT = COLOR_WHITE
+    static let titleYPosition = 30
 }

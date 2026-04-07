@@ -27,10 +27,10 @@ class PathFinder {
     }
 
     // MARK: - Constants
-    private let COST_DIAGONAL: Int = 14
-    private let COST_STRAIGHT: Int = 10
-    private let COST_IMPOSSIBLE: Int = 99999
-    private let TIMEOUT_SECS: Double = 4.5
+    private let costDiagonal: Int = 14
+    private let costStraight: Int = 10
+    private let costImpossible: Int = 99999
+    private let timeoutSecs: Double = 4.5
 
     // MARK: - Singleton
 
@@ -72,13 +72,13 @@ class PathFinder {
         let startTime = Date()
 
         while !open.isEmpty {
-            if Date().timeIntervalSince(startTime) > TIMEOUT_SECS {
+            if Date().timeIntervalSince(startTime) > timeoutSecs {
                 Log.shared.debug("PathFinder: timeout.")
                 return nil
             }
 
             guard let bestIdx = open.indices.min(by: { open[$0].costF < open[$1].costF }),
-                  open[bestIdx].costF < COST_IMPOSSIBLE else { return nil }
+                  open[bestIdx].costF < costImpossible else { return nil }
 
             let best = open.remove(at: bestIdx)
 
@@ -97,14 +97,14 @@ class PathFinder {
 
     private func addChildren(parent: Node, open: inout [Node],
                              closed: [Node], target: Node, map: Map) {
-        let up = openNode(parent: parent, i: parent.i - 1, j: parent.j, cost: COST_STRAIGHT, open: &open, closed: closed, target: target, map: map)
-        let right = openNode(parent: parent, i: parent.i, j: parent.j + 1, cost: COST_STRAIGHT, open: &open, closed: closed, target: target, map: map)
-        let down = openNode(parent: parent, i: parent.i + 1, j: parent.j, cost: COST_STRAIGHT, open: &open, closed: closed, target: target, map: map)
-        let left = openNode(parent: parent, i: parent.i, j: parent.j - 1, cost: COST_STRAIGHT, open: &open, closed: closed, target: target, map: map)
-        if up    && right { openNode(parent: parent, i: parent.i - 1, j: parent.j + 1, cost: COST_DIAGONAL, open: &open, closed: closed, target: target, map: map) }
-        if right && down  { openNode(parent: parent, i: parent.i + 1, j: parent.j + 1, cost: COST_DIAGONAL, open: &open, closed: closed, target: target, map: map) }
-        if down  && left  { openNode(parent: parent, i: parent.i + 1, j: parent.j - 1, cost: COST_DIAGONAL, open: &open, closed: closed, target: target, map: map) }
-        if left  && up    { openNode(parent: parent, i: parent.i - 1, j: parent.j - 1, cost: COST_DIAGONAL, open: &open, closed: closed, target: target, map: map) }
+        let up = openNode(parent: parent, i: parent.i - 1, j: parent.j, cost: costStraight, open: &open, closed: closed, target: target, map: map)
+        let right = openNode(parent: parent, i: parent.i, j: parent.j + 1, cost: costStraight, open: &open, closed: closed, target: target, map: map)
+        let down = openNode(parent: parent, i: parent.i + 1, j: parent.j, cost: costStraight, open: &open, closed: closed, target: target, map: map)
+        let left = openNode(parent: parent, i: parent.i, j: parent.j - 1, cost: costStraight, open: &open, closed: closed, target: target, map: map)
+        if up    && right { openNode(parent: parent, i: parent.i - 1, j: parent.j + 1, cost: costDiagonal, open: &open, closed: closed, target: target, map: map) }
+        if right && down  { openNode(parent: parent, i: parent.i + 1, j: parent.j + 1, cost: costDiagonal, open: &open, closed: closed, target: target, map: map) }
+        if down  && left  { openNode(parent: parent, i: parent.i + 1, j: parent.j - 1, cost: costDiagonal, open: &open, closed: closed, target: target, map: map) }
+        if left  && up    { openNode(parent: parent, i: parent.i - 1, j: parent.j - 1, cost: costDiagonal, open: &open, closed: closed, target: target, map: map) }
     }
 
     @discardableResult
@@ -117,7 +117,7 @@ class PathFinder {
         guard !closed.contains(child) else { return true }
 
         child.costG = cost + parent.costG
-        child.costH = (abs(i - target.i) + abs(j - target.j)) * COST_STRAIGHT
+        child.costH = (abs(i - target.i) + abs(j - target.j)) * costStraight
         child.costF = child.costG + child.costH
         child.parent = parent
 

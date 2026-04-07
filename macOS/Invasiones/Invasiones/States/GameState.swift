@@ -17,6 +17,8 @@ class GameState: State {
     private enum State { case start, won, lost, menu, playing, confirmacion }
     private enum MenuItem: Int { case continuar = 0, quit = 1 }
 
+    private let gamePausedY = -200
+
     // MARK: - Declarations
     private var episode: Episode?
     private var gameMenu: Menu?
@@ -30,11 +32,11 @@ class GameState: State {
 
         gameMenu = Menu(image: nil, itemCount: 2, x: 0, y: 0,
                               anchor: Surface.centerHorizontal | Surface.centerVertical)
-        gameMenu?.font = ResourceManager.shared.fonts[Definitions.FONT_MENU]
+        gameMenu?.font = ResourceManager.shared.fonts[FontConstants.menuFont]
         gameMenu?.addItem(index: MenuItem.continuar.rawValue,
-                          stringId: Res.STR_MENU_CONTINUAR, flag: Menu.ITEM_VISIBLE)
+                          stringId: Res.STR_MENU_CONTINUAR, flag: Menu.Constants.itemVisible)
         gameMenu?.addItem(index: MenuItem.quit.rawValue,
-                          stringId: Res.STR_MENU_SALIR, flag: Menu.ITEM_VISIBLE)
+                          stringId: Res.STR_MENU_SALIR, flag: Menu.Constants.itemVisible)
     }
 
     override func update() {
@@ -47,8 +49,8 @@ class GameState: State {
 
             button = Button(label: Res.STR_BOTON_MENU_DEL_JUEGO, font: nil)
             if let b = button {
-                b.setPosition(x: Video.width - b.width - Button.OFFSET_LIMITE_PANTALLA,
-                              y: Button.OFFSET_LIMITE_PANTALLA, anchor: 0)
+                b.setPosition(x: Video.width - b.width - Button.Constants.screenEdgeOffset,
+                              y: Button.Constants.screenEdgeOffset, anchor: 0)
             }
 
             confirmMenu = ConfirmationMenu(Res.STR_CONFIRMACION_SALIR,
@@ -102,9 +104,9 @@ class GameState: State {
         case .menu:
             episode?.draw(g)
             gameMenu?.draw(g)
-            g.setFont(ResourceManager.shared.fonts[Definitions.FONT_TITLE],
-                           Definitions.COLOR_WHITE)
-            g.write(Res.STR_JUEGO_PAUSADO, 0, Definitions.GAME_PAUSED_Y,
+            g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+                           GameColor.white)
+            g.write(Res.STR_JUEGO_PAUSADO, 0, gamePausedY,
                        Surface.centerVertical | Surface.centerHorizontal)
 
         case .confirmacion:

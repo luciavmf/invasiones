@@ -46,12 +46,12 @@ class Mouse {
     // MARK: - Properties
     var X: CGFloat {
         get { _x }
-        set { _x = max(0, min(newValue, CGFloat(Program.SCREEN_WIDTH))) }
+        set { _x = max(0, min(newValue, CGFloat(ScreenSize.SCREEN_WIDTH))) }
     }
 
     var Y: CGFloat {
         get { _y }
-        set { _y = max(0, min(newValue, CGFloat(Program.SCREEN_HEIGHT))) }
+        set { _y = max(0, min(newValue, CGFloat(ScreenSize.SCREEN_HEIGHT))) }
     }
 
     var dragRect: CGRect { dragRectStore }
@@ -110,8 +110,8 @@ class Mouse {
     }
 
     func positionCursor(x: CGFloat, y: CGFloat) {
-        _x = max(0, min(x, CGFloat(Program.SCREEN_WIDTH)))
-        _y = max(0, min(y, CGFloat(Program.SCREEN_HEIGHT)))
+        _x = max(0, min(x, CGFloat(ScreenSize.SCREEN_WIDTH)))
+        _y = max(0, min(y, CGFloat(ScreenSize.SCREEN_HEIGHT)))
     }
 
     /// Draws the custom cursor at the current position using the Video context.

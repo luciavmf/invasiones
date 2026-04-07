@@ -17,8 +17,8 @@ import SpriteKit
 class Video {
 
     // MARK: - Screen constants (equivalent to the static fields of Video in C#)
-    static let width: Int = Program.SCREEN_WIDTH
-    static let height: Int = Program.SCREEN_HEIGHT
+    static let width: Int = ScreenSize.SCREEN_WIDTH
+    static let height: Int = ScreenSize.SCREEN_HEIGHT
 
     // MARK: - Nodo canvas
     private let canvasNode: SKNode
@@ -33,8 +33,8 @@ class Video {
     // actual visual clipping is handled by the map renderer itself.
     private var clipX: Int = 0
     private var clipY: Int = 0
-    private var clipW: Int = Program.SCREEN_WIDTH
-    private var clipH: Int = Program.SCREEN_HEIGHT
+    private var clipW: Int = ScreenSize.SCREEN_WIDTH
+    private var clipH: Int = ScreenSize.SCREEN_HEIGHT
 
     // MARK: - Initializer
     init(escena: SKScene) {

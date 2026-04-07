@@ -49,8 +49,8 @@ class GameFrame {
         video = Video(escena: escena)
 
         Mouse.shared.positionCursor(
-            x: CGFloat(Program.SCREEN_WIDTH) / 2,
-            y: CGFloat(Program.SCREEN_HEIGHT) / 2
+            x: CGFloat(ScreenSize.SCREEN_WIDTH) / 2,
+            y: CGFloat(ScreenSize.SCREEN_HEIGHT) / 2
         )
         Mouse.shared.hideCursor()
 

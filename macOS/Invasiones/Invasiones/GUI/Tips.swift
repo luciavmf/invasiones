@@ -12,9 +12,14 @@ import Foundation
 class Tips: GUIBox {
 
     // MARK: - Constants
-    private static let INITIAL_TIP_TIME = 250
-    private static let MAX_BLINK = 40
-    private static let MIN_BLINK = 20
+    enum Constants {
+        static let initialTipTime = 250
+        static let maxBlink = 40
+        static let minBlink = 20
+        static let alpha = 100
+        static let defaultWidth = 450
+        static let defaultHeight = 100
+    }
 
     // MARK: - Declarations
     private var tipButton: Button
@@ -32,12 +37,12 @@ class Tips: GUIBox {
             y: Video.height  - 90 - tipButton.height,
             anchor: 0)
 
-        width = Definitions.TIPS_WIDTH
-        height = Definitions.TIPS_HEIGHT
+        width = Constants.defaultWidth
+        height = Constants.defaultHeight
 
         generateRandomTip()
 
-        tipCount = Tips.INITIAL_TIP_TIME
+        tipCount = Constants.initialTipTime
         shouldShowTip = false
     }
 
@@ -58,14 +63,14 @@ class Tips: GUIBox {
             if tipCount <= 0 {
                 shouldShowTip = false
             }
-            if blinkCount > Tips.MAX_BLINK {
+            if blinkCount > Constants.maxBlink {
                 blinkCount = 0
             }
         } else {
             if Int.random(in: 0..<300) == 99 {
                 shouldShowTip = true
                 blinkCount = 0
-                tipCount = Tips.INITIAL_TIP_TIME
+                tipCount = Constants.initialTipTime
                 generateRandomTip()
             }
         }
@@ -78,11 +83,11 @@ class Tips: GUIBox {
         guard shouldShowTip else { return }
 
         if tipButton.isUnderCursor {
-            g.setColor(Definitions.GUI_COLOR_MENUS)
-            g.fillRect(posX, posY, width, height, Definitions.TIPS_ALPHA)
+            g.setColor(UIColors.menus)
+            g.fillRect(posX, posY, width, height, Constants.alpha)
             g.setFont(
-                ResourceManager.shared.fonts[Definitions.FONT_OBJECTIVES_REMINDER],
-                Definitions.GUI_COLOR_TEXT)
+                ResourceManager.shared.fonts[FontConstants.objectivesReminderFont],
+                UIColors.text)
             g.write(label,
                        posX - (Video.width >> 1) + (width >> 1),
                        posY + height / 5,
@@ -90,7 +95,7 @@ class Tips: GUIBox {
             tipButton.draw(g)
         } else {
             tipCount -= 1
-            if blinkCount > Tips.MIN_BLINK && blinkCount < Tips.MAX_BLINK {
+            if blinkCount > Constants.minBlink && blinkCount < Constants.maxBlink {
                 tipButton.draw(g)
             }
         }

@@ -15,9 +15,9 @@ class LogoState: State {
 
     // MARK: - Constants
     /// Number of ticks before the logo starts fading in.
-    private let LOGO_INICIO_CNT = 20
+    private let logoStartTick = 20
     /// Number of ticks the logo is displayed (fade-in window).
-    private let LOGO_TIEMPO_CNT = 70
+    private let logoEndTick = 70
 
     // MARK: - Declarations
     private var logo: Surface?
@@ -38,16 +38,16 @@ class LogoState: State {
         if count == 0 {
             logo = ResourceManager.shared.getAlphaImage(Res.IMG_LOGO)
             alpha = 10
-        } else if count > LOGO_INICIO_CNT + LOGO_TIEMPO_CNT {
+        } else if count > logoStartTick + logoEndTick {
             stateMachine.setNextState(.mainMenu)
         }
         count += 1
     }
 
     override func draw(_ g: Video) {
-        g.fillRect(Definitions.COLOR_BLACK)
+        g.fillRect(GameColor.black)
 
-        if count > LOGO_INICIO_CNT && count < LOGO_TIEMPO_CNT {
+        if count > logoStartTick && count < logoEndTick {
             if alpha < 255 - 10 {
                 alpha += 10
             }

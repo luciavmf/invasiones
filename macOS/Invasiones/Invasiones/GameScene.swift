@@ -19,7 +19,7 @@ class GameScene: SKScene {
     // MARK: - Scene lifecycle
     override func didMove(to view: SKView) {
         // Fixed size matching the original screen resolution
-        size = CGSize(width: Program.SCREEN_WIDTH, height: Program.SCREEN_HEIGHT)
+        size = CGSize(width: ScreenSize.SCREEN_WIDTH, height: ScreenSize.SCREEN_HEIGHT)
         scaleMode = .aspectFit
         // Origin at the bottom-left corner — all Video code assumes (0,0) = bottom-left.
         anchorPoint = CGPoint(x: 0, y: 0)
@@ -44,7 +44,7 @@ class GameScene: SKScene {
             let viewPos = v.convert(winPos, from: nil)
             let scenePos = convertPoint(fromView: viewPos)
             Mouse.shared.X = scenePos.x
-            Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - scenePos.y
+            Mouse.shared.Y = CGFloat(ScreenSize.SCREEN_HEIGHT) - scenePos.y
         }
         gameFrame.update()
         gameFrame.draw()
@@ -54,14 +54,14 @@ class GameScene: SKScene {
     override func mouseDown(with event: NSEvent) {
         let pos = event.location(in: self)
         Mouse.shared.X = pos.x
-        Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - pos.y
+        Mouse.shared.Y = CGFloat(ScreenSize.SCREEN_HEIGHT) - pos.y
         Mouse.shared.pressButton(Mouse.BUTTON_LEFT)
     }
 
     override func rightMouseDown(with event: NSEvent) {
         let pos = event.location(in: self)
         Mouse.shared.X = pos.x
-        Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - pos.y
+        Mouse.shared.Y = CGFloat(ScreenSize.SCREEN_HEIGHT) - pos.y
         Mouse.shared.pressButton(Mouse.BUTTON_RIGHT)
     }
 
@@ -84,14 +84,14 @@ class GameScene: SKScene {
     override func mouseMoved(with event: NSEvent) {
         let pos = event.location(in: self)
         Mouse.shared.X = pos.x
-        Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - pos.y
+        Mouse.shared.Y = CGFloat(ScreenSize.SCREEN_HEIGHT) - pos.y
         view?.window?.acceptsMouseMovedEvents = true
     }
 
     override func mouseDragged(with event: NSEvent) {
         let pos = event.location(in: self)
         Mouse.shared.X = pos.x
-        Mouse.shared.Y = CGFloat(Program.SCREEN_HEIGHT) - pos.y
+        Mouse.shared.Y = CGFloat(ScreenSize.SCREEN_HEIGHT) - pos.y
     }
 
     // MARK: - Keyboard events
