@@ -176,7 +176,7 @@ private class NivelXMLDelegate: NSObject, XMLParserDelegate {
 
     func parser(_ parser: XMLParser, didEndElement name: String,
                 namespaceURI: String?, qualifiedName: String?) {
-        if name == "objetivo", let obj = currentObj {
+        if name == "objetivo", var obj = currentObj {
             obj.commands = currentCommands.reversed()
             batallas[batallas.count - 1].objetivos.append(obj)
             currentObj = nil

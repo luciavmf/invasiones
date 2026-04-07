@@ -72,17 +72,13 @@ class Player {
         objective = obj
         objectiveCompleted = false
 
-        if let obj = objective {
-            command = obj.nextCommand()
+        command = objective?.nextCommand()
 
-            if let ord = command {
-                if ord.id == .TAKE_OBJECT, let img = ord.image {
-                    objectToTake = MapObject(sup: img, i: ord.point.x, j: ord.point.y)
-                }
-                ring?.setPosition(i: ord.point.x, j: ord.point.y)
+        if let ord = command {
+            if ord.id == .TAKE_OBJECT, let img = ord.image {
+                objectToTake = MapObject(sup: img, i: ord.point.x, j: ord.point.y)
             }
-        } else {
-            command = nil
+            ring?.setPosition(i: ord.point.x, j: ord.point.y)
         }
 
         units.forEach { $0.setObjectiveCommand(ord: command) }

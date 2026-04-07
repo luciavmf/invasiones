@@ -10,7 +10,7 @@
 import Foundation
 
 /// Represents a single order that a unit or group must carry out (move, attack, heal, etc.).
-class Command {
+struct Command {
 
     /// The type of order that can be issued to a unit or group.
     enum TYPE: Int {
