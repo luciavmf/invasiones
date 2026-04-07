@@ -88,16 +88,13 @@ class Map {
 
     // MARK: - Loading
 
-    @discardableResult
-    func load(_ mapId: Int) -> Bool {
+    func load(_ mapId: Int) throws {
         guard mapId >= Res.TLS_COUNT, mapId < Res.TLS_COUNT + Res.MAP_COUNT else {
-            Log.shared.error("Map ID \(mapId) inválido.")
-            return false
+            throw GameError.invalidResource("Map ID \(mapId) inválido.")
         }
         let paths = ResourceManager.shared.scenarioPaths
         guard mapId < paths.count, let mapPath = paths[mapId] else {
-            Log.shared.error("No hay path para el mapa \(mapId).")
-            return false
+            throw GameError.fileNotFound("No hay path para el mapa \(mapId).")
         }
 
         tilesetCount = 0
@@ -105,13 +102,12 @@ class Map {
         mapData = []
         layerNames = [:]
 
-        guard readMapInfo(mapPath) else { return false }
-        guard readTilesets(mapPath, paths: paths) else { return false }
-        guard readLayers(mapPath) else { return false }
+        try readMapInfo(mapPath)
+        try readTilesets(mapPath, paths: paths)
+        try readLayers(mapPath)
 
         loadLayerInfo(paths: paths)
         mapLoaded = true
-        return true
     }
 
     // MARK: - Drawing
@@ -374,13 +370,17 @@ class Map {
 
     // MARK: - Internal TMX loading
 
-    private func readMapInfo(_ path: String) -> Bool {
-        guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else { return false }
+    private func readMapInfo(_ path: String) throws {
+        guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else {
+            throw GameError.fileNotFound("Map: no se puede abrir \(path)")
+        }
         let d = MapInfoDelegate()
         parser.delegate = d
-        guard parser.parse() else { return false }
+        guard parser.parse() else {
+            throw GameError.parsingFailed("Map: error al parsear \(path)")
+        }
         guard d.orientation == "isometric" else {
-            Log.shared.error("Map: orientación no isométrica."); return false
+            throw GameError.invalidResource("Map: orientación no isométrica.")
         }
         width = d.width; physicalWidth = d.width * 2
         height = d.height; physicalHeight = d.height * 2
@@ -388,40 +388,46 @@ class Map {
         tileHeight = d.tileHeight; physicalTileHeight = d.tileHeight / 2
         camera.X = ((d.tileCamaraJ - d.tileCamaraI) * tileWidth) >> 1
         camera.Y = -((d.tileCamaraJ + d.tileCamaraI) * tileHeight) >> 1
-        return true
     }
 
-    private func readTilesets(_ mapPath: String, paths: [String?]) -> Bool {
-        guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: mapPath)) else { return false }
+    private func readTilesets(_ mapPath: String, paths: [String?]) throws {
+        guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: mapPath)) else {
+            throw GameError.fileNotFound("Map: no se puede abrir \(mapPath)")
+        }
         let base = (mapPath as NSString).deletingLastPathComponent
         let d = TilesetRefDelegate(base: base)
         parser.delegate = d
         let ok = parser.parse()
         withExtendedLifetime(d) {}
-        guard ok else { return false }
+        guard ok else {
+            throw GameError.parsingFailed("Map: error al parsear tilesets de \(mapPath)")
+        }
         // Load each TSX *after* the TMX parser has fully finished — avoids reentrant XMLParser.
         for entry in d.collected {
             let ts = Tileset()
             ts.firstGid = entry.gid
-            ts.load(entry.path)
+            try ts.load(entry.path)
             addTileset(ts)
         }
-        return true
     }
 
-    private func readLayers(_ path: String) -> Bool {
-        guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else { return false }
+    private func readLayers(_ path: String) throws {
+        guard let parser = XMLParser(contentsOf: URL(fileURLWithPath: path)) else {
+            throw GameError.fileNotFound("Map: no se puede abrir \(path)")
+        }
         let d = LayerDelegate(map: self)
         parser.delegate = d
         let ok = parser.parse()
         withExtendedLifetime(d) {}
-        return ok
+        if !ok {
+            throw GameError.parsingFailed("Map: error al parsear capas de \(path)")
+        }
     }
 
     private func loadLayerInfo(paths: [String?]) {
         if Map.tilesetDebug == nil {
             let ts = Tileset()
-            if let p = paths[Res.TLS_DEBUG] { ts.load(p) }
+            if let p = paths[Res.TLS_DEBUG] { try? ts.load(p) }
             Map.tilesetDebug = ts
         }
 
@@ -455,7 +461,7 @@ class Map {
                 }
             }
         }
-        _ = PathFinder.shared.loadMap(self)
+        try? PathFinder.shared.loadMap(self)
     }
 
     // MARK: - Helpers called from delegates

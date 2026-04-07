@@ -76,22 +76,21 @@ class Animation {
 
     // MARK: - Methods
 
-    @discardableResult
-    func load() -> Bool {
+    func load() throws {
         guard animRead else {
             Log.shared.warn("No se puede load la animation \(currentAnimation): no fue leída.")
-            return false
+            return
         }
         guard !animLoaded else {
             Log.shared.warn("La animation \(currentAnimation) ya fue cargada.")
-            return false
+            return
         }
 
         if image == nil {
             image = ResourceManager.shared.getImage(imagePath)
         }
         guard let img = image else {
-            return false
+            throw GameError.fileNotFound(imagePath)
         }
 
         animLoaded = true
@@ -101,7 +100,6 @@ class Animation {
         animationCount = frameHeight > 0 ? img.height / frameHeight : 1
 
         img.setClip(x: 0, y: currentAnimation * frameHeight, w: frameWidth, h: frameHeight)
-        return true
     }
 
     func stop() {

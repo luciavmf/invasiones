@@ -91,14 +91,11 @@ class Sprite {
         g.draw(img, x, y, 0)
     }
 
-    @discardableResult
-    func load() -> Bool {
-        var ok = true
+    func load() throws {
         for anim in animations.compactMap({ $0 }) {
-            if !anim.load() { ok = false }
+            try anim.load()
         }
         currentAnim = animations.compactMap({ $0 }).first
-        return ok
     }
 
     func play() { currentAnim?.play() }

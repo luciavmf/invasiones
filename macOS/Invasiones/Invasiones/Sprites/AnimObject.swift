@@ -23,7 +23,7 @@ class AnimObject: MapObject {
         let p = tileToWorld(i: i, j: j)
         worldPos = p
 
-        animation.load()
+        try? animation.load()
         updateScreenPos()
 
         worldPos.x -= animation.offsets.x

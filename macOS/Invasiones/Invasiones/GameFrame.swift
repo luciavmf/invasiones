@@ -54,11 +54,15 @@ class GameFrame {
         )
         Mouse.shared.hideCursor()
 
-        GameText.loadStrings()
-        ResourceManager.shared.loadResourcePaths()
-        ResourceManager.shared.readSpriteInfo()
-        ResourceManager.shared.readAnimationInfo()
-        ResourceManager.shared.loadFonts()
+        do {
+            try GameText.loadStrings()
+            try ResourceManager.shared.loadResourcePaths()
+            try ResourceManager.shared.readSpriteInfo()
+            try ResourceManager.shared.readAnimationInfo()
+            try ResourceManager.shared.loadFonts()
+        } catch {
+            Log.shared.error(error.localizedDescription)
+        }
 
         Sound.shared.loadAllSounds()
 

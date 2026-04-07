@@ -51,19 +51,16 @@ class ResourceManager {
 
     // MARK: - Load paths from res.xml
 
-    @discardableResult
-    func loadResourcePaths() -> Bool {
+    func loadResourcePaths() throws {
         guard let path = Utils.getPath(Program.RESOURCES_XML_FILE) else {
-            Log.shared.error("No existe el archivo \(Program.RESOURCES_XML_FILE).")
-            return false
+            throw GameError.fileNotFound("No existe el archivo \(Program.RESOURCES_XML_FILE).")
         }
 
         let parser = ResXMLParser()
         let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
         xmlParser?.delegate = parser
         guard xmlParser?.parse() == true else {
-            Log.shared.error("Error al parsear \(Program.RESOURCES_XML_FILE).")
-            return false
+            throw GameError.parsingFailed("Error al parsear \(Program.RESOURCES_XML_FILE).")
         }
 
         fontPaths = parser.fonts
@@ -75,9 +72,8 @@ class ResourceManager {
         let hasErrors = fontPaths.contains(where: { $0 == nil })
                       || imagePaths.contains(where: { $0 == nil })
         if hasErrors {
-            Log.shared.error("Uno o más archivos no pudieron ser cargados.")
+            throw GameError.invalidResource("Uno o más archivos no pudieron ser cargados.")
         }
-        return !hasErrors
     }
 
     // MARK: - Images
@@ -120,9 +116,8 @@ class ResourceManager {
 
     // MARK: - Fonts
 
-    @discardableResult
-    func loadFonts() -> Bool {
-        guard fonts.isEmpty else { return false }
+    func loadFonts() throws {
+        guard fonts.isEmpty else { return }
 
         fonts = Array(repeating: nil, count: Definitions.FNT.TOTAL.rawValue)
 
@@ -138,7 +133,9 @@ class ResourceManager {
         fonts[Definitions.FNT.LBLACK20.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 20)
         fonts[Definitions.FNT.LBLACK28.rawValue] = GameFont(fontId: Res.FNT_LBLACK, size: 28)
 
-        return fonts[Definitions.FNT.SANS12.rawValue] != nil
+        if fonts[Definitions.FNT.SANS12.rawValue] == nil {
+            throw GameError.invalidResource("No se pudo cargar la fuente SANS12.")
+        }
     }
 
     // MARK: - Unit types
@@ -154,32 +151,36 @@ class ResourceManager {
 
     // MARK: - Sprites (reads <sprites> section of res.xml)
 
-    @discardableResult
-    func readSpriteInfo() -> Bool {
-        guard let path = Utils.getPath(Program.RESOURCES_XML_FILE) else { return false }
+    func readSpriteInfo() throws {
+        guard let path = Utils.getPath(Program.RESOURCES_XML_FILE) else {
+            throw GameError.fileNotFound("No existe el archivo \(Program.RESOURCES_XML_FILE).")
+        }
 
         let parser = SpritesXMLParser()
         let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
         xmlParser?.delegate = parser
-        guard xmlParser?.parse() == true else { return false }
+        guard xmlParser?.parse() == true else {
+            throw GameError.parsingFailed("Error al parsear sprites de \(Program.RESOURCES_XML_FILE).")
+        }
 
         sprites = parser.sprites
-        return true
     }
 
     // MARK: - Animations (reads <anims> section of res.xml)
 
-    @discardableResult
-    func readAnimationInfo() -> Bool {
-        guard let path = Utils.getPath(Program.RESOURCES_XML_FILE) else { return false }
+    func readAnimationInfo() throws {
+        guard let path = Utils.getPath(Program.RESOURCES_XML_FILE) else {
+            throw GameError.fileNotFound("No existe el archivo \(Program.RESOURCES_XML_FILE).")
+        }
 
         let parser = AnimsXMLParser()
         let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
         xmlParser?.delegate = parser
-        guard xmlParser?.parse() == true else { return false }
+        guard xmlParser?.parse() == true else {
+            throw GameError.parsingFailed("Error al parsear animaciones de \(Program.RESOURCES_XML_FILE).")
+        }
 
         animations = parser.animations
-        return true
     }
 }
 
@@ -334,7 +335,7 @@ private class SpritesXMLParser: NSObject, XMLParserDelegate {
                 for (i, anim) in animations.enumerated() {
                     spr.addAnimation(i: i, anim: anim)
                 }
-                spr.load()
+                try? spr.load()
                 sprites[spriteIdx] = spr
                 spriteIdx += 1
             }

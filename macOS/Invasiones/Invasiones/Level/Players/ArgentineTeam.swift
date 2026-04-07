@@ -39,7 +39,7 @@ class ArgentineTeam: Player {
 
         if Res.ANIM_FLECHA_GUIA < anims.count, let animFlecha = anims[Res.ANIM_FLECHA_GUIA] {
             orientationArrow = Animation(copia: animFlecha)
-            orientationArrow?.load()
+            try? orientationArrow?.load()
         }
     }
 
@@ -53,14 +53,14 @@ class ArgentineTeam: Player {
         }
     }
 
-    override func loadUnits(_ levelIndex: Int) -> Bool {
+    override func loadUnits(_ levelIndex: Int) throws {
         arrowObj = MapObject(sup: ResourceManager.shared.getImage(Res.IMG_FLECHA),
                                i: 0, j: 0)
         count = 99999
 
         guard let tilesetUnidades = map.tilesets.compactMap({ $0 }).first(where: {
             $0.id == Int16(Res.TLS_UNIDADES)
-        }) else { return true }
+        }) else { return }
 
         units = []
 
@@ -82,7 +82,6 @@ class ArgentineTeam: Player {
                 }
             }
         }
-        return true
     }
 
     // MARK: - Draw (llamado desde Episode)
