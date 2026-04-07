@@ -15,8 +15,8 @@ class OptionsState: State {
         background = ResourceManager.shared.getImage(Res.IMG_FONDO)
         button = Button(label: Res.STR_BOTON_MENU, font: nil)
         button?.setPosition(
-            x: Video.width - (button?.width ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
-            y: Video.height - (button?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            x: Video.width - (button?.width ?? 0) - Button.Constants.screenEdgeOffset,
+            y: Video.height - (button?.height ?? 0) - Button.Constants.screenEdgeOffset,
             anchor: 0)
     }
 
@@ -28,9 +28,9 @@ class OptionsState: State {
 
     override func draw(_ g: Video) {
         g.draw(background, 0, 0, 0)
-        g.setFont(ResourceManager.shared.fonts[Definitions.FONT_TITLE],
-                       Definitions.GUI_COLOR_TEXT)
-        g.write(Res.STR_MENU_OPCIONES, 0, Definitions.TITLE_Y, Surface.centerHorizontal)
+        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+                       UIColors.text)
+        g.write(Res.STR_MENU_OPCIONES, 0, Layout.titleYPosition, Surface.centerHorizontal)
         button?.draw(g)
     }
 

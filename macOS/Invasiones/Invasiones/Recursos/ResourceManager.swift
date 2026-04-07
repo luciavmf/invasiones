@@ -52,15 +52,15 @@ class ResourceManager {
     // MARK: - Load paths from res.xml
 
     func loadResourcePaths() throws {
-        guard let path = Utils.getPath(Program.RESOURCES_XML_FILE) else {
-            throw GameError.fileNotFound("No existe el archivo \(Program.RESOURCES_XML_FILE).")
+        guard let path = Utils.getPath(ResourcePath.RESOURCES_XML_FILE) else {
+            throw GameError.fileNotFound("No existe el archivo \(ResourcePath.RESOURCES_XML_FILE).")
         }
 
         let parser = ResXMLParser()
         let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
         xmlParser?.delegate = parser
         guard xmlParser?.parse() == true else {
-            throw GameError.parsingFailed("Error al parsear \(Program.RESOURCES_XML_FILE).")
+            throw GameError.parsingFailed("Error al parsear \(ResourcePath.RESOURCES_XML_FILE).")
         }
 
         fontPaths = parser.fonts
@@ -152,15 +152,15 @@ class ResourceManager {
     // MARK: - Sprites (reads <sprites> section of res.xml)
 
     func readSpriteInfo() throws {
-        guard let path = Utils.getPath(Program.RESOURCES_XML_FILE) else {
-            throw GameError.fileNotFound("No existe el archivo \(Program.RESOURCES_XML_FILE).")
+        guard let path = Utils.getPath(ResourcePath.RESOURCES_XML_FILE) else {
+            throw GameError.fileNotFound("No existe el archivo \(ResourcePath.RESOURCES_XML_FILE).")
         }
 
         let parser = SpritesXMLParser()
         let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
         xmlParser?.delegate = parser
         guard xmlParser?.parse() == true else {
-            throw GameError.parsingFailed("Error al parsear sprites de \(Program.RESOURCES_XML_FILE).")
+            throw GameError.parsingFailed("Error al parsear sprites de \(ResourcePath.RESOURCES_XML_FILE).")
         }
 
         sprites = parser.sprites
@@ -169,15 +169,15 @@ class ResourceManager {
     // MARK: - Animations (reads <anims> section of res.xml)
 
     func readAnimationInfo() throws {
-        guard let path = Utils.getPath(Program.RESOURCES_XML_FILE) else {
-            throw GameError.fileNotFound("No existe el archivo \(Program.RESOURCES_XML_FILE).")
+        guard let path = Utils.getPath(ResourcePath.RESOURCES_XML_FILE) else {
+            throw GameError.fileNotFound("No existe el archivo \(ResourcePath.RESOURCES_XML_FILE).")
         }
 
         let parser = AnimsXMLParser()
         let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
         xmlParser?.delegate = parser
         guard xmlParser?.parse() == true else {
-            throw GameError.parsingFailed("Error al parsear animaciones de \(Program.RESOURCES_XML_FILE).")
+            throw GameError.parsingFailed("Error al parsear animaciones de \(ResourcePath.RESOURCES_XML_FILE).")
         }
 
         animations = parser.animations

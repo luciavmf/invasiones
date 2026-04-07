@@ -200,11 +200,11 @@ class Unit: MapObject {
         if isSelected {
             let healthFraction = Double(health) / Double(max(resistancePoints, 1))
             let barAncho = Int(Double(SELECCION_ANCHO) * healthFraction)
-            g.setColor(Definitions.COLOR_GREEN)
+            g.setColor(GameColor.green)
             g.fillRect(x - SELECCION_ANCHO / 2,
                                y + SELECCION_Y,
                                barAncho, 3)
-            g.setColor(Definitions.COLOR_RED)
+            g.setColor(GameColor.red)
             g.fillRect(x - SELECCION_ANCHO / 2 + barAncho,
                                y + SELECCION_Y,
                                SELECCION_ANCHO - barAncho, 3)

@@ -18,6 +18,12 @@ class ConfirmationMenu: GUIBox {
         case right =  1
     }
 
+    enum Constants {
+        static let alpha = 128
+        static let defaultWidth = 350
+        static let defaultHeight = 150
+    }
+
     // MARK: - Declarations
     private var leftButton: Button
     private var rightButton: Button
@@ -30,8 +36,8 @@ class ConfirmationMenu: GUIBox {
         rightButton.setPosition(x: 200, y: 200, anchor: 0)
         super.init()
         label = lbl
-        width = Definitions.CONFIRMATION_WIDTH
-        height = Definitions.CONFIRMATION_HEIGHT
+        width = Constants.defaultWidth
+        height = Constants.defaultHeight
     }
 
     // MARK: - GUIBox overrides
@@ -43,14 +49,14 @@ class ConfirmationMenu: GUIBox {
         if (anchor & Surface.centerVertical) != 0 { posY += (Video.height >> 1) - (height >> 1) }
 
         leftButton.setPosition(
-            x: posX + Button.OFFSET_LIMITE_PANTALLA,
-            y: posY + height - leftButton.height - Button.OFFSET_LIMITE_PANTALLA,
+            x: posX + Button.Constants.screenEdgeOffset,
+            y: posY + height - leftButton.height - Button.Constants.screenEdgeOffset,
             anchor: 0
         )
 
         rightButton.setPosition(
-            x: posX + width - rightButton.width - Button.OFFSET_LIMITE_PANTALLA,
-            y: posY + height  - rightButton.height  - Button.OFFSET_LIMITE_PANTALLA,
+            x: posX + width - rightButton.width - Button.Constants.screenEdgeOffset,
+            y: posY + height  - rightButton.height  - Button.Constants.screenEdgeOffset,
             anchor: 0
         )
     }
@@ -63,12 +69,12 @@ class ConfirmationMenu: GUIBox {
     }
 
     override func draw(_ g: Video) {
-        g.setColor(Definitions.GUI_COLOR_MENUS)
-        g.fillRect(posX, posY, width, height, Definitions.CONFIRMATION_ALPHA)
+        g.setColor(UIColors.menus)
+        g.fillRect(posX, posY, width, height, Constants.alpha)
 
         g.setFont(
-            ResourceManager.shared.fonts[Definitions.FONT_MENU],
-            Definitions.GUI_COLOR_TEXT
+            ResourceManager.shared.fonts[FontConstants.menuFont],
+            UIColors.text
         )
         g.write(
             label,

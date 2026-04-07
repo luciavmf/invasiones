@@ -12,11 +12,13 @@ import Foundation
 class Button: GUIBox {
 
     // MARK: - Constants
-    static let OFFSET_LIMITE_PANTALLA = 15
-    static let ALTO = 25
-    static let ANCHO = 100
-    static let ANCHO_MINIMO = 10
-    static let ALTO_MINIMO = 10
+    enum Constants {
+        static let screenEdgeOffset = 15
+        static let defaultHeight = 25
+        static let defaultWidth = 100
+        static let minWidth = 10
+        static let minHeight = 10
+    }
 
     // MARK: - Declarations
     private var selectedImage: Surface?
@@ -26,14 +28,14 @@ class Button: GUIBox {
     init(label: Int, font: GameFont?) {
         super.init()
 
-        self.height = Button.ALTO
-        self.width = Button.ANCHO
+        self.height = Constants.defaultHeight
+        self.width = Constants.defaultWidth
 
         self.image = ResourceManager.shared.getAlphaImage(Res.IMG_BOTON)
-        self.height = self.image?.height ?? Button.ALTO
-        self.width = self.image?.width ?? Button.ANCHO
+        self.height = self.image?.height ?? Constants.defaultHeight
+        self.width = self.image?.width ?? Constants.defaultWidth
         selectedImage = ResourceManager.shared.getAlphaImage(Res.IMG_BOTON_SELECCION)
-        self.font = font ?? ResourceManager.shared.fonts[Definitions.FONT_BUTTON]
+        self.font = font ?? ResourceManager.shared.fonts[FontConstants.buttonFont]
         self.label = label
     }
 
@@ -64,19 +66,19 @@ class Button: GUIBox {
             if selectedImage != nil {
                 g.draw(selectedImage, posX, posY, 0)
             } else {
-                g.setColor(Definitions.GUI_COLOR_SELECTION)
-                g.fillRect(posX, posY, width, height, Definitions.GUI_ALPHA)
+                g.setColor(UIColors.selection)
+                g.fillRect(posX, posY, width, height, UIColors.alpha)
             }
         } else {
             if image != nil {
                 g.draw(image, posX, posY, 0)
             } else {
-                g.setColor(Definitions.GUI_COLOR_MENUS)
-                g.fillRect(posX, posY, width, height, Definitions.GUI_ALPHA)
+                g.setColor(UIColors.menus)
+                g.fillRect(posX, posY, width, height, UIColors.alpha)
             }
         }
 
-        g.setFont(font, Definitions.GUI_COLOR_TEXT)
+        g.setFont(font, UIColors.text)
         g.write(label,
                    posX - Video.width / 2 + width / 2,
                    posY - Video.height  / 2 + height  / 2,

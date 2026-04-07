@@ -6,6 +6,27 @@ The original game was written in C# for Windows, with all code in Spanish (`Unid
 
 The port is being developed with the assistance of [Claude Code](https://claude.ai/code), Anthropic's AI coding tool, which is helping with the translation from C# to Swift, debugging, and Swiftification of the codebase.
 
+## Coding conventions
+
+Swift code follows the official [Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/). The codebase is being progressively updated toward full compliance as part of the Swiftification effort.
+
+## Swiftification progress
+
+The codebase is being progressively updated toward full Swift API Design Guidelines compliance. Completed so far:
+
+- `m_` prefix removal from all private properties
+- Singleton pattern: `static let shared = Foo()`
+- Setter methods replaced with `didSet` observers
+- `NSObject` removed where conformance was unused
+- Argument labels added to game-logic functions
+- C# XML doc comments restored as Swift `///` comments in English
+- `Int16` → `Int` throughout
+- Value types converted to `struct` (`Tile`, `Command`, `Objective`)
+- SCREAMING_CASE enum names/cases → Swift convention (PascalCase types, lowerCamelCase cases)
+- `FontIndex` and `Direction` enums moved to top level
+- SCREAMING_CASE `static let` / `let` constants → `lowerCamelCase` across all files
+- `throws` instead of `Bool` return values for error propagation
+
 ## Status
 
 Work in progress — actively being ported, debugged, and Swiftified.

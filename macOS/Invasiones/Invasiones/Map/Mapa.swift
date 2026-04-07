@@ -546,7 +546,7 @@ private class TilesetRefDelegate: NSObject, XMLParserDelegate {
         guard name == "tileset", let src = a["source"] else { return }
         let gid = Int(a["firstgid"] ?? "0") ?? 0
         let candidate1 = (base as NSString).appendingPathComponent(src)
-        let candidate2 = (Program.SCENARIOS_PATH as NSString).appendingPathComponent(src)
+        let candidate2 = (ResourcePath.SCENARIOS_PATH as NSString).appendingPathComponent(src)
         if let p = Utils.getPath(candidate1)
                 ?? Utils.getPath(candidate2)
                 ?? Utils.getPath(src) {

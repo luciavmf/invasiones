@@ -57,7 +57,7 @@ class Level {
     /// Reads the level definition from nivel_{levelIndex}.xml and populates the battles array.
     /// - Parameter levelIndex: The level number to load.
     func load(_ levelIndex: Int) {
-        let pathStr = Program.LEVEL_PATH + "/nivel_\(levelIndex).xml"
+        let pathStr = ResourcePath.LEVEL_PATH + "/nivel_\(levelIndex).xml"
         guard let path = Utils.getPath(pathStr) else {
             Log.shared.debug("No se pueden load los objetivos. No se encuentra el archivo: \(pathStr)")
             return

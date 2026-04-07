@@ -26,10 +26,17 @@ class Episode {
 
     // MARK: - Constants
     /// Number of frames to wait before showing the restart prompt after losing.
-    private static let COUNT_TO_ASK_RESTART = 50
-    private static let OBJECTIVES_BOX_WIDTH = 600
-    private static let OBJECTIVES_BOX_HEIGHT = 270
-    private static let OBJECTIVES_BOX_BUTTON_Y = 70
+    enum Constants {
+        static let countdownToRestart = 50
+        static let objectivesBoxWidth = 600
+        static let objectivesBoxHeight = 270
+        static let objectivesBoxButtonY = 70
+        static let objectiveShowStartCount = 50
+        static let objectivesButtonY = 510
+        static let objectivesBorder = 100
+        static let pagesPerIntro = 3
+        static let loadingY = 200
+    }
 
     // MARK: - Declarations
     /// "Next" button used in the introduction/objectives screens.
@@ -62,6 +69,8 @@ class Episode {
     /// The current intro/objective page being displayed.
     private var currentPage: Int = 0
     private var gameOverMenu: ConfirmationMenu
+    // MARK: - Cheats
+    private let cheatsEnabled = true
 
     // Cheats
     private var cheatGanarIndice: Int = 0
@@ -125,7 +134,7 @@ class Episode {
         case .lost: drawLostState(g)
         case .end: break
         }
-        g.setColor(Definitions.COLOR_WHITE)
+        g.setColor(GameColor.white)
     }
 
     // MARK: - LOADING state
@@ -146,10 +155,10 @@ class Episode {
 
     private func drawLoadingState(_ g: Video) {
         g.fillRect(0)
-        g.setColor(Definitions.COLOR_TITLE)
-        g.setFont(ResourceManager.shared.fonts[Definitions.FONT_TITLE],
-                       Definitions.COLOR_TITLE)
-        g.write(Res.STR_CARGANDO, 0, Definitions.LOADING_Y, Surface.centerHorizontal)
+        g.setColor(UIColors.title)
+        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+                       UIColors.title)
+        g.write(Res.STR_CARGANDO, 0, Constants.loadingY, Surface.centerHorizontal)
     }
 
     private func loadSprites() {
@@ -241,12 +250,12 @@ class Episode {
 
     private func updateShowIntroState() {
         if count == 0 {
-            button?.setPosition(x: 0, y: Definitions.OBJECTIVES_BUTTON_Y, anchor: Surface.centerHorizontal)
+            button?.setPosition(x: 0, y: Constants.objectivesButtonY, anchor: Surface.centerHorizontal)
         }
         count += 1
         if button?.update() != 0 {
             currentPage += 1
-            if currentPage == Definitions.PAGES_PER_INTRO - 1 {
+            if currentPage == Constants.pagesPerIntro - 1 {
                 setState(.playing)
             }
         }
@@ -275,24 +284,26 @@ class Episode {
     private func drawShowIntroState(_ g: Video) {
         drawPlayingState(g)
 
-        g.setColor(Definitions.COLOR_OBJECTIVES)
+        g.setColor(UIColors.objectivesText)
         let hudAlto = hud?.height ?? 0
-        g.fillRect(0, -(hudAlto >> 1),
-                           Video.width - (Definitions.OBJECTIVES_BORDER << 1),
-                           Video.height  - (Definitions.OBJECTIVES_BORDER << 1) - hudAlto,
-                           Definitions.OBJECTIVES_ALPHA,
-                           Surface.centerVertical | Surface.centerHorizontal)
+        g.fillRect(
+            0, -(hudAlto >> 1),
+            Video.width - (Constants.objectivesBorder << 1),
+            Video.height  - (Constants.objectivesBorder << 1) - hudAlto,
+            UIColors.alpha,
+            Surface.centerVertical | Surface.centerHorizontal
+        )
 
         if currentPage == 0 {
-            g.setFont(ResourceManager.shared.fonts[Definitions.FONT_OBJECTIVES_TITLE],
-                           Definitions.GUI_COLOR_TEXT)
+            g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+                           UIColors.text)
         } else {
-            g.setFont(ResourceManager.shared.fonts[Definitions.FONT_OBJECTIVES],
-                           Definitions.GUI_COLOR_TEXT)
+            g.setFont(ResourceManager.shared.fonts[FontConstants.objectivesFont],
+                           UIColors.text)
         }
 
         let strIdx = Res.STR_PRIMER_BATALLA + currentPage +
-                     ((currentLevel?.currentBattleIndex ?? 0) * Definitions.PAGES_PER_INTRO)
+                     ((currentLevel?.currentBattleIndex ?? 0) * Constants.pagesPerIntro)
         g.write(strIdx, 0, -(hudAlto >> 1), Surface.centerVertical | Surface.centerHorizontal)
         button?.draw(g)
     }
@@ -301,13 +312,13 @@ class Episode {
 
     private func updateShowObjectiveState() {
         if count == 0 {
-            acceptButton?.setPosition(x: 0, y: Episode.OBJECTIVES_BOX_BUTTON_Y,
+            acceptButton?.setPosition(x: 0, y: Constants.objectivesBoxButtonY,
                                       anchor: Surface.centerHorizontal | Surface.centerVertical)
         }
         count += 1
         if acceptButton?.update() != 0 {
             currentPage += 1
-            if currentPage == Definitions.PAGES_PER_INTRO {
+            if currentPage == Constants.pagesPerIntro {
                 setState(.playing)
                 showObjectivePopup = false
                 showObjectiveReminder = true
@@ -319,22 +330,24 @@ class Episode {
         drawPlayingState(g)
 
         let hudAlto = hud?.height ?? 0
-        g.setColor(Definitions.COLOR_OBJECTIVES)
-        g.fillRect(0, -(hudAlto / 2),
-                           Episode.OBJECTIVES_BOX_WIDTH, Episode.OBJECTIVES_BOX_HEIGHT,
-                           Definitions.OBJECTIVES_ALPHA,
-                           Surface.centerVertical | Surface.centerHorizontal)
+        g.setColor(UIColors.objectivesText)
+        g.fillRect(
+            0, -(hudAlto / 2),
+            Constants.objectivesBoxWidth, Constants.objectivesBoxHeight,
+            UIColors.alpha,
+            Surface.centerVertical | Surface.centerHorizontal
+        )
 
-        g.setFont(ResourceManager.shared.fonts[Definitions.FONT_TITLE],
-                       Definitions.GUI_COLOR_TEXT)
-        g.write(Res.STR_OBJETIVOS, 0,
-                   -(hudAlto / 2) - Episode.OBJECTIVES_BOX_HEIGHT / 2 + 50,
-                   Surface.centerVertical | Surface.centerHorizontal)
+        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.text)
+        g.write(
+            Res.STR_OBJETIVOS, 0,
+            -(hudAlto / 2) - Constants.objectivesBoxHeight / 2 + 50,
+            Surface.centerVertical | Surface.centerHorizontal
+        )
 
-        g.setFont(ResourceManager.shared.fonts[Definitions.FONT_OBJECTIVES],
-                       Definitions.GUI_COLOR_TEXT)
+        g.setFont(ResourceManager.shared.fonts[FontConstants.objectivesFont], UIColors.text)
         let strIdx = Res.STR_PRIMER_BATALLA + currentPage +
-                     ((currentLevel?.currentBattleIndex ?? 0) * Definitions.PAGES_PER_INTRO)
+                     ((currentLevel?.currentBattleIndex ?? 0) * Constants.pagesPerIntro)
         g.write(strIdx, 0, -(hudAlto >> 1) + 30, Surface.centerVertical | Surface.centerHorizontal)
 
         acceptButton?.draw(g)
@@ -345,7 +358,7 @@ class Episode {
     private func updatePlayingState() {
         if showObjectivePopup { objectiveShowCount += 1 }
 
-        if Definitions.CHEATS_ENABLED { checkCheats() }
+        if cheatsEnabled { checkCheats() }
 
         map?.update()
 
@@ -383,7 +396,7 @@ class Episode {
     }
 
     private func drawPlayingState(_ g: Video) {
-        g.fillRect(Definitions.COLOR_BLACK)
+        g.fillRect(GameColor.black)
 
         if let map = map { map.drawLayer(g: g, layer: map.TERRAIN_LAYER) }
 
@@ -396,26 +409,26 @@ class Episode {
         player?.drawOrientationArrow(g)
 
         if showObjectivePopup &&
-           objectiveShowCount > Definitions.OBJECTIVE_SHOW_START_COUNT {
+           objectiveShowCount > Constants.objectiveShowStartCount {
             setState(.showObjectives)
         } else if showObjectiveReminder &&
-                  objectiveShowCount > Definitions.OBJECTIVE_SHOW_START_COUNT {
+                  objectiveShowCount > Constants.objectiveShowStartCount {
             let hudAlto = hud?.height ?? 0
             let camAlto = camera?.height ?? Video.height
-            g.setFont(ResourceManager.shared.fonts[Definitions.FONT_OBJECTIVES_REMINDER],
-                           Definitions.COLOR_OBJECTIVES_FONT)
+            g.setFont(ResourceManager.shared.fonts[FontConstants.objectivesReminderFont],
+                      UIColors.title)
             g.write(Res.STR_OBJETIVOS,
-                       Definitions.OBJECTIVES_OFFSET << 1,
-                       camAlto - (Definitions.OBJECTIVES_HEIGHT + Definitions.OBJECTIVES_OFFSET * 2) - 10, 0)
+                       Layout.objectivesOffset << 1,
+                       camAlto - (Layout.objectivesHeight + Layout.objectivesOffset * 2) - 10, 0)
             let strIdx = Res.STR_OBJETIVO_BATALLA_1_1 + (currentLevel?.completedObjectiveCount ?? 0)
             g.write(strIdx,
-                       Definitions.OBJECTIVES_OFFSET << 1,
-                       camAlto - (Definitions.OBJECTIVES_HEIGHT + Definitions.OBJECTIVES_OFFSET * 2) + 5, 0)
+                       Layout.objectivesOffset << 1,
+                       camAlto - (Layout.objectivesHeight + Layout.objectivesOffset * 2) + 5, 0)
             _ = hudAlto  // suppress warning
         }
 
         if Mouse.shared.isDragging() {
-            g.setColor(Definitions.COLOR_GREEN)
+            g.setColor(GameColor.green)
             let r = Mouse.shared.dragRect
             g.drawRect(Int(r.minX), Int(r.minY), Int(r.width), Int(r.height), 0)
         }
@@ -504,8 +517,8 @@ class Episode {
     private func drawWonState(_ g: Video) {
         drawPlayingState(g)
         button?.draw(g)
-        g.setFont(ResourceManager.shared.fonts[Definitions.FONT_WIN],
-                       Definitions.COLOR_WIN_TEXT)
+        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+                       UIColors.title)
         g.write(Res.STR_GANASTE, 0, 0, Surface.centerHorizontal | Surface.centerVertical)
     }
 
@@ -513,7 +526,7 @@ class Episode {
 
     private func updateLostState() {
         count += 1
-        guard count > Episode.COUNT_TO_ASK_RESTART else { return }
+        guard count > Constants.countdownToRestart else { return }
 
         let result = gameOverMenu.update()
         if result == ConfirmationMenu.Selection.left.rawValue {
@@ -526,10 +539,9 @@ class Episode {
 
     private func drawLostState(_ g: Video) {
         drawPlayingState(g)
-        g.setFont(ResourceManager.shared.fonts[Definitions.FONT_WIN],
-                       Definitions.COLOR_WIN_TEXT)
+        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.title)
         g.write(Res.STR_PERDISTE, 0, -100, Surface.centerHorizontal | Surface.centerVertical)
-        if count > Episode.COUNT_TO_ASK_RESTART {
+        if count > Constants.countdownToRestart {
             gameOverMenu.draw(g)
         }
     }

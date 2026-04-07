@@ -10,10 +10,7 @@
 
 import Foundation
 
-enum Program {
-
-    static let DEFAULT_FPS: Int = 20
-
+enum ResourcePath {
     static let DATA_PATH = "data"
     static let SCENARIOS_PATH = "escenarios"
     static let LEVEL_PATH = "nivel"
@@ -21,9 +18,16 @@ enum Program {
 
     static let STRINGS_XML_FILE = "strings.xml"
     static let RESOURCES_XML_FILE = "res.xml"
+}
 
+enum ScreenSize {
     static let SCREEN_WIDTH: Int = 1024
     static let SCREEN_HEIGHT: Int = 768
+}
+
+enum Program {
+
+    static let DEFAULT_FPS: Int = 20
 
 #if DEBUG
     static let FULLSCREEN = false

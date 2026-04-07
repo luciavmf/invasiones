@@ -17,6 +17,11 @@ class HelpState: State {
         static let total = 9
     }
 
+    private enum Constants {
+        static let helpTextY = 200
+        static let helpItemY = 150
+    }
+
     // MARK: - Declarations
     private var substate: Substate = .select
     private var backButton: Button?
@@ -32,22 +37,22 @@ class HelpState: State {
 
         button = Button(label: Res.STR_BOTON_MENU, font: fnt)
         button?.setPosition(
-            x: Video.width - (button?.width ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
-            y: Video.height - (button?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            x: Video.width - (button?.width ?? 0) - Button.Constants.screenEdgeOffset,
+            y: Video.height - (button?.height ?? 0) - Button.Constants.screenEdgeOffset,
             anchor: 0
         )
 
         nextButton = Button(label: Res.STR_SIGUIENTE, font: fnt)
         nextButton?.setPosition(
-            x: Video.width - (nextButton?.width ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
-            y: Video.height - (nextButton?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            x: Video.width - (nextButton?.width ?? 0) - Button.Constants.screenEdgeOffset,
+            y: Video.height - (nextButton?.height ?? 0) - Button.Constants.screenEdgeOffset,
             anchor: 0
         )
 
         backButton = Button(label: Res.STR_ATRAS, font: fnt)
         backButton?.setPosition(
-            x: Video.width - (nextButton?.width ?? 0) * 2 - Button.OFFSET_LIMITE_PANTALLA,
-            y: Video.height - (nextButton?.height ?? 0) - Button.OFFSET_LIMITE_PANTALLA,
+            x: Video.width - (nextButton?.width ?? 0) * 2 - Button.Constants.screenEdgeOffset,
+            y: Video.height - (nextButton?.height ?? 0) - Button.Constants.screenEdgeOffset,
             anchor: 0
         )
 
@@ -80,20 +85,20 @@ class HelpState: State {
     override func draw(_ g: Video) {
         g.draw(background, 0, 0, 0)
 
-        g.setFont(ResourceManager.shared.fonts[Definitions.FONT_TITLE],
-                       Definitions.COLOR_TITLE)
-        g.write(Res.STR_MENU_AYUDA, 0, Definitions.TITLE_Y, Surface.centerHorizontal)
+        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+                       UIColors.title)
+        g.write(Res.STR_MENU_AYUDA, 0, Layout.titleYPosition, Surface.centerHorizontal)
 
         if substate.rawValue < Substate.total {
-            g.setFont(ResourceManager.shared.fonts[Definitions.FONT_HELP_TITLE],
-                           Definitions.GUI_COLOR_TEXT)
+            g.setFont(ResourceManager.shared.fonts[FontConstants.helpTitleFont],
+                           UIColors.text)
             g.write(Res.STR_MENU_AYUDA_TEXTO_SELECCIONAR_01 + substate.rawValue * 2,
-                       0, Definitions.HELP_ITEM_Y, Surface.centerHorizontal)
+                       0, Constants.helpItemY, Surface.centerHorizontal)
 
-            g.setFont(ResourceManager.shared.fonts[Definitions.FONT_HELP],
-                           Definitions.GUI_COLOR_TEXT)
+            g.setFont(ResourceManager.shared.fonts[FontConstants.helpFont],
+                           UIColors.text)
             g.write(Res.STR_MENU_AYUDA_TEXTO_SELECCIONAR_02 + substate.rawValue * 2,
-                       0, Definitions.HELP_TEXT_Y, Surface.centerHorizontal)
+                       0, Constants.helpTextY, Surface.centerHorizontal)
         }
 
         currentScreenshot?.draw(g: g, x: 0, y: 150, anchor: Surface.centerHorizontal | Surface.centerVertical)
