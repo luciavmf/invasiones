@@ -12,8 +12,8 @@ enum GameError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .fileNotFound(let path):      return "File not found: \(path)"
-        case .parsingFailed(let detail):   return "Parsing failed: \(detail)"
+        case .fileNotFound(let path): return "File not found: \(path)"
+        case .parsingFailed(let detail): return "Parsing failed: \(detail)"
         case .invalidResource(let detail): return "Invalid resource: \(detail)"
         }
     }

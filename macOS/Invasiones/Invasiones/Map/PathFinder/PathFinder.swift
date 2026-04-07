@@ -27,10 +27,10 @@ class PathFinder {
     }
 
     // MARK: - Constants
-    private let COST_DIAGONAL:  Int = 14
-    private let COST_STRAIGHT:  Int = 10
+    private let COST_DIAGONAL: Int = 14
+    private let COST_STRAIGHT: Int = 10
     private let COST_IMPOSSIBLE: Int = 99999
-    private let TIMEOUT_SECS:   Double = 4.5
+    private let TIMEOUT_SECS: Double = 4.5
 
     // MARK: - Singleton
 
@@ -67,7 +67,7 @@ class PathFinder {
         let start = Node(startI, startJ)
         let target = Node(targetI, targetJ)
 
-        var open:   [Node] = [start]
+        var open: [Node] = [start]
         var closed: [Node] = []
         let startTime = Date()
 

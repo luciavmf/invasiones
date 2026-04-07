@@ -141,11 +141,11 @@ private class NivelXMLDelegate: NSObject, XMLParserDelegate {
             let jVal = (Int(a["j"] ?? "0") ?? 0) << 1
             let type: Command.Kind
             switch name {
-            case "tomar":   type = .takeObject
-            case "llegar":  type = .move
+            case "tomar": type = .takeObject
+            case "llegar": type = .move
             case "trigger": type = .trigger
-            case "matar":   type = .kill
-            default:        type = .invalid
+            case "matar": type = .kill
+            default: type = .invalid
             }
             let ord: Command
             if type == .takeObject, let img = a["imagen"] {

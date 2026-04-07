@@ -96,13 +96,13 @@ class Group {
 
     func update() {
         switch stateValue {
-        case .waitingCommand:   updateWaitingState()
-        case .moving:          updateMovingState()
-        case .grouping:         updateGroupingState()
+        case .waitingCommand: updateWaitingState()
+        case .moving: updateMovingState()
+        case .grouping: updateGroupingState()
         case .pursuingEnemy: break
-        case .attacking:         break
-        case .healing:           updateHealingState()
-        case .eliminating:         return
+        case .attacking: break
+        case .healing: updateHealingState()
+        case .eliminating: return
         }
 
         checkHealthAndOrder()
@@ -332,13 +332,13 @@ class Group {
 
             // spiral
             switch dir {
-            case 1:  // UP
+            case 1: // UP
                 i += 2; if i == inc { dir = 2 }
-            case 2:  // RIGHT
+            case 2: // RIGHT
                 j += 2; if j == inc { dir = 3 }
-            case 3:  // DOWN
+            case 3: // DOWN
                 i -= 2; if i == -inc { dir = 0 }
-            case 0:  // LEFT
+            case 0: // LEFT
                 j -= 2; if j == -inc { dir = 1; inc += 2 }
             default: break
             }

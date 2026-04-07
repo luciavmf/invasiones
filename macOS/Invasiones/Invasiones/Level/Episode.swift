@@ -102,13 +102,13 @@ class Episode {
     @discardableResult
     func update() -> Bool {
         switch stateValue {
-        case .loading:              updateLoadingState()
-        case .showIntro:  updateShowIntroState()
-        case .showObjectives:     updateShowObjectiveState()
-        case .playing:               updatePlayingState()
-        case .won:                  updateWonState()
-        case .lost:                updateLostState()
-        case .end:                   break
+        case .loading: updateLoadingState()
+        case .showIntro: updateShowIntroState()
+        case .showObjectives: updateShowObjectiveState()
+        case .playing: updatePlayingState()
+        case .won: updateWonState()
+        case .lost: updateLostState()
+        case .end: break
         }
         return false
     }
@@ -117,13 +117,13 @@ class Episode {
 
     func draw(_ g: Video) {
         switch stateValue {
-        case .loading:             drawLoadingState(g)
-        case .showObjectives:    drawShowObjectiveState(g)
-        case .playing:              drawPlayingState(g)
+        case .loading: drawLoadingState(g)
+        case .showObjectives: drawShowObjectiveState(g)
+        case .playing: drawPlayingState(g)
         case .showIntro: drawShowIntroState(g)
-        case .won:                 drawWonState(g)
-        case .lost:               drawLostState(g)
-        case .end:                  break
+        case .won: drawWonState(g)
+        case .lost: drawLostState(g)
+        case .end: break
         }
         g.setColor(Definitions.COLOR_WHITE)
     }

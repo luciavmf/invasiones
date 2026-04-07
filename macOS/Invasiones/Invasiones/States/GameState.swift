@@ -70,8 +70,8 @@ class GameState: State {
             if let item = gameMenu?.update() {
                 switch MenuItem(rawValue: item) {
                 case .continuar: setState(.playing)
-                case .quit:     setState(.confirmacion)
-                case .none:      break
+                case .quit: setState(.confirmacion)
+                case .none: break
                 }
             }
 

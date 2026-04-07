@@ -19,18 +19,18 @@ class Tileset {
     fileprivate(set) var name: String = "" {
         didSet {
             switch name.lowercased() {
-            case "tierra":      id = Res.TLS_TIERRA
-            case "agua":        id = Res.TLS_AGUA
-            case "pasto":       id = Res.TLS_PASTO
-            case "arboles":     id = Res.TLS_ARBOLES
-            case "unidades":    id = Res.TLS_UNIDADES
-            case "piedras":     id = Res.TLS_PIEDRAS
-            case "texturas":    id = Res.TLS_TEXTURAS
-            case "piedras2":    id = Res.TLS_PIEDRAS2
-            case "enfermeria":  id = Res.TLS_ENFERMERIA
-            case "edificios":   id = Res.TLS_EDIFICIOS
+            case "tierra": id = Res.TLS_TIERRA
+            case "agua": id = Res.TLS_AGUA
+            case "pasto": id = Res.TLS_PASTO
+            case "arboles": id = Res.TLS_ARBOLES
+            case "unidades": id = Res.TLS_UNIDADES
+            case "piedras": id = Res.TLS_PIEDRAS
+            case "texturas": id = Res.TLS_TEXTURAS
+            case "piedras2": id = Res.TLS_PIEDRAS2
+            case "enfermeria": id = Res.TLS_ENFERMERIA
+            case "edificios": id = Res.TLS_EDIFICIOS
             case "invalidados": id = Res.TLS_INVALIDADO
-            case "fuerte":      id = Res.TLS_FUERTE
+            case "fuerte": id = Res.TLS_FUERTE
             default: break
             }
         }
@@ -128,12 +128,12 @@ private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
             let propValue = attributes["value"] ?? ""
             if propName == "id" || propName == "unidad" {
                 switch propValue {
-                case "TILES_VECINOS":    ts.tiles[currentTileId]?.id = Res.TILE_DEBUG_ID_TILES_VECINOS
+                case "TILES_VECINOS": ts.tiles[currentTileId]?.id = Res.TILE_DEBUG_ID_TILES_VECINOS
                 case "CAMINO_A_SEGUIR": ts.tiles[currentTileId]?.id = Res.TILE_DEBUG_ID_CAMINO_A_SEGUIR
-                case "PATRICIO":        ts.tiles[currentTileId]?.id = Res.TILE_UNIDADES_ID_PATRICIO
-                case "ENFERMERIA":      ts.tiles[currentTileId]?.id = Res.TILE_INVALIDADOS_ID_ENFERMERIA
-                case "CASA":            ts.tiles[currentTileId]?.id = Res.TILE_INVALIDADOS_ID_CASA
-                case "INGLES":          ts.tiles[currentTileId]?.id = Res.TILE_UNIDADES_ID_INGLES
+                case "PATRICIO": ts.tiles[currentTileId]?.id = Res.TILE_UNIDADES_ID_PATRICIO
+                case "ENFERMERIA": ts.tiles[currentTileId]?.id = Res.TILE_INVALIDADOS_ID_ENFERMERIA
+                case "CASA": ts.tiles[currentTileId]?.id = Res.TILE_INVALIDADOS_ID_CASA
+                case "INGLES": ts.tiles[currentTileId]?.id = Res.TILE_UNIDADES_ID_INGLES
                 default: break
                 }
             } else if propName == "cantidad" {
