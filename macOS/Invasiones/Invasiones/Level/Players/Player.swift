@@ -249,7 +249,7 @@ class Player {
                 }
 
                 if esVisible && unit.faction == .ARGENTINE {
-                    map.visibleTilesLayer[i][j] = Int16(Map.TILE_VISIBLE)
+                    map.visibleTilesLayer[i][j] = Map.TILE_VISIBLE
                 }
             }
         }

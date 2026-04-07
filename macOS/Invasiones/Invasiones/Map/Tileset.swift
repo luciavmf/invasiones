@@ -12,25 +12,25 @@ import Foundation
 class Tileset {
 
     // MARK: - Declarations
-    var firstGid: Int16 = 0
-    private(set) var id: Int16 = 0
-    fileprivate(set) var tileWidth: Int16 = 0
-    fileprivate(set) var tileHeight: Int16 = 0
+    var firstGid: Int = 0
+    private(set) var id: Int = 0
+    fileprivate(set) var tileWidth: Int = 0
+    fileprivate(set) var tileHeight: Int = 0
     fileprivate(set) var name: String = "" {
         didSet {
             switch name.lowercased() {
-            case "tierra":      id = Int16(Res.TLS_TIERRA)
-            case "agua":        id = Int16(Res.TLS_AGUA)
-            case "pasto":       id = Int16(Res.TLS_PASTO)
-            case "arboles":     id = Int16(Res.TLS_ARBOLES)
-            case "unidades":    id = Int16(Res.TLS_UNIDADES)
-            case "piedras":     id = Int16(Res.TLS_PIEDRAS)
-            case "texturas":    id = Int16(Res.TLS_TEXTURAS)
-            case "piedras2":    id = Int16(Res.TLS_PIEDRAS2)
-            case "enfermeria":  id = Int16(Res.TLS_ENFERMERIA)
-            case "edificios":   id = Int16(Res.TLS_EDIFICIOS)
-            case "invalidados": id = Int16(Res.TLS_INVALIDADO)
-            case "fuerte":      id = Int16(Res.TLS_FUERTE)
+            case "tierra":      id = Res.TLS_TIERRA
+            case "agua":        id = Res.TLS_AGUA
+            case "pasto":       id = Res.TLS_PASTO
+            case "arboles":     id = Res.TLS_ARBOLES
+            case "unidades":    id = Res.TLS_UNIDADES
+            case "piedras":     id = Res.TLS_PIEDRAS
+            case "texturas":    id = Res.TLS_TEXTURAS
+            case "piedras2":    id = Res.TLS_PIEDRAS2
+            case "enfermeria":  id = Res.TLS_ENFERMERIA
+            case "edificios":   id = Res.TLS_EDIFICIOS
+            case "invalidados": id = Res.TLS_INVALIDADO
+            case "fuerte":      id = Res.TLS_FUERTE
             default: break
             }
         }
@@ -38,7 +38,7 @@ class Tileset {
     fileprivate(set) var image: Surface? {
         didSet {
             if let img = image, tileWidth > 0, tileHeight > 0 {
-                let count = (img.height / Int(tileHeight)) * (img.width / Int(tileWidth))
+                let count = (img.height / tileHeight) * (img.width / tileWidth)
                 tiles = Array(repeating: nil, count: count)
             }
         }
@@ -69,11 +69,10 @@ class Tileset {
     /// Returns the (x, y, w, h) rectangle within the tileset image for the given tile.
     func getTileRect(_ tileId: Int) -> (x: Int, y: Int, w: Int, h: Int) {
         guard let img = image, tileWidth > 0, tileHeight > 0 else { return (0, 0, 0, 0) }
-        let cols = img.width / Int(tileWidth)
+        let cols = img.width / tileWidth
         let col = cols > 0 ? tileId % cols : 0
         let row = cols > 0 ? tileId / cols : 0
-        return (col * Int(tileWidth), row * Int(tileHeight),
-                Int(tileWidth), Int(tileHeight))
+        return (col * tileWidth, row * tileHeight, tileWidth, tileHeight)
     }
 
 }
@@ -99,8 +98,8 @@ private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
         switch name {
         case "tileset":
             if let n = attributes["name"] { ts.name = n }
-            if let w = attributes["tilewidth"]  { ts.tileWidth  = Int16(w) ?? 0 }
-            if let h = attributes["tileheight"] { ts.tileHeight = Int16(h) ?? 0 }
+            if let w = attributes["tilewidth"]  { ts.tileWidth  = Int(w) ?? 0 }
+            if let h = attributes["tileheight"] { ts.tileHeight = Int(h) ?? 0 }
 
         case "image":
             if let src = attributes["source"] {
@@ -129,12 +128,12 @@ private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
             let propValue = attributes["value"] ?? ""
             if propName == "id" || propName == "unidad" {
                 switch propValue {
-                case "TILES_VECINOS":    ts.tiles[currentTileId]?.id = Int16(Res.TILE_DEBUG_ID_TILES_VECINOS)
-                case "CAMINO_A_SEGUIR": ts.tiles[currentTileId]?.id = Int16(Res.TILE_DEBUG_ID_CAMINO_A_SEGUIR)
-                case "PATRICIO":        ts.tiles[currentTileId]?.id = Int16(Res.TILE_UNIDADES_ID_PATRICIO)
-                case "ENFERMERIA":      ts.tiles[currentTileId]?.id = Int16(Res.TILE_INVALIDADOS_ID_ENFERMERIA)
-                case "CASA":            ts.tiles[currentTileId]?.id = Int16(Res.TILE_INVALIDADOS_ID_CASA)
-                case "INGLES":          ts.tiles[currentTileId]?.id = Int16(Res.TILE_UNIDADES_ID_INGLES)
+                case "TILES_VECINOS":    ts.tiles[currentTileId]?.id = Res.TILE_DEBUG_ID_TILES_VECINOS
+                case "CAMINO_A_SEGUIR": ts.tiles[currentTileId]?.id = Res.TILE_DEBUG_ID_CAMINO_A_SEGUIR
+                case "PATRICIO":        ts.tiles[currentTileId]?.id = Res.TILE_UNIDADES_ID_PATRICIO
+                case "ENFERMERIA":      ts.tiles[currentTileId]?.id = Res.TILE_INVALIDADOS_ID_ENFERMERIA
+                case "CASA":            ts.tiles[currentTileId]?.id = Res.TILE_INVALIDADOS_ID_CASA
+                case "INGLES":          ts.tiles[currentTileId]?.id = Res.TILE_UNIDADES_ID_INGLES
                 default: break
                 }
             } else if propName == "cantidad" {

@@ -108,11 +108,11 @@ The codebase has been progressively Swiftified from the C# port style. Completed
 5. Column-alignment padding spaces removed throughout
 6. Argument labels added to game-logic functions (removing `_` suppression)
 7. C# XML doc comments restored as Swift `///` comments in English
+8. `Int16` → `Int` throughout (`Tile`, `Tileset`, `Map`, `PathFinder`, `Obstacle`, `Player`, `ArgentineTeam`, `EnemyTeam`)
 
 In progress / not yet done:
 - `throws` instead of `Bool` returns
 - `struct` for value types (`Tile`, etc.)
-- `Int16` → `Int` in Tileset/Map
 - Raw `Int` constants → typed Swift enums
 
 ## Conventions
