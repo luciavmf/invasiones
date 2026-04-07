@@ -6,6 +6,18 @@ As part of the course requirements, the entire codebase and documentation had to
 
 The original project was hosted in an SVN repository on Assembla, so the development history has been lost.
 
+## Screenshots
+
+| Main Menu   |
+|-------------|
+| ![Main Menu](screenshots/MainMenu.jpg) | 
+| Gameplay   |
+|![Gameplay](screenshots/Gameplay.jpg) |
+| Battle Intro |
+| ![Battle Intro](screenshots/Objectives0.png) | 
+| Objectives |
+| ![Objectives](screenshots/Objectives.jpg) |
+
 ## Gameplay
 
 The player commands Argentine units across tile-based maps during the British Invasions of the Río de la Plata (1806–1807). Each level is divided into battles, and each battle into a sequence of objectives: moving units to key positions, capturing objects, eliminating enemies, or triggering events. The enemy faction is controlled by an AI that issues its own orders per battle.
