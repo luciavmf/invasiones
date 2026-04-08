@@ -18,12 +18,7 @@ class Mouse {
     static let BUTTON_RIGHT = 1
 
     // MARK: - Singleton
-    private static var s_instance: Mouse?
-
-    static var shared: Mouse {
-        if s_instance == nil { s_instance = Mouse() }
-        return s_instance!
-    }
+    static let shared = Mouse()
 
     // MARK: - Declarations
     private var _x: CGFloat = 0
