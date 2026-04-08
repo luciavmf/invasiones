@@ -79,7 +79,7 @@ class EnemyTeam: Player {
 
     private func updateOrders() {
         guard !selectedUnits.isEmpty else { return }
-        if Mouse.shared.pressedButtons.contains(Mouse.BUTTON_LEFT) {
+        if Mouse.shared.pressedButtons.contains(Mouse.Constants.leftButton) {
             selectedUnits.forEach { $0.isSelected = false }
             clearSelection()
         }

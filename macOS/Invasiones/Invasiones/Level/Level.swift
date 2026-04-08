@@ -14,7 +14,10 @@ class Level {
 
     // MARK: - Constants
     /// The maximum number of battles a level can contain.
-    static let MAX_BATTLES = 5
+
+    enum Constants {
+        static let maxBattles = 5
+    }
 
     // MARK: - Private class
     /// Contains the ordered stack of objectives for a single battle phase.
@@ -46,7 +49,7 @@ class Level {
 
     // MARK: - Initializer
     init() {
-        battles = Array(repeating: nil, count: Level.MAX_BATTLES)
+        battles = Array(repeating: nil, count: Level.Constants.maxBattles)
         currentBattleIndex = 0
         battleCount = 0
         completedObjectiveCount = -1
@@ -57,7 +60,7 @@ class Level {
     /// Reads the level definition from nivel_{levelIndex}.xml and populates the battles array.
     /// - Parameter levelIndex: The level number to load.
     func load(_ levelIndex: Int) {
-        let pathStr = ResourcePath.LEVEL_PATH + "/nivel_\(levelIndex).xml"
+        let pathStr = ResourcePath.levelPath + "/nivel_\(levelIndex).xml"
         guard let path = Utils.getPath(pathStr) else {
             Log.shared.debug("No se pueden load los objetivos. No se encuentra el archivo: \(pathStr)")
             return

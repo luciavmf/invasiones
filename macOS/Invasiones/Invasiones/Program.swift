@@ -11,18 +11,18 @@
 import Foundation
 
 enum ResourcePath {
-    static let DATA_PATH = "data"
-    static let SCENARIOS_PATH = "escenarios"
-    static let LEVEL_PATH = "nivel"
-    static let ICON_PATH = "imagenes/icono.png"
+    static let dataPath = "data"
+    static let scenatiosPath = "escenarios"
+    static let levelPath = "nivel"
+    static let iconPath = "imagenes/icono.png"
 
-    static let STRINGS_XML_FILE = "strings.xml"
-    static let RESOURCES_XML_FILE = "res.xml"
+    static let stringsPath = "strings.xml"
+    static let resourcesPath = "res.xml"
 }
 
 enum ScreenSize {
-    static let SCREEN_WIDTH: Int = 1024
-    static let SCREEN_HEIGHT: Int = 768
+    static let width: Int = 1024
+    static let height: Int = 768
 }
 
 enum Program {

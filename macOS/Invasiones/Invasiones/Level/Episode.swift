@@ -398,7 +398,7 @@ class Episode {
     private func drawPlayingState(_ g: Video) {
         g.fillRect(GameColor.black)
 
-        if let map = map { map.drawLayer(g: g, layer: map.TERRAIN_LAYER) }
+        if let map = map { map.drawLayer(g: g, layer: map.layers.terrain) }
 
         dibujarObjetos(g)
 
@@ -551,38 +551,38 @@ class Episode {
     private func checkCheats() {
         let teclas = Keyboard.shared.pressedKeys
 
-        if teclas.contains(Keyboard.KEY_G) && cheatGanarIndice == 0 {
+        if teclas.contains(Keyboard.Key.g.rawValue) && cheatGanarIndice == 0 {
             cheatGanarIndice += 1
-        } else if teclas.contains(Keyboard.KEY_A) && cheatGanarIndice == 1 {
+        } else if teclas.contains(Keyboard.Key.a.rawValue) && cheatGanarIndice == 1 {
             cheatGanarIndice += 1
-        } else if teclas.contains(Keyboard.KEY_N) && cheatGanarIndice == 2 {
+        } else if teclas.contains(Keyboard.Key.n.rawValue) && cheatGanarIndice == 2 {
             cheatGanarIndice += 1
-        } else if teclas.contains(Keyboard.KEY_X) && cheatGanarIndice == 3 {
+        } else if teclas.contains(Keyboard.Key.x.rawValue) && cheatGanarIndice == 3 {
             cheatGanarIndice += 1
-        } else if teclas.contains(Keyboard.KEY_W) && cheatGanarIndice == 4 {
+        } else if teclas.contains(Keyboard.Key.w.rawValue) && cheatGanarIndice == 4 {
             setState(.won); cheatGanarIndice = 0
-        } else if teclas.contains(Keyboard.KEY_P) && cheatPerderIndice == 0 {
+        } else if teclas.contains(Keyboard.Key.p.rawValue) && cheatPerderIndice == 0 {
             cheatPerderIndice += 1
-        } else if teclas.contains(Keyboard.KEY_E) && cheatPerderIndice == 1 {
+        } else if teclas.contains(Keyboard.Key.e.rawValue) && cheatPerderIndice == 1 {
             cheatPerderIndice += 1
-        } else if teclas.contains(Keyboard.KEY_R) && cheatPerderIndice == 2 {
+        } else if teclas.contains(Keyboard.Key.r.rawValue) && cheatPerderIndice == 2 {
             cheatPerderIndice += 1
-        } else if teclas.contains(Keyboard.KEY_X) && cheatPerderIndice == 3 {
+        } else if teclas.contains(Keyboard.Key.x.rawValue) && cheatPerderIndice == 3 {
             cheatPerderIndice += 1
-        } else if teclas.contains(Keyboard.KEY_W) && cheatPerderIndice == 4 {
+        } else if teclas.contains(Keyboard.Key.w.rawValue) && cheatPerderIndice == 4 {
             setState(.lost); cheatPerderIndice = 0
-        } else if teclas.contains(Keyboard.KEY_O) && cheatObjetivoIndice == 0 {
+        } else if teclas.contains(Keyboard.Key.o.rawValue) && cheatObjetivoIndice == 0 {
             cheatObjetivoIndice += 1
-        } else if teclas.contains(Keyboard.KEY_B) && cheatObjetivoIndice == 1 {
+        } else if teclas.contains(Keyboard.Key.b.rawValue) && cheatObjetivoIndice == 1 {
             cheatObjetivoIndice += 1
-        } else if teclas.contains(Keyboard.KEY_J) && cheatObjetivoIndice == 2 {
+        } else if teclas.contains(Keyboard.Key.j.rawValue) && cheatObjetivoIndice == 2 {
             cheatObjetivoIndice += 1
-        } else if teclas.contains(Keyboard.KEY_X) && cheatObjetivoIndice == 3 {
+        } else if teclas.contains(Keyboard.Key.x.rawValue) && cheatObjetivoIndice == 3 {
             cheatObjetivoIndice += 1
-        } else if teclas.contains(Keyboard.KEY_W) && cheatObjetivoIndice == 4 {
+        } else if teclas.contains(Keyboard.Key.w.rawValue) && cheatObjetivoIndice == 4 {
             setNewObjective(); cheatObjetivoIndice = 0
         } else if !teclas.isEmpty {
-            if teclas.contains(Keyboard.KEY_U) { player?.selectNextUnit() }
+            if teclas.contains(Keyboard.Key.u.rawValue) { player?.selectNextUnit() }
             Log.shared.debug("Reseteo todos los cheats--")
             cheatObjetivoIndice = 0
             cheatGanarIndice = 0

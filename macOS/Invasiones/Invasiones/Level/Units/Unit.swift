@@ -15,23 +15,24 @@ import Foundation
 class Unit: MapObject {
 
     // MARK: - Constants
-    /// Maximum tile radius a unit can see other units.
-    static let MAX_VISIBILITY = 15
-    /// Tile radius within which collision checks are performed.
-    static let COLLISION_CHECK_DISTANCE = 4
-
-    /// Minimum number of tiles away a patrol destination can be from the base position.
-    private let PATROL_RANDOM_MIN = 8
-    /// Maximum number of tiles away a patrol destination can be from the base position.
-    private let PATROL_RANDOM_MAX = 16
-    /// Minimum tile distance to the objective for a MOVE order to be considered fulfilled.
-    private let CANTIDAD_MINIMA_TILES_ORD_MOVER = 3
-    /// Width of the selection/health bar drawn above the unit when selected.
-    private let SELECCION_ANCHO = 20
-    /// Vertical offset of the selection bar relative to the unit's screen y coordinate.
-    private let SELECCION_Y = -3
-    /// Number of ticks the unit's corpse remains visible on screen before disappearing.
-    private let CUENTA_FRAME_MUERTO = 150
+    enum Constants {
+        /// Maximum tile radius a unit can see other units.
+        static let maxVisibility = 15
+        /// Tile radius within which collision checks are performed.
+        static let collisionCheckDistance = 4
+        /// Minimum number of tiles away a patrol destination can be from the base position.
+        static let patrolRandomMin = 8
+        /// Maximum number of tiles away a patrol destination can be from the base position.
+        static let patrolRandomMax = 16
+        /// Minimum tile distance to the objective for a MOVE order to be considered fulfilled.
+        static let minTilesToCompleteMove = 3
+        /// Width of the selection/health bar drawn above the unit when selected.
+        static let selectionBarWidth = 20
+        /// Vertical offset of the selection bar relative to the unit's screen y coordinate.
+        static let selectionBarY = -3
+        /// Number of ticks the unit's corpse remains visible on screen before disappearing.
+        static let deathFrameCount = 150
+    }
 
     // MARK: - Enums
     /// States in which a unit can exist.
@@ -199,15 +200,15 @@ class Unit: MapObject {
         // Selection (health bar) is drawn here
         if isSelected {
             let healthFraction = Double(health) / Double(max(resistancePoints, 1))
-            let barAncho = Int(Double(SELECCION_ANCHO) * healthFraction)
+            let barAncho = Int(Double(Constants.selectionBarWidth) * healthFraction)
             g.setColor(GameColor.green)
-            g.fillRect(x - SELECCION_ANCHO / 2,
-                               y + SELECCION_Y,
+            g.fillRect(x - Constants.selectionBarWidth / 2,
+                               y + Constants.selectionBarY,
                                barAncho, 3)
             g.setColor(GameColor.red)
-            g.fillRect(x - SELECCION_ANCHO / 2 + barAncho,
-                               y + SELECCION_Y,
-                               SELECCION_ANCHO - barAncho, 3)
+            g.fillRect(x - Constants.selectionBarWidth / 2 + barAncho,
+                               y + Constants.selectionBarY,
+                               Constants.selectionBarWidth - barAncho, 3)
         }
         sprite?.draw(g: g, x: x - (sprite?.frameAncho ?? 0) / 2,
                      y: y - (sprite?.frameAlto ?? 0))
@@ -312,7 +313,7 @@ class Unit: MapObject {
     func completedMoveObjective() -> Bool {
         guard let ord = objectiveCommand else { return false }
         let dist = calculateDistance(toI: ord.point.x, toJ: ord.point.y)
-        return dist <= Double(CANTIDAD_MINIMA_TILES_ORD_MOVER)
+        return dist <= Double(Constants.minTilesToCompleteMove)
     }
 
     // MARK: - Group / formation
@@ -695,15 +696,15 @@ class Unit: MapObject {
 
     private func findRandomPatrolPath(i: Int, j: Int) -> [(i: Int, j: Int)]? {
         guard let map = MapObject.map else { return nil }
-        let range = PATROL_RANDOM_MAX - PATROL_RANDOM_MIN
+        let range = Constants.patrolRandomMax - Constants.patrolRandomMin
         // Mirror original C#: loop until a valid path is found.
         // Use the stored patrol base position as the destination origin (not current pos).
         var path: [(i: Int, j: Int)]? = nil
         var intentos = 0
         while path == nil && intentos < 20 {
             intentos += 1
-            let offI = Int.random(in: 0..<range) + PATROL_RANDOM_MIN
-            let offJ = Int.random(in: 0..<range) + PATROL_RANDOM_MIN
+            let offI = Int.random(in: 0..<range) + Constants.patrolRandomMin
+            let offJ = Int.random(in: 0..<range) + Constants.patrolRandomMin
             let signoI = Bool.random() ? 1 : -1
             let signoJ = Bool.random() ? 1 : -1
             let destI = patrolPosition.x + signoI * offI
@@ -829,7 +830,7 @@ class Unit: MapObject {
         }
 
         count += 1
-        if count >= CUENTA_FRAME_MUERTO {
+        if count >= Constants.deathFrameCount {
             setState(.dead)
         }
     }

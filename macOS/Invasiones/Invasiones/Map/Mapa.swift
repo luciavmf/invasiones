@@ -13,16 +13,21 @@ import Foundation
 class Map {
 
     // MARK: - Constants
-    private let MAX_LAYERS_COUNT = 8
-    private let INFO_LAYER = 8
+    enum Constants {
+        static let maxLayersCount = 8
+        static let infoLayer = 8
+        static let visibleTile: Int = 1
+    }
 
     // MARK: - Layer indices (read from XML)
-    private(set) var TERRAIN_LAYER: Int = 0
-    private var OBSTACLES_LAYER: Int = 0
-    private var PLAYER_UNITS_LAYER: Int = 0
-    private var INVALIDATED_POSITIONS_LAYER: Int = 0
+    struct LayerIndices {
+        var terrain: Int = 0
+        var obstacles: Int = 0
+        var playerUnits: Int = 0
+        var invalidatedPositions: Int = 0
+    }
 
-    static let TILE_VISIBLE: Int = 1
+    private(set) var layers = LayerIndices()
 
     // MARK: - Datos del mapa
     private var mapData: [[[Int]]] = []           // [layer][col][row]
@@ -64,20 +69,20 @@ class Map {
     var physicalMapWidth: Int { physicalWidth }
 
     var unitsLayer: [[Int]] {
-        guard PLAYER_UNITS_LAYER < mapData.count else { return [] }
-        return mapData[PLAYER_UNITS_LAYER]
+        guard layers.playerUnits < mapData.count else { return [] }
+        return mapData[layers.playerUnits]
     }
     var obstaclesLayer: [[Int]] {
-        guard OBSTACLES_LAYER < mapData.count else { return [] }
-        return mapData[OBSTACLES_LAYER]
+        guard layers.obstacles < mapData.count else { return [] }
+        return mapData[layers.obstacles]
     }
     var buildingsLayer: [[Int]] {
-        guard INVALIDATED_POSITIONS_LAYER < mapData.count else { return [] }
-        return mapData[INVALIDATED_POSITIONS_LAYER]
+        guard layers.invalidatedPositions < mapData.count else { return [] }
+        return mapData[layers.invalidatedPositions]
     }
     var terrainLayer: [[Int]] {
-        guard TERRAIN_LAYER < mapData.count else { return [] }
-        return mapData[TERRAIN_LAYER]
+        guard layers.terrain < mapData.count else { return [] }
+        return mapData[layers.terrain]
     }
 
     // MARK: - Initializer
@@ -430,8 +435,7 @@ class Map {
             Map.tilesetDebug = ts
         }
 
-        // Expand the map to the INFO layer (INFO_LAYER = 8)
-        while mapData.count <= INFO_LAYER {
+        while mapData.count <= Constants.infoLayer {
             mapData.append(Array(repeating: Array(repeating: 0, count: height),
                                 count: width))
         }
@@ -448,7 +452,7 @@ class Map {
                     if let ts = getTileset(mapData[layer][i][j]),
                        ts.id != Res.TLS_UNIDADES {
                         let tsId = ts.id
-                        mapData[INFO_LAYER][i][j] = tsId
+                        mapData[Constants.infoLayer][i][j] = tsId
                         let ci = i * 2, cj = j * 2
                         if ci + 1 < physicalTilesLayer.count && cj + 1 < physicalTilesLayer[ci].count {
                             physicalTilesLayer[ci][cj]     = tsId
@@ -468,16 +472,16 @@ class Map {
     fileprivate func addLayerName(name: String, index: Int) {
         layerNames[name] = index
         switch name.trimmingCharacters(in: .whitespaces).lowercased() {
-        case "obstaculos": OBSTACLES_LAYER = index
-        case "terreno": TERRAIN_LAYER    = index
-        case "unidades": PLAYER_UNITS_LAYER = index
-        case "posicion invalidada": INVALIDATED_POSITIONS_LAYER = index
+        case "obstaculos": layers.obstacles = index
+        case "terreno": layers.terrain = index
+        case "unidades": layers.playerUnits = index
+        case "posicion invalidada": layers.invalidatedPositions = index
         default: break
         }
     }
 
     fileprivate func addLayer(_ layerData: [[Int]]) {
-        guard maxLayers < MAX_LAYERS_COUNT else { return }
+        guard maxLayers < Constants.maxLayersCount else { return }
         while mapData.count <= maxLayers {
             mapData.append(Array(repeating: Array(repeating: 0, count: height),
                                 count: width))
@@ -546,7 +550,7 @@ private class TilesetRefDelegate: NSObject, XMLParserDelegate {
         guard name == "tileset", let src = a["source"] else { return }
         let gid = Int(a["firstgid"] ?? "0") ?? 0
         let candidate1 = (base as NSString).appendingPathComponent(src)
-        let candidate2 = (ResourcePath.SCENARIOS_PATH as NSString).appendingPathComponent(src)
+        let candidate2 = (ResourcePath.scenatiosPath as NSString).appendingPathComponent(src)
         if let p = Utils.getPath(candidate1)
                 ?? Utils.getPath(candidate2)
                 ?? Utils.getPath(src) {

@@ -29,7 +29,7 @@ class IA {
 
     // MARK: - Initializer
     init() {
-        battles = Array(repeating: Batalla(), count: Level.MAX_BATTLES)
+        battles = Array(repeating: Batalla(), count: Level.Constants.maxBattles)
     }
 
     // MARK: - Loading
@@ -40,7 +40,7 @@ class IA {
     ///   - y: The tile row where the group is placed.
     ///   - levelIndex: The level number, used to locate the script file.
     func load(x: Int, y: Int, levelIndex: Int) {
-        let pathStr = ResourcePath.LEVEL_PATH + "/orden_nv\(levelIndex)_\(x)_\(y).xml"
+        let pathStr = ResourcePath.levelPath + "/orden_nv\(levelIndex)_\(x)_\(y).xml"
         guard let path = Utils.getPath(pathStr) else {
             Log.shared.debug("IA: No se encuentra el archivo: \(pathStr)")
             return

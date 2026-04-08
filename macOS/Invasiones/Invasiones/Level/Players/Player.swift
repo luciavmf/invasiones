@@ -227,10 +227,10 @@ class Player {
     /// - Returns: A list of visible units, or `nil` if none are found.
     func getVisibleUnitsAndTiles(_ unit: Unit) -> [Unit]? {
         var visible: [Unit]? = nil
-        let iStart = max(0, unit.physicalTilePos.x - Unit.MAX_VISIBILITY)
-        let jStart = max(0, unit.physicalTilePos.y - Unit.MAX_VISIBILITY)
-        let iFin = min(map.physicalMapHeight, unit.physicalTilePos.x + Unit.MAX_VISIBILITY)
-        let jFin = min(map.physicalMapWidth, unit.physicalTilePos.y + Unit.MAX_VISIBILITY)
+        let iStart = max(0, unit.physicalTilePos.x - Unit.Constants.maxVisibility)
+        let jStart = max(0, unit.physicalTilePos.y - Unit.Constants.maxVisibility)
+        let iFin = min(map.physicalMapHeight, unit.physicalTilePos.x + Unit.Constants.maxVisibility)
+        let jFin = min(map.physicalMapWidth, unit.physicalTilePos.y + Unit.Constants.maxVisibility)
         let esVisible = unit.isOnScreen()
 
         for i in iStart..<iFin {
@@ -245,7 +245,7 @@ class Player {
                 }
 
                 if esVisible && unit.faction == .argentine {
-                    map.visibleTilesLayer[i][j] = Map.TILE_VISIBLE
+                    map.visibleTilesLayer[i][j] = Map.Constants.visibleTile
                 }
             }
         }
@@ -254,7 +254,7 @@ class Player {
 
     private func getUnitsToCollide(_ unit: Unit) -> [Unit]? {
         var nearby: [Unit]? = nil
-        let range = Unit.COLLISION_CHECK_DISTANCE
+        let range = Unit.Constants.collisionCheckDistance
         let iStart = max(0, unit.physicalTilePos.x - range)
         let jStart = max(0, unit.physicalTilePos.y - range)
         let iFin = min(map.physicalMapHeight, unit.physicalTilePos.x + range)

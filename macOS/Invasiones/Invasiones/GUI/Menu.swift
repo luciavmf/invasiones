@@ -83,7 +83,7 @@ class Menu: GUIBox {
                 let my = Int(Mouse.shared.Y)
                 if mx > posX && mx < posX + buttonWidth && my > y && my < y + buttonHeight {
                     items[i] |= (Constants.itemHover << 8)
-                    if Mouse.shared.pressedButtons.contains(Mouse.BUTTON_LEFT) {
+                    if Mouse.shared.pressedButtons.contains(Mouse.Constants.leftButton) {
                         items[i] |= (Constants.itemSelected << 8)
                         itemSeleccionado = i
                     }

@@ -13,9 +13,11 @@ import AppKit
 class Mouse {
 
     // MARK: - Button constants (equivalent to SDL_BUTTON_*)
-    static let BUTTON_LEFT = 0
-    static let BUTTON_MIDDLE = 2
-    static let BUTTON_RIGHT = 1
+    enum Constants {
+        static let leftButton = 0
+        static let middleButton = 2
+        static let rightButton = 1
+    }
 
     // MARK: - Singleton
     static let shared = Mouse()
@@ -41,12 +43,12 @@ class Mouse {
     // MARK: - Properties
     var X: CGFloat {
         get { _x }
-        set { _x = max(0, min(newValue, CGFloat(ScreenSize.SCREEN_WIDTH))) }
+        set { _x = max(0, min(newValue, CGFloat(ScreenSize.width))) }
     }
 
     var Y: CGFloat {
         get { _y }
-        set { _y = max(0, min(newValue, CGFloat(ScreenSize.SCREEN_HEIGHT))) }
+        set { _y = max(0, min(newValue, CGFloat(ScreenSize.height))) }
     }
 
     var dragRect: CGRect { dragRectStore }
@@ -64,7 +66,7 @@ class Mouse {
 
     /// Updates the drag state. Call once per frame from GameFrame.update().
     func update() {
-        if pressedButtons.contains(Mouse.BUTTON_LEFT) {
+        if pressedButtons.contains(Constants.leftButton) {
             finishedDragging = false
             if !dragging {
                 // New drag starts: reset rectangle and record the anchor point.
@@ -105,8 +107,8 @@ class Mouse {
     }
 
     func positionCursor(x: CGFloat, y: CGFloat) {
-        _x = max(0, min(x, CGFloat(ScreenSize.SCREEN_WIDTH)))
-        _y = max(0, min(y, CGFloat(ScreenSize.SCREEN_HEIGHT)))
+        _x = max(0, min(x, CGFloat(ScreenSize.width)))
+        _y = max(0, min(y, CGFloat(ScreenSize.height)))
     }
 
     /// Draws the custom cursor at the current position using the Video context.
