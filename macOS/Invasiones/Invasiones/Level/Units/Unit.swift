@@ -200,18 +200,18 @@ class Unit: MapObject {
         // Selection (health bar) is drawn here
         if isSelected {
             let healthFraction = Double(health) / Double(max(resistancePoints, 1))
-            let barAncho = Int(Double(Constants.selectionBarWidth) * healthFraction)
+            let barWidth = Int(Double(Constants.selectionBarWidth) * healthFraction)
             g.setColor(GameColor.green)
             g.fillRect(x - Constants.selectionBarWidth / 2,
                                y + Constants.selectionBarY,
-                               barAncho, 3)
+                               barWidth, 3)
             g.setColor(GameColor.red)
-            g.fillRect(x - Constants.selectionBarWidth / 2 + barAncho,
+            g.fillRect(x - Constants.selectionBarWidth / 2 + barWidth,
                                y + Constants.selectionBarY,
-                               Constants.selectionBarWidth - barAncho, 3)
+                               Constants.selectionBarWidth - barWidth, 3)
         }
-        sprite?.draw(g: g, x: x - (sprite?.frameAncho ?? 0) / 2,
-                     y: y - (sprite?.frameAlto ?? 0))
+        sprite?.draw(g: g, x: x - (sprite?.frameWidth ?? 0) / 2,
+                     y: y - (sprite?.frameHeight ?? 0))
     }
 
     // MARK: - Public orders
@@ -449,8 +449,8 @@ class Unit: MapObject {
     func isUnderMouse() -> Bool {
         let mx = Int(Mouse.shared.X)
         let my = Int(Mouse.shared.Y)
-        let fw = sprite?.frameAncho ?? (frameWidth > 0 ? frameWidth : 20)
-        let fh = sprite?.frameAlto  ?? (frameHeight  > 0 ? frameHeight  : 30)
+        let fw = sprite?.frameWidth ?? (frameWidth > 0 ? frameWidth : 20)
+        let fh = sprite?.frameHeight  ?? (frameHeight  > 0 ? frameHeight  : 30)
         let hw = fw / 2
         return mx >= x - hw && mx <= x + hw && my >= y - fh && my <= y
     }
@@ -490,8 +490,8 @@ class Unit: MapObject {
     /// Selects the unit if its sprite overlaps the drag-selection rectangle.
     /// - Returns: `true` if the unit was selected.
     func selectIfInRect(x: Int, y: Int, w: Int, h: Int) -> Bool {
-        let fw = sprite?.frameAncho ?? (frameWidth > 0 ? frameWidth : 20)
-        let fh = sprite?.frameAlto  ?? (frameHeight  > 0 ? frameHeight  : 30)
+        let fw = sprite?.frameWidth ?? (frameWidth > 0 ? frameWidth : 20)
+        let fh = sprite?.frameHeight  ?? (frameHeight  > 0 ? frameHeight  : 30)
         // In Swift, x = sprite horizontal center, y = sprite bottom.
         // Sprite bounds: left = x-fw/2, right = x+fw/2, top = y-fh, bottom = y.
         // Matches the original C# check (translated from top-left convention to center/bottom).
@@ -700,15 +700,15 @@ class Unit: MapObject {
         // Mirror original C#: loop until a valid path is found.
         // Use the stored patrol base position as the destination origin (not current pos).
         var path: [(i: Int, j: Int)]? = nil
-        var intentos = 0
-        while path == nil && intentos < 20 {
-            intentos += 1
+        var attempts = 0
+        while path == nil && attempts < 20 {
+            attempts += 1
             let offI = Int.random(in: 0..<range) + Constants.patrolRandomMin
             let offJ = Int.random(in: 0..<range) + Constants.patrolRandomMin
-            let signoI = Bool.random() ? 1 : -1
-            let signoJ = Bool.random() ? 1 : -1
-            let destI = patrolPosition.x + signoI * offI
-            let destJ = patrolPosition.y + signoJ * offJ
+            let signI = Bool.random() ? 1 : -1
+            let signJ = Bool.random() ? 1 : -1
+            let destI = patrolPosition.x + signI * offI
+            let destJ = patrolPosition.y + signJ * offJ
             guard map.isWalkable(x: destI, y: destJ) else { continue }
             path = PathFinder.shared.findShortestPath(startI: i, startJ: j, targetI: destI, targetJ: destJ)
         }

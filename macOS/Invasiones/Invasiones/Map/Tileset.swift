@@ -106,7 +106,7 @@ private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
                 let fullPath = Utils.getPath(
                     (basePath as NSString).appendingPathComponent(src))
                     ?? Utils.getPath(
-                        (ResourcePath.scenatiosPath as NSString).appendingPathComponent(src))
+                        (ResourcePath.scenariosPath as NSString).appendingPathComponent(src))
                 if let path = fullPath {
                     ts.image = ResourceManager.shared.getImage(path)
                 } else {

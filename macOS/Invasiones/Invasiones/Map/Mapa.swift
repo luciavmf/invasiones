@@ -164,14 +164,14 @@ class Map {
     // MARK: - Tile Chico (fog-of-war)
 
     /// Draws a small tile (physical map) at the corresponding isometric position.
-    /// If `semiTransparente` is true, draws the semi-transparent grey tile (fog-of-war).
-    func drawSmallTile(g: Video, i: Int, j: Int, semiTransparente: Bool) {
+    /// If `semiTransparent` is true, draws the semi-transparent grey tile (fog-of-war).
+    func drawSmallTile(g: Video, i: Int, j: Int, semiTransparent: Bool) {
         guard i >= 0, j >= 0, i < physicalHeight, j < physicalWidth else { return }
 
         let posX = camera.startX + (((i - j) * tileWidth / 2) >> 1) + camera.X + tileWidth / 4
         let posY = camera.startY + (((i + j) * tileHeight  / 2) >> 1) + camera.Y
 
-        if semiTransparente {
+        if semiTransparent {
             if greyTileImage == nil {
                 greyTileImage = ResourceManager.shared.getImage(Res.IMG_TILE_GRIS)
             }
@@ -550,7 +550,7 @@ private class TilesetRefDelegate: NSObject, XMLParserDelegate {
         guard name == "tileset", let src = a["source"] else { return }
         let gid = Int(a["firstgid"] ?? "0") ?? 0
         let candidate1 = (base as NSString).appendingPathComponent(src)
-        let candidate2 = (ResourcePath.scenatiosPath as NSString).appendingPathComponent(src)
+        let candidate2 = (ResourcePath.scenariosPath as NSString).appendingPathComponent(src)
         if let p = Utils.getPath(candidate1)
                 ?? Utils.getPath(candidate2)
                 ?? Utils.getPath(src) {

@@ -32,8 +32,8 @@ class Sprite {
         set { currentAnim?.loop = newValue }
     }
 
-    var frameAncho: Int { currentAnim?.frameWidth ?? 0 }
-    var frameAlto: Int { currentAnim?.frameHeight ?? 0 }
+    var frameWidth: Int { currentAnim?.frameWidth ?? 0 }
+    var frameHeight: Int { currentAnim?.frameHeight ?? 0 }
     var frameCount: Int { currentAnim?.frameCount ?? 0 }
     var image: Surface? { currentAnim?.image }
     var offsets: (x: Int, y: Int) { currentAnim?.offsets ?? (0, 0) }

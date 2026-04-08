@@ -15,13 +15,13 @@ class IA {
 
     // MARK: - Private class
     /// Contains the ordered stack of commands for a single battle phase.
-    private class Batalla {
+    private class Battle {
         var commands: [Command] = []  // LIFO via popLast
     }
 
     // MARK: - Declarations
     /// All battles this AI has scripted orders for.
-    private var battles: [Batalla]
+    private var battles: [Battle]
     /// The total number of battles loaded.
     private var battleCount: Int = 0
     /// The index of the battle whose commands are currently being issued.
@@ -29,7 +29,7 @@ class IA {
 
     // MARK: - Initializer
     init() {
-        battles = Array(repeating: Batalla(), count: Level.Constants.maxBattles)
+        battles = Array(repeating: Battle(), count: Level.Constants.maxBattles)
     }
 
     // MARK: - Loading

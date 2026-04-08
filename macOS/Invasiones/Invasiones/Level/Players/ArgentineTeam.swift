@@ -58,7 +58,7 @@ class ArgentineTeam: Player {
                                i: 0, j: 0)
         count = 99999
 
-        guard let tilesetUnidades = map.tilesets.compactMap({ $0 }).first(where: {
+        guard let unitsTileset = map.tilesets.compactMap({ $0 }).first(where: {
             $0.id == Res.TLS_UNIDADES
         }) else { return }
 
@@ -69,9 +69,9 @@ class ArgentineTeam: Player {
                 let tileId = map.unitsLayer[i][j]
                 guard tileId != 0 else { continue }
 
-                let localId = tileId - tilesetUnidades.firstGid
-                guard localId >= 0, localId < tilesetUnidades.tiles.count,
-                      let tile = tilesetUnidades.tiles[localId],
+                let localId = tileId - unitsTileset.firstGid
+                guard localId >= 0, localId < unitsTileset.tiles.count,
+                      let tile = unitsTileset.tiles[localId],
                       tile.id == Res.TILE_UNIDADES_ID_PATRICIO else { continue }
 
                 let list = placeUnits(type: Res.UNIDAD_PATRICIO, count: tile.count, x: i << 1, y: j << 1)

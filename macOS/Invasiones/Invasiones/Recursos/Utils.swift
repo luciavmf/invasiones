@@ -22,30 +22,30 @@ enum Utils {
         }
 
         // Normalize Windows → Unix separators
-        let normalizado = name.replacingOccurrences(of: "\\", with: "/")
+        let normalized = name.replacingOccurrences(of: "\\", with: "/")
 
         // If it's already an absolute path that exists, return it directly.
-        if normalizado.hasPrefix("/") {
-            if FileManager.default.fileExists(atPath: normalizado) { return normalizado }
-            Log.shared.warn("ObtenerPath: no existe el archivo \"\(normalizado)\"")
+        if normalized.hasPrefix("/") {
+            if FileManager.default.fileExists(atPath: normalized) { return normalized }
+            Log.shared.warn("ObtenerPath: no existe el archivo \"\(normalized)\"")
             return nil
         }
 
         // Search in the bundle's resourcePath (the most reliable approach with folder references)
         if let resourcePath = Bundle.main.resourcePath {
             // 1. Directly under the bundle
-            let fullPath = (resourcePath as NSString).appendingPathComponent(normalizado)
+            let fullPath = (resourcePath as NSString).appendingPathComponent(normalized)
             if FileManager.default.fileExists(atPath: fullPath) {
                 return fullPath
             }
             // 2. Under data/
-            let fullPathData = (resourcePath as NSString).appendingPathComponent("data/" + normalizado)
+            let fullPathData = (resourcePath as NSString).appendingPathComponent("data/" + normalized)
             if FileManager.default.fileExists(atPath: fullPathData) {
                 return fullPathData
             }
         }
 
-        Log.shared.warn("ObtenerPath: no existe el archivo \"\(normalizado)\"")
+        Log.shared.warn("ObtenerPath: no existe el archivo \"\(normalized)\"")
         return nil
     }
 
