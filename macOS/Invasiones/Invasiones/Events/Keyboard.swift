@@ -12,30 +12,18 @@ import AppKit
 
 class Keyboard {
 
-    // MARK: - Key constants (Carbon virtual key codes on macOS)
-    static let KEY_REPEAT_INTERVAL = 15
-
-    static let KEY_UP = 126   // kVK_UpArrow
-    static let KEY_DOWN = 125   // kVK_DownArrow
-    static let KEY_LEFT = 123   // kVK_LeftArrow
-    static let KEY_RIGHT = 124   // kVK_RightArrow
-
-    static let KEY_A = 0;  static let KEY_B = 11; static let KEY_C = 8
-    static let KEY_D = 2;  static let KEY_E = 14; static let KEY_F = 3
-    static let KEY_G = 5;  static let KEY_H = 4;  static let KEY_I = 34
-    static let KEY_J = 38; static let KEY_K = 40; static let KEY_L = 37
-    static let KEY_M = 46; static let KEY_N = 45; static let KEY_O = 31
-    static let KEY_P = 35; static let KEY_Q = 12; static let KEY_R = 15
-    static let KEY_S = 1;  static let KEY_T = 17; static let KEY_U = 32
-    static let KEY_V = 9;  static let KEY_W = 13; static let KEY_X = 7
-    static let KEY_Y = 16; static let KEY_Z = 6
-
-    static let KEY_RSHIFT = 60   // kVK_RightShift
-    static let KEY_LSHIFT = 56   // kVK_Shift
-    static let KEY_CAPSLOCK = 57   // kVK_CapsLock
-    static let KEY_BACKSPACE = 51   // kVK_Delete
-    static let KEY_ENTER = 36   // kVK_Return
-    static let KEY_ESC = 53   // kVK_Escape
+    // MARK: - Key codes (Carbon virtual key codes on macOS)
+    enum Key: Int {
+        case a = 0,  s = 1,  d = 2,  f = 3,  h = 4,  g = 5,  z = 6,  x = 7
+        case c = 8,  v = 9,  b = 11, q = 12, w = 13, e = 14, r = 15, y = 16
+        case t = 17, u = 32, i = 34, o = 31, p = 35, l = 37, j = 38, k = 40
+        case n = 45, m = 46
+        case enter = 36
+        case backspace = 51
+        case escape = 53
+        case lShift = 56, capsLock = 57, rShift = 60
+        case left = 123, right = 124, down = 125, up = 126
+    }
 
     // MARK: - Singleton
     static let shared = Keyboard()

@@ -14,11 +14,6 @@ import Foundation
 /// The group coordinates movement using a spiral formation algorithm and delegates attack/heal orders to individual units.
 class Group {
 
-    // MARK: - Constants
-    /// The spacing between units in the formation, in physical tiles.
-    static let UNIT_SPACING = 2
-    /// Sentinel value representing an impossibly large distance.
-    static let MAX_DISTANCE = 99999
     private static var s_random: Bool = true  // initialized once
 
     enum State {

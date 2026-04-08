@@ -24,7 +24,7 @@ class ArgentineTeam: Player {
     private var arrowPos: (x: Int, y: Int) = (0, 0)
     private var unitToFindIdx: Int = 0
 
-    private let ARROW_MAX_COUNT = 100
+    private let arrowMaxCount = 100
 
     // MARK: - Initializer
     override init(map: Map, camera: Camera, objectsToDraw: ObjectTable, hud: Hud) {
@@ -96,7 +96,7 @@ class ArgentineTeam: Player {
         fireEffects?.forEach { $0.draw(g) }
 
         // Draw static destination arrow if there's a recent order
-        if count < ARROW_MAX_COUNT {
+        if count < arrowMaxCount {
             arrowObj?.draw(g)
         }
 
@@ -208,26 +208,26 @@ class ArgentineTeam: Player {
         else if degrees >= half + factor * 5 && degrees < half + factor * 6 { dir = .south     }
         else                                                                 { dir = .southEast }
 
-        let OFFSET = -20
+        let offset = -20
         let fw = flecha.frameWidth
         let fh = flecha.frameHeight
 
         if commandTargetPos.x > camera.startX &&
-           commandTargetPos.x < camera.width - fw + OFFSET {
+           commandTargetPos.x < camera.width - fw + offset {
             arrowPos.x = commandTargetPos.x
         } else if commandTargetPos.x <= camera.startX {
-            arrowPos.x = -OFFSET
+            arrowPos.x = -offset
         } else {
-            arrowPos.x = camera.width - fw + OFFSET
+            arrowPos.x = camera.width - fw + offset
         }
 
         if commandTargetPos.y > camera.startY &&
-           commandTargetPos.y < camera.height - fh + OFFSET {
+           commandTargetPos.y < camera.height - fh + offset {
             arrowPos.y = commandTargetPos.y
         } else if commandTargetPos.y <= camera.startY {
-            arrowPos.y = -OFFSET
+            arrowPos.y = -offset
         } else {
-            arrowPos.y = camera.height - fh + OFFSET
+            arrowPos.y = camera.height - fh + offset
         }
 
         flecha.setAnimation(anim: dir.rawValue)
@@ -271,7 +271,7 @@ class ArgentineTeam: Player {
 
     private func checkUnitOrders() {
         // Left click on an Argentine unit: select it
-        if Mouse.shared.pressedButtons.contains(Mouse.BUTTON_LEFT) {
+        if Mouse.shared.pressedButtons.contains(Mouse.Constants.leftButton) {
             if let unitUnderMouse = unitUnderMouse, unitUnderMouse.faction == .argentine {
                 let up = Mouse.shared.dragRect
                 let isDragging = Mouse.shared.isDragging()
@@ -286,7 +286,7 @@ class ArgentineTeam: Player {
                         unitUnderMouse.myGroup?.removeUnit(unitUnderMouse)
                         unitUnderMouse.leaveGroup()
                     }
-                    Mouse.shared.releaseButton(Mouse.BUTTON_LEFT)
+                    Mouse.shared.releaseButton(Mouse.Constants.leftButton)
                 }
             }
         }
@@ -294,8 +294,8 @@ class ArgentineTeam: Player {
         guard selectedUnit != nil || selectedGroup != nil else { return }
 
         // Right click: move or attack
-        if Mouse.shared.pressedButtons.contains(Mouse.BUTTON_RIGHT) {
-            Mouse.shared.releaseButton(Mouse.BUTTON_RIGHT)
+        if Mouse.shared.pressedButtons.contains(Mouse.Constants.rightButton) {
+            Mouse.shared.releaseButton(Mouse.Constants.rightButton)
 
             let tile = map.smallTileUnderMouse
 
@@ -346,7 +346,7 @@ class ArgentineTeam: Player {
         }
 
         // Left click without dragging: deselect
-        if Mouse.shared.pressedButtons.contains(Mouse.BUTTON_LEFT) {
+        if Mouse.shared.pressedButtons.contains(Mouse.Constants.leftButton) {
             let up = Mouse.shared.dragRect
             let isDragging = Mouse.shared.isDragging()
                 && Int(up.width) >= 4 && Int(up.height) >= 4

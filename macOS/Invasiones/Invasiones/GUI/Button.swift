@@ -54,8 +54,8 @@ class Button: GUIBox {
         let my = Int(Mouse.shared.Y)
         isUnderCursor = mx > posX && mx < posX + width && my > posY && my < posY + height
 
-        if isUnderCursor && Mouse.shared.pressedButtons.contains(Mouse.BUTTON_LEFT) {
-            Mouse.shared.releaseButton(Mouse.BUTTON_LEFT)
+        if isUnderCursor && Mouse.shared.pressedButtons.contains(Mouse.Constants.leftButton) {
+            Mouse.shared.releaseButton(Mouse.Constants.leftButton)
             return 1
         }
         return 0

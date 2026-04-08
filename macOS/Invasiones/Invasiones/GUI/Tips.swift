@@ -12,7 +12,7 @@ import Foundation
 class Tips: GUIBox {
 
     // MARK: - Constants
-    enum Constants {
+    private enum Constants {
         static let initialTipTime = 250
         static let maxBlink = 40
         static let minBlink = 20

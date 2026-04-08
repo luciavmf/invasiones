@@ -22,8 +22,8 @@ class GameText: NSObject, XMLParserDelegate {
     static func loadStrings() throws {
         s_strings = Array(repeating: "", count: Res.STR_COUNT)
 
-        guard let path = Utils.getPath(ResourcePath.STRINGS_XML_FILE) else {
-            throw GameError.fileNotFound("No se encuentra el archivo \(ResourcePath.STRINGS_XML_FILE).")
+        guard let path = Utils.getPath(ResourcePath.stringsPath) else {
+            throw GameError.fileNotFound("No se encuentra el archivo \(ResourcePath.stringsPath).")
         }
 
         let parser = GameText()
@@ -32,7 +32,7 @@ class GameText: NSObject, XMLParserDelegate {
         let ok = xmlParser?.parse() ?? false
 
         if !ok {
-            throw GameError.parsingFailed("Error al leer el archivo \(ResourcePath.STRINGS_XML_FILE).")
+            throw GameError.parsingFailed("Error al leer el archivo \(ResourcePath.stringsPath).")
         }
 
         s_strings = parser.parsedStrings

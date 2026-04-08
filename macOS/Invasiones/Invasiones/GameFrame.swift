@@ -36,9 +36,9 @@ class GameFrame {
     private var video: Video?
 
     /// The current frames per second (updated each interval).
-    static var FPS: Double = 0
+    static var fps: Double = 0
     /// The current updates per second (updated each interval).
-    static var UPS: Double = 0
+    static var ups: Double = 0
 
     // MARK: - Initializer
     init() {}
@@ -49,8 +49,8 @@ class GameFrame {
         video = Video(escena: escena)
 
         Mouse.shared.positionCursor(
-            x: CGFloat(ScreenSize.SCREEN_WIDTH) / 2,
-            y: CGFloat(ScreenSize.SCREEN_HEIGHT) / 2
+            x: CGFloat(ScreenSize.width) / 2,
+            y: CGFloat(ScreenSize.height) / 2
         )
         Mouse.shared.hideCursor()
 
