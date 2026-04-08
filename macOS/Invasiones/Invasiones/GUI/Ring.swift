@@ -24,6 +24,7 @@ class Ring: MapObject {
         worldPos = p
 
         try? animation.load()
+        animation.setAnimation(anim: 0)
         updateScreenPos()
 
         worldPos.x -= animation.offsets.x
