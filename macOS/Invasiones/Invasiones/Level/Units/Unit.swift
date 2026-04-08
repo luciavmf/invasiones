@@ -135,7 +135,7 @@ class Unit: MapObject {
         super.init()
         let types = ResourceManager.shared.unitTypes
         guard id >= 0, id < types.count, let copia = types[id] else {
-            Log.shared.debug("La copia de la unit no esta cargada: id=\(id)")
+            Log.shared.debug("Unit copy not loaded: id=\(id)")
             return
         }
         type = copia.type
@@ -382,7 +382,7 @@ class Unit: MapObject {
 
                     if newPath == nil {
                         guard let prevValidIdx = findPrevValidPosition(pathCopy, from: nextValidIdx) else {
-                            Log.shared.debug("El path no es valido por ningun lado.")
+                            Log.shared.debug("Unit: no valid path found.")
                             pathToFollow = []
                             return
                         }
@@ -462,7 +462,7 @@ class Unit: MapObject {
         guard let map = MapObject.map else { return }
         let p = map.getLineOfSightPosition(x1: x, x2: physicalTilePos.x, y1: y, y2: physicalTilePos.y)
         if p.x == -1 {
-            Log.shared.debug("No se la puede mandar a heal.")
+            Log.shared.debug("Unit: cannot send to heal.")
             return
         }
         setHealing(x: p.x, y: p.y)
@@ -478,7 +478,7 @@ class Unit: MapObject {
         if let c = path, !c.isEmpty {
             pathToFollow = Array(c.dropLast())
         } else {
-            Log.shared.debug("No se encontro el path para heal...")
+            Log.shared.debug("Unit: no path found to heal location.")
             setState(.idle)
             pathToFollow = nil
             return
@@ -519,7 +519,7 @@ class Unit: MapObject {
     /// Called when this unit starts being attacked. If idle and in range, counter-attacks.
     func counterAttack(_ attacker: Unit) {
         guard stateValue == .idle else { return }
-        Log.shared.debug("Me atacan, contraataco.")
+        Log.shared.debug("Unit: under attack, counter-attacking.")
         enemy = attacker
         if calculateDistance(toI: attacker.physicalTilePos.x, toJ: attacker.physicalTilePos.y) < Double(attackRange) {
             aimAtUnit(attacker)
@@ -652,7 +652,7 @@ class Unit: MapObject {
         // If no path, keep popping further waypoints until one is reachable.
         while newPath == nil {
             guard pathToFollow != nil, !pathToFollow!.isEmpty else {
-                Log.shared.debug("RecalcularProximoPaso: sin path alternativo.")
+                Log.shared.debug("Unit: no alternative path found.")
                 setLastPosition()
                 return
             }
@@ -808,7 +808,7 @@ class Unit: MapObject {
 
     /// Transitions the unit into the dying state and plays the death sound.
     func morir() {
-        Log.shared.debug("Me mori.")
+        Log.shared.debug("Unit: died.")
         setState(.dying)
         enemy = nil
         if type == Res.UNIDAD_PATRICIO {
@@ -861,7 +861,7 @@ class Unit: MapObject {
         let paths = ResourceManager.shared.unitPaths
         guard id >= 0, id < paths.count, let path = paths[id],
               let contenido = try? String(contentsOfFile: path, encoding: .utf8) else {
-            Log.shared.error("No se puede leer la unit con id=\(id)")
+            Log.shared.error("Unit: failed to read unit with id=\(id)")
             return
         }
 

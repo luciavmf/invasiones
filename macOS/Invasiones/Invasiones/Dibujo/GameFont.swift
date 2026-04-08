@@ -25,7 +25,7 @@ class GameFont {
 
         let paths = ResourceManager.shared.fontPaths
         guard fontId < paths.count, let path = paths[fontId] else {
-            Log.shared.error("GameFont: path inválido para id \(fontId)")
+            Log.shared.error("GameFont: invalid path for id \(fontId)")
             self.name = ""
             return
         }
@@ -42,13 +42,13 @@ class GameFont {
             self.nsFont = NSFont(name: postscriptName, size: CGFloat(size))
         } else {
             self.name = ""
-            Log.shared.error("GameFont: no se pudo obtener descriptor desde \(path)")
+            Log.shared.error("GameFont: failed to get descriptor from \(path)")
         }
 
         if nsFont == nil {
             // Fall back to system font
             self.nsFont = NSFont.systemFont(ofSize: CGFloat(size))
-            Log.shared.warn("GameFont: usando fuente del sistema como fallback (tamaño \(size))")
+            Log.shared.warn("GameFont: falling back to system font (size \(size))")
         }
     }
 

@@ -141,7 +141,7 @@ class Group {
             x1: x, x2: cmd.physicalTilePos.x,
             y1: y, y2: cmd.physicalTilePos.y)
         if p.x == -1 {
-            Log.shared.debug("Group: No se puede mandar a heal.")
+            Log.shared.debug("Group: no heal location found.")
             return
         }
         setHealing(x: p.x, y: p.y)

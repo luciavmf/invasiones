@@ -51,7 +51,7 @@ class Surface {
             texture = SKTexture(image: image)
             texture?.filteringMode = .nearest
         } else {
-            Log.shared.error("Surface: no se pudo load \(path)")
+            Log.shared.error("Surface: failed to load \(path)")
         }
     }
 

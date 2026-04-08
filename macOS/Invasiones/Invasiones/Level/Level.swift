@@ -62,7 +62,7 @@ class Level {
     func load(_ levelIndex: Int) {
         let pathStr = ResourcePath.levelPath + "/nivel_\(levelIndex).xml"
         guard let path = Utils.getPath(pathStr) else {
-            Log.shared.debug("No se pueden load los objectives. No se encuentra el archivo: \(pathStr)")
+            Log.shared.debug("Level: objectives file not found: \(pathStr)")
             return
         }
         currentBattleIndex = 0
@@ -99,9 +99,9 @@ class Level {
         if battle.objectives.isEmpty {
             currentBattleIndex += 1
             currentObjectiveIndex = 0
-            Log.shared.debug("Paso a la siguiente battle.")
+            Log.shared.debug("Level: advancing to next battle.")
             if currentBattleIndex >= battleCount {
-                Log.shared.debug("No hay mas objectives — gane!!")
+                Log.shared.debug("Level: no more objectives — won!")
                 return nil
             }
         }

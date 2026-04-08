@@ -334,7 +334,7 @@ class ArgentineTeam: Player {
                       ts.id == Res.TLS_INVALIDADO,
                       tileProp.id == Res.TILE_INVALIDADOS_ID_ENFERMERIA else { return }
 
-                Log.shared.debug("Me llevan a heal.")
+                Log.shared.debug("Unit ordered to heal.")
                 if let group = selectedGroup,
                    group.health < group.resistancePoints {
                     group.heal(x: tile.x, y: tile.y)
@@ -460,7 +460,7 @@ class ArgentineTeam: Player {
 
         if command == nil {
             objectiveCompleted = true
-            Log.shared.debug("Se cumplio con el objetivo deseado!!!!!!!")
+            Log.shared.debug("Objective completed.")
         }
     }
 

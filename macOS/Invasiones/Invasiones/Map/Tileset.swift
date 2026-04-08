@@ -110,7 +110,7 @@ private class TilesetXMLDelegate: NSObject, XMLParserDelegate {
                 if let path = fullPath {
                     ts.image = ResourceManager.shared.getImage(path)
                 } else {
-                    Log.shared.error("Tileset: no se encuentra image \(src)")
+                    Log.shared.error("Tileset: image not found \(src)")
                 }
             }
 

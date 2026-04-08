@@ -47,7 +47,7 @@ class StateMachine {
     /// Queues the next state to transition into on the next update() call.
     func setNextState(_ key: GameFrame.State) {
         guard allStates.keys.contains(key) else {
-            Log.shared.error("La maquina de estados no contiene la clave \(key)")
+            Log.shared.error("StateMachine: unknown state key \(key)")
             return
         }
         nextState = allStates[key] ?? nil

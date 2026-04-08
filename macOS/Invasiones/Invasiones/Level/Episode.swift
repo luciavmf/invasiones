@@ -262,13 +262,13 @@ class Episode {
     }
 
     private func setNewObjective() {
-        Log.shared.debug("Le seteo un nuevo objetivo.........")
+        Log.shared.debug("Setting new objective.")
         showObjectivePopup = true
         let currentBattle = currentLevel?.currentBattleIndex ?? 0
         objective = currentLevel?.nextObjective()
 
         if (currentLevel?.currentBattleIndex ?? 0) != currentBattle {
-            Log.shared.debug("Pase del nivelllllllll")
+            Log.shared.debug("Level completed.")
             setState(.showIntro)
         }
         showObjectivePopup = true
@@ -390,7 +390,7 @@ class Episode {
 
     private func updateOrders() {
         if player?.completedObjective() == true {
-            Log.shared.debug("Felicitaciones!! cumpliste el objetivo.....")
+            Log.shared.debug("Objective fulfilled.")
             setNewObjective()
         }
     }
@@ -583,7 +583,7 @@ class Episode {
             setNewObjective(); cheatObjectiveIndex = 0
         } else if !keys.isEmpty {
             if keys.contains(Keyboard.Key.u.rawValue) { player?.selectNextUnit() }
-            Log.shared.debug("Reseteo todos los cheats--")
+            Log.shared.debug("Resetting all cheat indices.")
             cheatObjectiveIndex = 0
             cheatWinIndex = 0
             cheatLoseIndex = 0

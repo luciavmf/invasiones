@@ -70,11 +70,11 @@ class Sprite {
     @discardableResult
     func addAnimation(i: Int, anim: Animation) -> Bool {
         guard !animations.isEmpty else {
-            Log.shared.error("No se carga la unit: la cantidad de animaciones no está seteada.")
+            Log.shared.error("Sprite: cannot add animation — slot count not set.")
             return false
         }
         guard i < animations.count else {
-            Log.shared.debug("Animacion con index invalido: \(i)")
+            Log.shared.debug("Sprite: animation index out of range: \(i)")
             return false
         }
         animations[i] = anim
