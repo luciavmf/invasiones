@@ -27,6 +27,18 @@ The codebase is being progressively updated toward full Swift API Design Guideli
 - SCREAMING_CASE `static let` / `let` constants → `lowerCamelCase` across all files
 - `throws` instead of `Bool` return values for error propagation
 
+## Cheat codes
+
+Cheats are only active during gameplay (not in menus). Each code is entered one key at a time — pressing any other key resets all sequences.
+
+| Sequence | Effect |
+|----------|--------|
+| G A N X W | Instant win — jumps to the victory screen |
+| P E R X W | Instant lose — jumps to the game over screen |
+| O B J X W | Skip objective — advances to the next objective immediately |
+
+Additionally, pressing **U** at any time during gameplay cycles the camera to the next Argentine unit.
+
 ## Status
 
 Work in progress — actively being ported, debugged, and Swiftified.
