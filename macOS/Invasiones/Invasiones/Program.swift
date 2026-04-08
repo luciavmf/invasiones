@@ -16,7 +16,7 @@ enum ResourcePath {
     static let levelPath = "nivel"
     static let iconPath = "imagenes/icono.png"
 
-    static let stringsPath = "strings.xml"
+    static let stringsPath = "strings.json"
     static let resourcesPath = "res.json"
 }
 
