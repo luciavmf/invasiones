@@ -82,32 +82,32 @@ class HelpState: State {
         currentScreenshot?.update()
     }
 
-    override func draw(_ g: Video) {
-        g.draw(background, 0, 0, 0)
+    override func draw(_ video: Video) {
+        video.draw(background, 0, 0, 0)
 
-        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
                        UIColors.title)
-        g.write(Res.STR_MENU_AYUDA, 0, Layout.titleYPosition, Surface.centerHorizontal)
+        video.write(Res.STR_MENU_AYUDA, 0, Layout.titleYPosition, Surface.centerHorizontal)
 
         if substate.rawValue < Substate.total {
-            g.setFont(ResourceManager.shared.fonts[FontConstants.helpTitleFont],
+            video.setFont(ResourceManager.shared.fonts[FontConstants.helpTitleFont],
                            UIColors.text)
-            g.write(Res.STR_MENU_AYUDA_TEXTO_SELECCIONAR_01 + substate.rawValue * 2,
+            video.write(Res.STR_MENU_AYUDA_TEXTO_SELECCIONAR_01 + substate.rawValue * 2,
                        0, Constants.helpItemY, Surface.centerHorizontal)
 
-            g.setFont(ResourceManager.shared.fonts[FontConstants.helpFont],
+            video.setFont(ResourceManager.shared.fonts[FontConstants.helpFont],
                            UIColors.text)
-            g.write(Res.STR_MENU_AYUDA_TEXTO_SELECCIONAR_02 + substate.rawValue * 2,
+            video.write(Res.STR_MENU_AYUDA_TEXTO_SELECCIONAR_02 + substate.rawValue * 2,
                        0, Constants.helpTextY, Surface.centerHorizontal)
         }
 
-        currentScreenshot?.draw(g: g, x: 0, y: 150, anchor: Surface.centerHorizontal | Surface.centerVertical)
+        currentScreenshot?.draw(video: video, x: 0, y: 150, anchor: Surface.centerHorizontal | Surface.centerVertical)
 
-        if substate != .select { backButton?.draw(g) }
+        if substate != .select { backButton?.draw(video) }
         if substate != .win {
-            nextButton?.draw(g)
+            nextButton?.draw(video)
         } else {
-            button?.draw(g)
+            button?.draw(video)
         }
     }
 

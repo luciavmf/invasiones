@@ -95,7 +95,7 @@ class GameFrame {
         guard let v = video else { return }
         v.clear()
         stateMachine.draw(v)
-        Mouse.shared.drawCursor(en: v)
+        Mouse.shared.drawCursor(v)
     }
 
     // MARK: - Exit

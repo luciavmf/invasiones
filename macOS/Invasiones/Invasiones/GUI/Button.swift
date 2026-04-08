@@ -50,8 +50,8 @@ class Button: GUIBox {
 
     @discardableResult
     override func update() -> Int {
-        let mx = Int(Mouse.shared.X)
-        let my = Int(Mouse.shared.Y)
+        let mx = Int(Mouse.shared.x)
+        let my = Int(Mouse.shared.y)
         isUnderCursor = mx > posX && mx < posX + width && my > posY && my < posY + height
 
         if isUnderCursor && Mouse.shared.pressedButtons.contains(Mouse.Constants.leftButton) {
@@ -61,25 +61,25 @@ class Button: GUIBox {
         return 0
     }
 
-    override func draw(_ g: Video) {
+    override func draw(_ video: Video) {
         if isUnderCursor {
             if selectedImage != nil {
-                g.draw(selectedImage, posX, posY, 0)
+                video.draw(selectedImage, posX, posY, 0)
             } else {
-                g.setColor(UIColors.selection)
-                g.fillRect(posX, posY, width, height, UIColors.alpha)
+                video.setColor(UIColors.selection)
+                video.fillRect(posX, posY, width, height, UIColors.alpha)
             }
         } else {
             if image != nil {
-                g.draw(image, posX, posY, 0)
+                video.draw(image, posX, posY, 0)
             } else {
-                g.setColor(UIColors.menus)
-                g.fillRect(posX, posY, width, height, UIColors.alpha)
+                video.setColor(UIColors.menus)
+                video.fillRect(posX, posY, width, height, UIColors.alpha)
             }
         }
 
-        g.setFont(font, UIColors.text)
-        g.write(label,
+        video.setFont(font, UIColors.text)
+        video.write(label,
                    posX - Video.width / 2 + width / 2,
                    posY - Video.height  / 2 + height  / 2,
                    Surface.centerHorizontal | Surface.centerVertical)

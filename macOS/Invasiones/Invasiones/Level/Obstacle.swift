@@ -59,13 +59,13 @@ class Obstacle: MapObject {
         return false
     }
 
-    override func draw(_ g: Video) {
+    override func draw(_ video: Video) {
         guard let img = image, let map = MapObject.map else { return }
         img.setClip(x: index * frameWidth, y: 0, w: frameWidth, h: frameHeight)
         if isBuilding {
-            g.draw(img, x, y - frameHeight + map.tileHeight / 2, 0)
+            video.draw(img, x, y - frameHeight + map.tileHeight / 2, 0)
         } else {
-            g.draw(img,
+            video.draw(img,
                       x - frameWidth / 2 + map.tileWidth / 2,
                       y - frameHeight  + map.tileHeight / 2,
                       0)

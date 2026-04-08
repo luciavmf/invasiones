@@ -26,12 +26,12 @@ class OptionsState: State {
         }
     }
 
-    override func draw(_ g: Video) {
-        g.draw(background, 0, 0, 0)
-        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+    override func draw(_ video: Video) {
+        video.draw(background, 0, 0, 0)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
                        UIColors.text)
-        g.write(Res.STR_MENU_OPCIONES, 0, Layout.titleYPosition, Surface.centerHorizontal)
-        button?.draw(g)
+        video.write(Res.STR_MENU_OPCIONES, 0, Layout.titleYPosition, Surface.centerHorizontal)
+        button?.draw(video)
     }
 
     override func exit() {}

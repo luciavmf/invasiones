@@ -86,9 +86,9 @@ class Sprite {
         animations = Array(repeating: nil, count: count)
     }
 
-    func draw(g: Video, x: Int, y: Int) {
+    func draw(video: Video, x: Int, y: Int) {
         guard let img = currentAnim?.image else { return }
-        g.draw(img, x, y, 0)
+        video.draw(img, x, y, 0)
     }
 
     func load() throws {

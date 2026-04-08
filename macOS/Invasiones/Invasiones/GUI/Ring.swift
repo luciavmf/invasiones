@@ -42,9 +42,9 @@ class Ring: MapObject {
         return false
     }
 
-    override func draw(_ g: Video) {
+    override func draw(_ video: Video) {
         guard let map = MapObject.map else { return }
-        animation.draw(g: g, x: x + map.tileWidth / 2, y: y + map.tileHeight / 2, anchor: 0)
+        animation.draw(video: video, x: x + map.tileWidth / 2, y: y + map.tileHeight / 2, anchor: 0)
     }
 
     // MARK: - Own methods

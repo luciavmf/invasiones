@@ -103,9 +103,9 @@ class MainMenuState: State {
         }
     }
 
-    override func draw(_ g: Video) {
-        g.draw(background, 0, 0, 0)
-        menu?.draw(g)
+    override func draw(_ video: Video) {
+        video.draw(background, 0, 0, 0)
+        menu?.draw(video)
     }
 
     override func exit() {

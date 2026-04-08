@@ -79,7 +79,7 @@ class StateMachine {
     }
 
     /// Draws the current state.
-    func draw(_ g: Video) {
-        currentStateObj?.draw(g)
+    func draw(_ video: Video) {
+        currentStateObj?.draw(video)
     }
 }

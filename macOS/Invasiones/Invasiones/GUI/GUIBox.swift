@@ -33,7 +33,7 @@ class GUIBox {
         fatalError("\(type(of: self)).update must be overridden")
     }
 
-    func draw(_ g: Video) {
+    func draw(_ video: Video) {
         fatalError("\(type(of: self)).draw must be overridden")
     }
 }

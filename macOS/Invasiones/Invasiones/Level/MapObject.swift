@@ -72,13 +72,13 @@ class MapObject {
     /// Recalculates the screen-space (x, y) coordinates from the current camera and world position.
     func updateScreenPos() {
         guard let cam = MapObject.camera else { return }
-        x = cam.startX + worldPos.x + cam.X
-        y = cam.startY + worldPos.y + cam.Y
+        x = cam.startX + worldPos.x + cam.x
+        y = cam.startY + worldPos.y + cam.y
     }
 
-    func draw(_ g: Video) {
+    func draw(_ video: Video) {
         guard let img = image, let map = MapObject.map else { return }
-        g.draw(
+        video.draw(
             img,
             x - frameWidth / 2 + map.tileWidth / 2,
             y - frameHeight  + map.tileHeight  / 4,

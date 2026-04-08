@@ -65,42 +65,42 @@ class Hud {
     }
 
     // MARK: - Draw
-    func draw(_ g: Video) {
+    func draw(_ video: Video) {
         if let img = image {
             // V_FONDO = draws at the bottom
-            g.draw(img, 0, posY, 0)
+            video.draw(img, 0, posY, 0)
         }
-        tipsWindow.draw(g)
+        tipsWindow.draw(video)
 
-        g.setFont(ResourceManager.shared.fonts[FontIndex.sans12.rawValue],
+        video.setFont(ResourceManager.shared.fonts[FontIndex.sans12.rawValue],
                        GameColor.black)
-        g.write("\(enemyCount)", Constants.attrsEnemyCountX, posY + Constants.attrsCountY, 0)
-        g.write("\(argentineCount)", Constants.attrsArgentineCountX, posY + Constants.attrsCountY, 0)
+        video.write("\(enemyCount)", Constants.attrsEnemyCountX, posY + Constants.attrsCountY, 0)
+        video.write("\(argentineCount)", Constants.attrsArgentineCountX, posY + Constants.attrsCountY, 0)
 
-        g.setFont(ResourceManager.shared.fonts[FontIndex.sans12.rawValue],
+        video.setFont(ResourceManager.shared.fonts[FontIndex.sans12.rawValue],
                        GameColor.white)
 
         guard let uni = unitToShow else { return }
 
         if let av = uni.avatar {
-            g.draw(av, Constants.avatarX, posY + Constants.avatarY, 0)
+            video.draw(av, Constants.avatarX, posY + Constants.avatarY, 0)
         }
-        g.write(uni.name, Constants.avatarNameX, posY + Constants.avatarnNameY, 0)
+        video.write(uni.name, Constants.avatarNameX, posY + Constants.avatarnNameY, 0)
 
-        g.setColor(GameColor.black)
+        video.setColor(GameColor.black)
 
         let s = GameText.Strings
-        g.write("\(s[safe: Res.STR_ALCANCE] ?? ""):\(uni.range)",
+        video.write("\(s[safe: Res.STR_ALCANCE] ?? ""):\(uni.range)",
                 Constants.attrsStartX1, posY + Constants.attrsStartY, 0)
-        g.write("\(s[safe: Res.STR_PUNTERIA] ?? ""):\(uni.aim)",
+        video.write("\(s[safe: Res.STR_PUNTERIA] ?? ""):\(uni.aim)",
                 Constants.attrsStartX1, posY + Constants.attrsStartY + lineSpacing, 0)
-        g.write("\(s[safe: Res.STR_PUNTOS_DE_ATAQUE] ?? ""):\(uni.attackPoints)",
+        video.write("\(s[safe: Res.STR_PUNTOS_DE_ATAQUE] ?? ""):\(uni.attackPoints)",
                 Constants.attrsStartX2, posY + Constants.attrsStartY, 0)
-        g.write("\(s[safe: Res.STR_PUNTOS_DE_RESISTENCIA] ?? ""):\(uni.health)/\(uni.resistancePoints)",
+        video.write("\(s[safe: Res.STR_PUNTOS_DE_RESISTENCIA] ?? ""):\(uni.health)/\(uni.resistancePoints)",
                 Constants.attrsStartX2, posY + Constants.attrsStartY + lineSpacing, 0)
-        g.write("\(s[safe: Res.STR_VELOCIDAD] ?? ""):\(uni.defaultSpeed)",
+        video.write("\(s[safe: Res.STR_VELOCIDAD] ?? ""):\(uni.defaultSpeed)",
                 Constants.attrsStartX3, posY + Constants.attrsStartY, 0)
-        g.write("\(s[safe: Res.STR_VISIBILIDAD] ?? ""):\(uni.visibility)",
+        video.write("\(s[safe: Res.STR_VISIBILIDAD] ?? ""):\(uni.visibility)",
                 Constants.attrsStartX3, posY + Constants.attrsStartY + lineSpacing, 0)
     }
 }

@@ -79,24 +79,24 @@ class Tips: GUIBox {
         return -1  // SELECCION.NINGUNO
     }
 
-    override func draw(_ g: Video) {
+    override func draw(_ video: Video) {
         guard shouldShowTip else { return }
 
         if tipButton.isUnderCursor {
-            g.setColor(UIColors.menus)
-            g.fillRect(posX, posY, width, height, Constants.alpha)
-            g.setFont(
+            video.setColor(UIColors.menus)
+            video.fillRect(posX, posY, width, height, Constants.alpha)
+            video.setFont(
                 ResourceManager.shared.fonts[FontConstants.objectivesReminderFont],
                 UIColors.text)
-            g.write(label,
+            video.write(label,
                        posX - (Video.width >> 1) + (width >> 1),
                        posY + height / 5,
                        Surface.centerHorizontal)
-            tipButton.draw(g)
+            tipButton.draw(video)
         } else {
             tipCount -= 1
             if blinkCount > Constants.minBlink && blinkCount < Constants.maxBlink {
-                tipButton.draw(g)
+                tipButton.draw(video)
             }
         }
     }

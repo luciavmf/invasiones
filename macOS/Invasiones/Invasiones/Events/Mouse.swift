@@ -41,12 +41,12 @@ class Mouse {
     private init() {}
 
     // MARK: - Properties
-    var X: CGFloat {
+    var x: CGFloat {
         get { _x }
         set { _x = max(0, min(newValue, CGFloat(ScreenSize.width))) }
     }
 
-    var Y: CGFloat {
+    var y: CGFloat {
         get { _y }
         set { _y = max(0, min(newValue, CGFloat(ScreenSize.height))) }
     }
@@ -112,8 +112,8 @@ class Mouse {
     }
 
     /// Draws the custom cursor at the current position using the Video context.
-    func drawCursor(en g: Video) {
+    func drawCursor(_ video: Video) {
         guard !cursorHidden, let sup = cursorSurface else { return }
-        g.draw(sup, Int(_x), Int(_y), 255, 0)
+        video.draw(sup, Int(_x), Int(_y), 255, 0)
     }
 }

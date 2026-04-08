@@ -92,26 +92,26 @@ class GameState: State {
         }
     }
 
-    override func draw(_ g: Video) {
+    override func draw(_ video: Video) {
         switch stateValue {
 
         case .playing:
-            episode?.draw(g)
+            episode?.draw(video)
             if episode?.state == .playing {
-                button?.draw(g)
+                button?.draw(video)
             }
 
         case .menu:
-            episode?.draw(g)
-            gameMenu?.draw(g)
-            g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+            episode?.draw(video)
+            gameMenu?.draw(video)
+            video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
                            GameColor.white)
-            g.write(Res.STR_JUEGO_PAUSADO, 0, gamePausedY,
+            video.write(Res.STR_JUEGO_PAUSADO, 0, gamePausedY,
                        Surface.centerVertical | Surface.centerHorizontal)
 
         case .confirmation:
-            episode?.draw(g)
-            confirmMenu?.draw(g)
+            episode?.draw(video)
+            confirmMenu?.draw(video)
 
         default:
             break
