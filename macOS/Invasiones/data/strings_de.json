@@ -67,15 +67,15 @@
   "help_move_02":                      "Wähle eine oder mehrere Einheiten aus und klicke dann\nmit der rechten Maustaste auf das Ziel auf der Karte.",
   "help_attack_01":                    "Einheiten angreifen",
   "help_attack_02":                    "Wähle eine Einheit oder Gruppe aus und klicke dann\nmit der rechten Maustaste auf die feindliche Einheit, die du angreifen möchtest.\nWenn ein Angriff möglich ist, verwandelt sich der Mauszeiger in ein Schwert.\nImmer wenn deine Truppen eine feindliche Einheit sichten, greifen sie\nautomatisch an.",
-  "help_objective_01":                 "Zielanzeige:",
+  "help_objective_01":                 "Zielanzeige",
   "help_objective_02":                 "Der grüne Pfeil auf dem Bildschirm zeigt die Richtung\ndes aktuellen Ziels an.",
   "help_scroll_01":                    "Kamera bewegen",
   "help_scroll_02":                    "Du kannst die Kamera bewegen, um das Gelände zu erkunden oder\ndeine Truppen zu verfolgen, indem du den Mauszeiger\nan die Ränder des Bildschirms bewegst.",
-  "help_hud_01":                       "Benutzeroberfläche:",
+  "help_hud_01":                       "Benutzeroberfläche",
   "help_hud_02":                       "Die Oberfläche enthält wichtige Informationen:\nAnzahl argentinischer Einheiten (A).\nAnzahl britischer Einheiten (B).\nStatus der ausgewählten Einheit (C).",
   "help_heal_01":                      "Einheit heilen",
   "help_heal_02":                      "Wähle eine verwundete Einheit aus und klicke mit der rechten Maustaste\nauf ein Lazarett. Lazarette sind mit einem roten Kreuz markiert.",
-  "help_tips_01":                      "Tipps:",
+  "help_tips_01":                      "Tipps",
   "help_tips_02":                      "Vergiss nicht, die Tipps ab und zu zu lesen. Es stecken viele nützliche Informationen darin!",
   "help_win_01":                       "Eine Schlacht gewinnen",
   "help_win_02":                       "Um Schlachten zu gewinnen, musst du die Ziele erfüllen,\ndie auf dem Bildschirm angezeigt werden.",
@@ -104,5 +104,5 @@
   "tip_22":  "Verschwende keine Zeit mit unnötigen Kämpfen.\nKonzentriere dich auf die Missionsziele.",
   "tip_23":  "Wenn du dich auf der Karte verirrst, denke daran,\ndass du deine Truppen mit der Taste U wiederfinden kannst.",
   "language":       "Deutsch",
-  "language_label": "Sprache:"
+  "language_label": "Sprache"
 }

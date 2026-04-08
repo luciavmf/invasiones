@@ -67,15 +67,15 @@
   "help_move_02":                      "Select one or more units, then right-click\non the spot on the map where you want them to go.",
   "help_attack_01":                    "Attacking Units",
   "help_attack_02":                    "With a unit or group selected, right-click\non the enemy unit you want to attack. When you can attack a unit,\nthe mouse cursor will change to a sword.\nWhenever your troops spot an enemy unit, they will attack it\nautomatically.",
-  "help_objective_01":                 "Objective Indicator:",
+  "help_objective_01":                 "Objective Indicator",
   "help_objective_02":                 "The green arrow on screen shows the direction\nof the current objective.",
   "help_scroll_01":                    "Moving the Camera",
   "help_scroll_02":                    "You can move the camera to explore the terrain or\nfollow your troops by moving the mouse pointer\nto the edges of the screen.",
-  "help_hud_01":                       "Interface:",
+  "help_hud_01":                       "Interface",
   "help_hud_02":                       "There is essential information in the interface that can help you:\nNumber of Argentine Units (A).\nNumber of British Units (B).\nStatus of the selected unit (C).",
   "help_heal_01":                      "Healing a Unit",
   "help_heal_02":                      "Select an injured unit and right-click\non an infirmary. Infirmaries are marked with a red cross.",
-  "help_tips_01":                      "Tips:",
+  "help_tips_01":                      "Tips",
   "help_tips_02":                      "Don't forget to check the tips from time to time. There's a lot of useful information in them!",
   "help_win_01":                       "Winning a Battle",
   "help_win_02":                       "To win battles you must complete the objectives\nthat appear on screen.",
@@ -104,5 +104,5 @@
   "tip_22":  "Don't waste time attacking unnecessarily.\nFocus on the mission objectives.",
   "tip_23":  "If you get lost on the map, remember you can\nfind your troops again with the U key.",
   "language":       "English",
-  "language_label": "Language:"
+  "language_label": "Language"
 }
