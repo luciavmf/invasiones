@@ -42,7 +42,7 @@ class IA {
     func load(x: Int, y: Int, levelIndex: Int) {
         let pathStr = ResourcePath.levelPath + "/orden_nv\(levelIndex)_\(x)_\(y).xml"
         guard let path = Utils.getPath(pathStr) else {
-            Log.shared.debug("IA: No se encuentra el archivo: \(pathStr)")
+            Log.shared.debug("IA: file not found: \(pathStr)")
             return
         }
         battleCount = 0
@@ -68,15 +68,15 @@ class IA {
     /// - Returns: The next command, or `nil` if all battles are complete.
     func nextCommand() -> Command? {
         guard currentBattle < battleCount else {
-            Log.shared.debug("IA: No hay mas batallas.")
+            Log.shared.debug("IA: no more battles.")
             return nil
         }
 
         if battles[currentBattle].commands.isEmpty {
-            Log.shared.debug("IA: Paso a la siguiente battle.")
+            Log.shared.debug("IA: advancing to next battle.")
             currentBattle += 1
             if currentBattle >= battleCount {
-                Log.shared.debug("IA: No hay mas batallas.")
+                Log.shared.debug("IA: no more battles.")
                 return nil
             }
         }

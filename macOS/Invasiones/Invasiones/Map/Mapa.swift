@@ -556,7 +556,7 @@ private class TilesetRefDelegate: NSObject, XMLParserDelegate {
                 ?? Utils.getPath(src) {
             collected.append((gid: gid, path: p))
         } else {
-            Log.shared.error("Map: no se encuentra tileset \(src)")
+            Log.shared.error("Map: tileset not found \(src)")
         }
     }
 }

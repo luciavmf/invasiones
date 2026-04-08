@@ -32,7 +32,7 @@ class GameText: NSObject, XMLParserDelegate {
         let ok = xmlParser?.parse() ?? false
 
         if !ok {
-            throw GameError.parsingFailed("Error al leer el archivo \(ResourcePath.stringsPath).")
+            throw GameError.parsingFailed("GameText: failed to read \(ResourcePath.stringsPath).")
         }
 
         s_strings = parser.parsedStrings

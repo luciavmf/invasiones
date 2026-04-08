@@ -38,7 +38,7 @@ class Sound {
                 player.prepareToPlay()
                 sfxPlayers[i] = player
             } catch {
-                Log.shared.error("No se pudo load el sonido \(path): \(error)")
+                Log.shared.error("Sound: failed to load \(path): \(error)")
             }
         }
     }
@@ -46,7 +46,7 @@ class Sound {
     @discardableResult
     func play(id: Int, loop: Int) -> Bool {
         guard id >= 0, id < Res.SND_COUNT + Res.SFX_COUNT else {
-            Log.shared.warn("No se puede play el sonido \(id): no existe.")
+            Log.shared.warn("Sound: cannot play \(id): not found.")
             return false
         }
 

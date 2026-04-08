@@ -17,7 +17,7 @@ enum Utils {
     /// Searches first directly in the bundle, then under the "data/" subdirectory.
     static func getPath(_ name: String) -> String? {
         guard !name.isEmpty else {
-            Log.shared.warn("ObtenerPath: name de archivo no válido")
+            Log.shared.warn("Utils.getPath: invalid file name")
             return nil
         }
 
@@ -27,7 +27,7 @@ enum Utils {
         // If it's already an absolute path that exists, return it directly.
         if normalized.hasPrefix("/") {
             if FileManager.default.fileExists(atPath: normalized) { return normalized }
-            Log.shared.warn("ObtenerPath: no existe el archivo \"\(normalized)\"")
+            Log.shared.warn("Utils.getPath: file not found \"\(normalized)\"")
             return nil
         }
 
@@ -45,7 +45,7 @@ enum Utils {
             }
         }
 
-        Log.shared.warn("ObtenerPath: no existe el archivo \"\(normalized)\"")
+        Log.shared.warn("Utils.getPath: file not found \"\(normalized)\"")
         return nil
     }
 

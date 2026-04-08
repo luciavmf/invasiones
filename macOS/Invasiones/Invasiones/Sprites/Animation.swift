@@ -78,11 +78,11 @@ class Animation {
 
     func load() throws {
         guard animRead else {
-            Log.shared.warn("No se puede load la animation \(currentAnimation): no fue leída.")
+            Log.shared.warn("Animation \(currentAnimation): cannot load — not read from resources.")
             return
         }
         guard !animLoaded else {
-            Log.shared.warn("La animation \(currentAnimation) ya fue cargada.")
+            Log.shared.warn("Animation \(currentAnimation): already loaded.")
             return
         }
 

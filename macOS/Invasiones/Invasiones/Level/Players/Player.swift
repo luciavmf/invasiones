@@ -293,7 +293,7 @@ class Player {
     /// - Returns: The list of placed units.
     func placeUnits(type: Int, count: Int, x: Int, y: Int) -> [Unit] {
         guard count > 0 else {
-            Log.shared.error("No se puede crear un group de cantidad 0.")
+            Log.shared.error("Player: cannot create a group with 0 units.")
             return []
         }
 
@@ -323,7 +323,7 @@ class Player {
 
     private func placeUnitInternal(type: Int, i: Int, j: Int) -> Unit? {
         guard map.isWalkable(x: i, y: j) else {
-            Log.shared.debug("No se puede position la unit: tile no caminable.")
+            Log.shared.debug("Player: cannot place unit — tile not walkable.")
             return nil
         }
         let unit = Unit(type)

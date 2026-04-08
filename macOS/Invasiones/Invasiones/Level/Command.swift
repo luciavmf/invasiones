@@ -63,7 +63,7 @@ struct Command {
             image = ResourceManager.shared.getImage(p)
         }
         if image == nil {
-            Log.shared.debug("No se puede obtener la image que esta en el nivel: \(path)")
+            Log.shared.debug("Command: image not found in level: \(path)")
         }
     }
 
