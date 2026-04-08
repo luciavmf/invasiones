@@ -22,8 +22,9 @@ class MainMenuState: State {
     // MARK: - Menu items
     private enum Item: Int {
         case newGame = 0
-        case help = 1
-        case quit = 2
+        case help    = 1
+        case options = 2
+        case quit    = 3
     }
 
     private enum Constants {
@@ -54,15 +55,18 @@ class MainMenuState: State {
         Mouse.shared.setCursor(ResourceManager.shared.getImage(Res.IMG_CURSOR))
         Mouse.shared.showCursor()
 
-        let newMenu = Menu(image: nil,
-                        itemCount: 3,
-                        x: 0,
-                        y: Video.height - Constants.mainMenuYOffset,
-                        anchor: Surface.centerHorizontal)
+        let newMenu = Menu(
+            image: nil,
+            itemCount: 4,
+            x: 0,
+            y: Video.height - Constants.mainMenuYOffset,
+            anchor: Surface.centerHorizontal
+        )
 
         newMenu.addItem(index: Item.newGame.rawValue, stringId: Res.STR_MENU_NUEVO_JUEGO, flag: Menu.Constants.itemVisible)
-        newMenu.addItem(index: Item.help.rawValue, stringId: Res.STR_MENU_AYUDA, flag: Menu.Constants.itemVisible)
-        newMenu.addItem(index: Item.quit.rawValue, stringId: Res.STR_MENU_SALIR, flag: Menu.Constants.itemVisible)
+        newMenu.addItem(index: Item.help.rawValue,    stringId: Res.STR_MENU_AYUDA, flag: Menu.Constants.itemVisible)
+        newMenu.addItem(index: Item.options.rawValue, stringId: Res.STR_MENU_OPCIONES, flag: Menu.Constants.itemVisible)
+        newMenu.addItem(index: Item.quit.rawValue,    stringId: Res.STR_MENU_SALIR, flag: Menu.Constants.itemVisible)
 
         if firstBuild {
             firstBuild = false
@@ -96,6 +100,8 @@ class MainMenuState: State {
             stateMachine.setNextState(.game)
         case Item.help.rawValue:
             stateMachine.setNextState(.help)
+        case Item.options.rawValue:
+            stateMachine.setNextState(.options)
         case Item.quit.rawValue:
             stateMachine.setNextState(.quit)
         default:

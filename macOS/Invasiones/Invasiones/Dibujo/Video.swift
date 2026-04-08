@@ -173,6 +173,21 @@ class Video {
         canvasNode.addChild(node)
     }
 
+    /// Fills a rounded rectangle with the current colour, optional alpha and anchor.
+    func fillRoundedRect(_ x: Int, _ y: Int, _ w: Int, _ h: Int,
+                         _ radius: Int, _ alpha: Int = 255, _ anchor: Int = 0) {
+        var px = x, py = y
+        if (anchor & Surface.centerHorizontal) != 0 { px += Video.width  / 2 - w / 2 }
+        if (anchor & Surface.centerVertical)   != 0 { py += Video.height / 2 - h / 2 }
+        let rect = CGRect(x: px, y: Video.height - py - h, width: w, height: h)
+        let shape = SKShapeNode(rect: rect, cornerRadius: CGFloat(radius))
+        shape.fillColor   = currentColor
+        shape.strokeColor = SKColor.clear
+        shape.alpha       = CGFloat(max(0, min(alpha, 255))) / 255.0
+        shape.zPosition   = zPos; zPos += 1
+        canvasNode.addChild(shape)
+    }
+
     /// Fills the entire screen with a solid colour (overload without coordinates).
     func fillRect(_ color: Int) {
         setColor(color)

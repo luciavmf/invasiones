@@ -116,9 +116,11 @@ enum GameText {
         "tip_18",  // 98
         "tip_19",  // 99
         "tip_20",  // 100
-        "tip_21",  // 101
-        "tip_22",  // 102
-        "tip_23",  // 103
+        "tip_21",        // 101
+        "tip_22",        // 102
+        "tip_23",        // 103
+        "language",      // 104
+        "language_label", // 105
     ]
 
     // MARK: - Static storage
@@ -126,15 +128,16 @@ enum GameText {
 
     // MARK: - Load
     static func loadStrings() throws {
-        guard let path = Utils.getPath(ResourcePath.stringsPath) else {
-            throw GameError.fileNotFound("No se encuentra el archivo \(ResourcePath.stringsPath).")
+        let filename = Language.current.filename
+        guard let path = Utils.getPath(filename) else {
+            throw GameError.fileNotFound("No se encuentra el archivo \(filename).")
         }
         let data = try Data(contentsOf: URL(fileURLWithPath: path))
         let dict: [String: String]
         do {
             dict = try JSONDecoder().decode([String: String].self, from: data)
         } catch {
-            throw GameError.parsingFailed("GameText: failed to parse \(ResourcePath.stringsPath): \(error).")
+            throw GameError.parsingFailed("GameText: failed to parse \(filename): \(error).")
         }
         s_strings = keyOrder.map { dict[$0] ?? "" }
     }

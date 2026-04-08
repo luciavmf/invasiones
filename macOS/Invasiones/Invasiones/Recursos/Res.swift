@@ -100,7 +100,9 @@ enum Res {
     static let STR_TIP_15 = 95;  static let STR_TIP_16 = 96;  static let STR_TIP_17 = 97
     static let STR_TIP_18 = 98;  static let STR_TIP_19 = 99;  static let STR_TIP_20 = 100
     static let STR_TIP_21 = 101; static let STR_TIP_22 = 102; static let STR_TIP_23 = 103
-    static let STR_COUNT = 104
+    static let STR_LANGUAGE       = 104
+    static let STR_LANGUAGE_LABEL = 105
+    static let STR_COUNT = 106
 
     // MARK: - Font Ids
     static let FNT_SANS = 0
@@ -149,9 +151,8 @@ enum Res {
     static let IMG_HUD = 9
     static let IMG_BOTON = 10
     static let IMG_BOTON_SELECCION = 11
-    static let IMG_MENU_3 = 12
-    static let IMG_MENU_2 = 13
-    static let IMG_COUNT = 14
+    static let IMG_MENU_2 = 12
+    static let IMG_COUNT = 13
 
     // MARK: - Unidades Ids
     static let UNIDAD_PATRICIO = 0

@@ -102,5 +102,7 @@
   "tip_20":  "Du kannst nur Gruppen von maximal 6 Einheiten steuern,\nalso plane deine Angriffe je Gruppe sorgfältig.",
   "tip_21":  "Der grüne Pfeil auf dem Bildschirm zeigt die Richtung\ndes aktuellen Ziels. Vergiss das nicht.",
   "tip_22":  "Verschwende keine Zeit mit unnötigen Kämpfen.\nKonzentriere dich auf die Missionsziele.",
-  "tip_23":  "Wenn du dich auf der Karte verirrst, denke daran,\ndass du deine Truppen mit der Taste U wiederfinden kannst."
+  "tip_23":  "Wenn du dich auf der Karte verirrst, denke daran,\ndass du deine Truppen mit der Taste U wiederfinden kannst.",
+  "language":       "Deutsch",
+  "language_label": "Sprache:"
 }

@@ -102,5 +102,7 @@
   "tip_20":  "Solo podes manejar grupos de 6 unidades como maximo, \n asi que planea bien tus ataques por grupo. ",
   "tip_21":  "La flecha verde en pantalla indica la direccion\n del objetivo actual. No lo olvides.",
   "tip_22":  "No pierdas tiempo atacando innecesariamente.\n Concentrate en los objetivos de la mision.",
-  "tip_23":  "Si te pierdes en el mapa, recuerda que puedes\n volver a encontrar a tus tropas con la tecla U."
+  "tip_23":  "Si te pierdes en el mapa, recuerda que puedes\n volver a encontrar a tus tropas con la tecla U.",
+  "language":       "Español",
+  "language_label": "Idioma:"
 }

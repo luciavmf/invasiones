@@ -102,5 +102,7 @@
   "tip_20":  "You can only manage groups of up to 6 units,\nso plan your attacks by group carefully.",
   "tip_21":  "The green arrow on screen shows the direction\nof the current objective. Don't forget it.",
   "tip_22":  "Don't waste time attacking unnecessarily.\nFocus on the mission objectives.",
-  "tip_23":  "If you get lost on the map, remember you can\nfind your troops again with the U key."
+  "tip_23":  "If you get lost on the map, remember you can\nfind your troops again with the U key.",
+  "language":       "English",
+  "language_label": "Language:"
 }
