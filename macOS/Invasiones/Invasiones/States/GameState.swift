@@ -14,7 +14,7 @@ import Foundation
 class GameState: State {
 
     // MARK: - Enums
-    private enum State { case start, won, lost, menu, playing, confirmacion }
+    private enum State { case start, won, lost, menu, playing, confirmation }
     private enum MenuItem: Int { case continuar = 0, quit = 1 }
 
     private let gamePausedY = -200
@@ -72,12 +72,12 @@ class GameState: State {
             if let item = gameMenu?.update() {
                 switch MenuItem(rawValue: item) {
                 case .continuar: setState(.playing)
-                case .quit: setState(.confirmacion)
+                case .quit: setState(.confirmation)
                 case .none: break
                 }
             }
 
-        case .confirmacion:
+        case .confirmation:
             if let result = confirmMenu?.update() {
                 if result == ConfirmationMenu.Selection.left.rawValue {
                     setState(.playing)
@@ -109,7 +109,7 @@ class GameState: State {
             g.write(Res.STR_JUEGO_PAUSADO, 0, gamePausedY,
                        Surface.centerVertical | Surface.centerHorizontal)
 
-        case .confirmacion:
+        case .confirmation:
             episode?.draw(g)
             confirmMenu?.draw(g)
 

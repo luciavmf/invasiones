@@ -295,8 +295,8 @@ private class SpritesXMLParser: NSObject, XMLParserDelegate {
 
     // Current attributes of the <image> element
     private var imgPath = ""
-    private var frameAncho = 0
-    private var frameAlto = 0
+    private var frameWidth = 0
+    private var frameHeight = 0
     private var ticks = 0
     private var offsetX = 0
     private var offsetY = 0
@@ -312,13 +312,13 @@ private class SpritesXMLParser: NSObject, XMLParserDelegate {
 
         case "image" where inSprites:
             imgPath = Utils.getPath(attributes["path"] ?? "") ?? ""
-            frameAncho = Int(attributes["framewidth"] ?? "0") ?? 0
-            frameAlto = Int(attributes["frameheight"] ?? "0") ?? 0
+            frameWidth = Int(attributes["framewidth"] ?? "0") ?? 0
+            frameHeight = Int(attributes["frameheight"] ?? "0") ?? 0
             ticks = Int(attributes["frameticks"] ?? "0") ?? 0
             offsetX = Int(attributes["offsetX"] ?? "0") ?? 0
             offsetY = Int(attributes["offsetY"] ?? "0") ?? 0
             let anim = Animation(idx: 0, path: imgPath, ticks: ticks,
-                                   anchoFrame: frameAncho, altoFrame: frameAlto,
+                                   frameWidth: frameWidth, frameHeight: frameHeight,
                                    offsetX: offsetX, offsetY: offsetY)
             animations.append(anim)
 
@@ -359,15 +359,15 @@ private class AnimsXMLParser: NSObject, XMLParserDelegate {
 
         if name == "animacion", inAnims {
             let imgPath = Utils.getPath(attributes["imagepath"] ?? "") ?? ""
-            let frameAncho = Int(attributes["framewidth"] ?? "0") ?? 0
-            let frameAlto = Int(attributes["frameheight"] ?? "0") ?? 0
+            let frameWidth = Int(attributes["framewidth"] ?? "0") ?? 0
+            let frameHeight = Int(attributes["frameheight"] ?? "0") ?? 0
             let ticks = Int(attributes["frameticks"] ?? "0") ?? 0
             let offsetX = Int(attributes["offsetX"] ?? "0") ?? 0
             let offsetY = Int(attributes["offsetY"] ?? "0") ?? 0
 
             if animIdx < animations.count {
                 animations[animIdx] = Animation(idx: 0, path: imgPath, ticks: ticks,
-                                                   anchoFrame: frameAncho, altoFrame: frameAlto,
+                                                   frameWidth: frameWidth, frameHeight: frameHeight,
                                                    offsetX: offsetX, offsetY: offsetY)
                 animIdx += 1
             }

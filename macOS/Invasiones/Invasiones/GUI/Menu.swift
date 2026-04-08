@@ -73,7 +73,7 @@ class Menu: GUIBox {
 
     @discardableResult
     override func update() -> Int {
-        var itemSeleccionado = -1
+        var selectedItem = -1
         var y = posY
 
         for i in 0..<itemCount {
@@ -85,7 +85,7 @@ class Menu: GUIBox {
                     items[i] |= (Constants.itemHover << 8)
                     if Mouse.shared.pressedButtons.contains(Mouse.Constants.leftButton) {
                         items[i] |= (Constants.itemSelected << 8)
-                        itemSeleccionado = i
+                        selectedItem = i
                     }
                 } else {
                     items[i] &= ~(Constants.itemHover << 8)
@@ -94,7 +94,7 @@ class Menu: GUIBox {
             }
         }
 
-        return itemSeleccionado
+        return selectedItem
     }
 
     override func setPosition(x: Int, y: Int, anchor anch: Int) {

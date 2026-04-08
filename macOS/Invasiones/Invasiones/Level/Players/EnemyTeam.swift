@@ -30,10 +30,10 @@ class EnemyTeam: Player {
     }
 
     override func loadUnits(_ levelIndex: Int) throws {
-        guard let tilesetUnidades = map.tilesets.first(where: {
+        guard let unitsTileset = map.tilesets.first(where: {
             $0?.id == Res.TLS_UNIDADES
         }) else { return }
-        guard let ts = tilesetUnidades else { return }
+        guard let ts = unitsTileset else { return }
 
         units = []
 

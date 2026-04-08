@@ -12,7 +12,7 @@ import Foundation
 
 enum ResourcePath {
     static let dataPath = "data"
-    static let scenatiosPath = "escenarios"
+    static let scenariosPath = "escenarios"
     static let levelPath = "nivel"
     static let iconPath = "imagenes/icono.png"
 

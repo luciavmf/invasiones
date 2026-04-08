@@ -12,25 +12,25 @@ import Foundation
 class Ring: MapObject {
 
     // MARK: - Declarations
-    private let animacion: Animation
+    private let animation: Animation
 
     // MARK: - Initializer
     init(_ anim: Animation, _ i: Int, _ j: Int) {
-        animacion = anim
+        animation = anim
         super.init()
 
         physicalTilePos = (i, j)
         let p = tileToWorld(i: i, j: j)
         worldPos = p
 
-        try? animacion.load()
+        try? animation.load()
         updateScreenPos()
 
-        worldPos.x -= animacion.offsets.x
-        worldPos.y -= animacion.offsets.y
+        worldPos.x -= animation.offsets.x
+        worldPos.y -= animation.offsets.y
 
-        animacion.play()
-        animacion.loop = true
+        animation.play()
+        animation.loop = true
     }
 
     // MARK: - Override
@@ -38,13 +38,13 @@ class Ring: MapObject {
     @discardableResult
     override func update() -> Bool {
         super.update()
-        animacion.update()
+        animation.update()
         return false
     }
 
     override func draw(_ g: Video) {
         guard let map = MapObject.map else { return }
-        animacion.draw(g: g, x: x + map.tileWidth / 2, y: y + map.tileHeight / 2, anchor: 0)
+        animation.draw(g: g, x: x + map.tileWidth / 2, y: y + map.tileHeight / 2, anchor: 0)
     }
 
     // MARK: - Own methods
@@ -53,8 +53,8 @@ class Ring: MapObject {
         physicalTilePos = (i, j)
         let p = tileToWorld(i: i, j: j)
         worldPos = p
-        worldPos.x -= animacion.offsets.x
-        worldPos.y -= animacion.offsets.y
+        worldPos.x -= animation.offsets.x
+        worldPos.y -= animation.offsets.y
         updateScreenPos()
     }
 }

@@ -21,15 +21,15 @@ class Level {
 
     // MARK: - Private class
     /// Contains the ordered stack of objectives for a single battle phase.
-    private class Batalla {
-        var objetivos: [Objective] = []  // LIFO: popLast
+    private class Battle {
+        var objectives: [Objective] = []  // LIFO: popLast
         /// The total number of objectives this battle originally had.
         var objectiveCount: Int = 0
     }
 
     // MARK: - Declarations
     /// All battles in the level.
-    private var battles: [Batalla?]
+    private var battles: [Battle?]
     /// The index of the battle currently being played.
     private(set) var currentBattleIndex: Int = 0
     /// The total number of battles loaded for this level.
@@ -62,7 +62,7 @@ class Level {
     func load(_ levelIndex: Int) {
         let pathStr = ResourcePath.levelPath + "/nivel_\(levelIndex).xml"
         guard let path = Utils.getPath(pathStr) else {
-            Log.shared.debug("No se pueden load los objetivos. No se encuentra el archivo: \(pathStr)")
+            Log.shared.debug("No se pueden load los objectives. No se encuentra el archivo: \(pathStr)")
             return
         }
         currentBattleIndex = 0
@@ -77,9 +77,9 @@ class Level {
 
         for (i, battle) in d.batallas.enumerated() {
             if i < battles.count {
-                let b = Batalla()
-                b.objetivos = battle.objetivos.reversed()  // reversal puts first-in at last (pop = LIFO)
-                b.objectiveCount = battle.objetivos.count
+                let b = Battle()
+                b.objectives = battle.objectives.reversed()  // reversal puts first-in at last (pop = LIFO)
+                b.objectiveCount = battle.objectives.count
                 battles[i] = b
                 battleCount += 1
             }
@@ -96,21 +96,21 @@ class Level {
         guard currentBattleIndex < battles.count,
               let battle = battles[currentBattleIndex] else { return nil }
 
-        if battle.objetivos.isEmpty {
+        if battle.objectives.isEmpty {
             currentBattleIndex += 1
             currentObjectiveIndex = 0
             Log.shared.debug("Paso a la siguiente battle.")
             if currentBattleIndex >= battleCount {
-                Log.shared.debug("No hay mas objetivos — gane!!")
+                Log.shared.debug("No hay mas objectives — gane!!")
                 return nil
             }
         }
 
         guard currentBattleIndex < battles.count,
               let b2 = battles[currentBattleIndex],
-              !b2.objetivos.isEmpty else { return nil }
+              !b2.objectives.isEmpty else { return nil }
 
-        return b2.objetivos.removeLast()
+        return b2.objectives.removeLast()
     }
 }
 
@@ -118,8 +118,8 @@ class Level {
 
 private class NivelXMLDelegate: NSObject, XMLParserDelegate {
 
-    struct BatallaData { var objetivos: [Objective] = [] }
-    var batallas: [BatallaData] = []
+    struct BattleData { var objectives: [Objective] = [] }
+    var batallas: [BattleData] = []
 
     private var inBattle = false
     private var inObjective = false
@@ -132,7 +132,7 @@ private class NivelXMLDelegate: NSObject, XMLParserDelegate {
         switch name {
         case "batalla":
             inBattle = true
-            batallas.append(BatallaData())
+            batallas.append(BattleData())
         case "objetivo":
             let imgPath = a["imagen"]
             currentObj = Objective(pathImagen: imgPath)
@@ -181,7 +181,7 @@ private class NivelXMLDelegate: NSObject, XMLParserDelegate {
                 namespaceURI: String?, qualifiedName: String?) {
         if name == "objetivo", var obj = currentObj {
             obj.commands = currentCommands.reversed()
-            batallas[batallas.count - 1].objetivos.append(obj)
+            batallas[batallas.count - 1].objectives.append(obj)
             currentObj = nil
             inObjective = false
         } else if name == "batalla" {
