@@ -34,8 +34,8 @@ class State {
 
     // MARK: - Abstract methods (must be overridden by subclasses)
     /// Draws the state onto the given video surface.
-    /// - Parameter g: The screen to draw onto.
-    func draw(_ g: Video) {
+    /// - Parameter video: The screen to draw onto.
+    func draw(_ video: Video) {
         fatalError("\(type(of: self)).draw(_:) must be overridden")
     }
 

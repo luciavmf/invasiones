@@ -43,8 +43,8 @@ class GameScene: SKScene {
             let winPos = win.convertPoint(fromScreen: screenPos)
             let viewPos = v.convert(winPos, from: nil)
             let scenePos = convertPoint(fromView: viewPos)
-            Mouse.shared.X = scenePos.x
-            Mouse.shared.Y = CGFloat(ScreenSize.height) - scenePos.y
+            Mouse.shared.x = scenePos.x
+            Mouse.shared.y = CGFloat(ScreenSize.height) - scenePos.y
         }
         gameFrame.update()
         gameFrame.draw()
@@ -53,15 +53,15 @@ class GameScene: SKScene {
     // MARK: - Mouse events
     override func mouseDown(with event: NSEvent) {
         let pos = event.location(in: self)
-        Mouse.shared.X = pos.x
-        Mouse.shared.Y = CGFloat(ScreenSize.height) - pos.y
+        Mouse.shared.x = pos.x
+        Mouse.shared.y = CGFloat(ScreenSize.height) - pos.y
         Mouse.shared.pressButton(Mouse.Constants.leftButton)
     }
 
     override func rightMouseDown(with event: NSEvent) {
         let pos = event.location(in: self)
-        Mouse.shared.X = pos.x
-        Mouse.shared.Y = CGFloat(ScreenSize.height) - pos.y
+        Mouse.shared.x = pos.x
+        Mouse.shared.y = CGFloat(ScreenSize.height) - pos.y
         Mouse.shared.pressButton(Mouse.Constants.rightButton)
     }
 
@@ -83,15 +83,15 @@ class GameScene: SKScene {
 
     override func mouseMoved(with event: NSEvent) {
         let pos = event.location(in: self)
-        Mouse.shared.X = pos.x
-        Mouse.shared.Y = CGFloat(ScreenSize.height) - pos.y
+        Mouse.shared.x = pos.x
+        Mouse.shared.y = CGFloat(ScreenSize.height) - pos.y
         view?.window?.acceptsMouseMovedEvents = true
     }
 
     override func mouseDragged(with event: NSEvent) {
         let pos = event.location(in: self)
-        Mouse.shared.X = pos.x
-        Mouse.shared.Y = CGFloat(ScreenSize.height) - pos.y
+        Mouse.shared.x = pos.x
+        Mouse.shared.y = CGFloat(ScreenSize.height) - pos.y
     }
 
     // MARK: - Keyboard events

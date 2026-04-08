@@ -12,8 +12,8 @@ import Foundation
 class Camera {
 
     // MARK: - Declarations
-    var X: Int
-    var Y: Int
+    var x: Int
+    var y: Int
 
     private(set) var startX: Int = 0
     private(set) var startY: Int = 0
@@ -24,8 +24,8 @@ class Camera {
 
     // MARK: - Initializer
     init(x: Int, y: Int, height: Int) {
-        X = x
-        Y = y
+        self.x = x
+        self.y = y
         self.height = height
     }
 

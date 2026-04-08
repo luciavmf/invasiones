@@ -118,30 +118,30 @@ class Map {
 
     /// Draws layer `layer` onto the given Video using the current camera.
     @discardableResult
-    func drawLayer(g: Video, layer: Int) -> Bool {
+    func drawLayer(video: Video, layer: Int) -> Bool {
         guard layer < maxLayers, layer >= 0 else { return false }
         guard mapLoaded else { return false }
 
-        let oldClip = g.getClip()
-        g.setClip(x: camera.startX, y: camera.startY, w: camera.width, h: camera.height)
+        let oldClip = video.getClip()
+        video.setClip(x: camera.startX, y: camera.startY, w: camera.width, h: camera.height)
 
         var toggle = true
-        let p = calculateFirstTileToDraw(x: camera.X, y: camera.Y)
-        var XX = p.x, YY = p.y
+        let p = calculateFirstTileToDraw(x: camera.x, y: camera.y)
+        var startCol = p.x, startRow = p.y
 
-        var startPosX = camera.startX + (((XX - YY) * tileWidth) >> 1) + camera.X
-        var startPosY = camera.startY + (((XX + YY) * tileHeight)  >> 1) + camera.Y
+        var startPosX = camera.startX + (((startCol - startRow) * tileWidth) >> 1) + camera.x
+        var startPosY = camera.startY + (((startCol + startRow) * tileHeight)  >> 1) + camera.y
 
         while startPosY <= (camera.height + camera.startY) {
             var tileX = 0
-            var i = XX, j = YY
+            var i = startCol, j = startRow
             while (tileX * tileWidth + startPosX) <= (camera.startX + camera.width) && j >= 0 {
                 if i < height && i >= 0 && j < width && j >= 0 {
                     let tileId = mapData[layer][i][j]
                     if tileId != 0, let ts = getTileset(tileId) {
                         let localId = tileId - ts.firstGid
                         let rect = ts.getTileRect(localId)
-                        g.draw(ts.image, rect.x, rect.y, rect.w, rect.h,
+                        video.draw(ts.image, rect.x, rect.y, rect.w, rect.h,
                                   tileX * tileWidth + startPosX, startPosY)
                     }
                 }
@@ -151,13 +151,13 @@ class Map {
             startPosY += tileHeight >> 1
 
             if toggle {
-                XX += 1; startPosX += tileWidth >> 1; toggle = false
+                startCol += 1; startPosX += tileWidth >> 1; toggle = false
             } else {
-                YY += 1; startPosX -= tileWidth >> 1; toggle = true
+                startRow += 1; startPosX -= tileWidth >> 1; toggle = true
             }
         }
 
-        g.setClip(x: oldClip.x, y: oldClip.y, w: oldClip.w, h: oldClip.h)
+        video.setClip(x: oldClip.x, y: oldClip.y, w: oldClip.w, h: oldClip.h)
         return true
     }
 
@@ -165,17 +165,17 @@ class Map {
 
     /// Draws a small tile (physical map) at the corresponding isometric position.
     /// If `semiTransparent` is true, draws the semi-transparent grey tile (fog-of-war).
-    func drawSmallTile(g: Video, i: Int, j: Int, semiTransparent: Bool) {
+    func drawSmallTile(video: Video, i: Int, j: Int, semiTransparent: Bool) {
         guard i >= 0, j >= 0, i < physicalHeight, j < physicalWidth else { return }
 
-        let posX = camera.startX + (((i - j) * tileWidth / 2) >> 1) + camera.X + tileWidth / 4
-        let posY = camera.startY + (((i + j) * tileHeight  / 2) >> 1) + camera.Y
+        let posX = camera.startX + (((i - j) * tileWidth / 2) >> 1) + camera.x + tileWidth / 4
+        let posY = camera.startY + (((i + j) * tileHeight  / 2) >> 1) + camera.y
 
         if semiTransparent {
             if greyTileImage == nil {
                 greyTileImage = ResourceManager.shared.getImage(Res.IMG_TILE_GRIS)
             }
-            g.draw(greyTileImage, posX, posY, 128, 0)
+            video.draw(greyTileImage, posX, posY, 128, 0)
         }
     }
 
@@ -184,71 +184,71 @@ class Map {
     func update() {
         guard mapLoaded else { return }
 
-        let mx = Int(Mouse.shared.X)
-        let my = Int(Mouse.shared.Y)
+        let mx = Int(Mouse.shared.x)
+        let my = Int(Mouse.shared.y)
 
         if mx < camera.border {
-            if camera.X + camera.speed <= (width * tileWidth) / 2 {
-                let p = calculateFirstTileToDraw(x: camera.X, y: camera.Y)
+            if camera.x + camera.speed <= (width * tileWidth) / 2 {
+                let p = calculateFirstTileToDraw(x: camera.x, y: camera.y)
                 if p.x < -13 {
-                    camera.Y -= camera.speed / 2
+                    camera.y -= camera.speed / 2
                 } else {
-                    let p2 = calculateFirstTileToDraw(x: camera.X, y: camera.Y - camera.height)
-                    if p2.y > height + 13 { camera.Y += camera.speed / 2 }
+                    let p2 = calculateFirstTileToDraw(x: camera.x, y: camera.y - camera.height)
+                    if p2.y > height + 13 { camera.y += camera.speed / 2 }
                 }
-                camera.X += camera.speed
+                camera.x += camera.speed
             }
         }
 
         if my > camera.height - camera.border {
-            if (camera.Y - camera.speed) >= (camera.height - height * tileHeight) &&
-               camera.Y - camera.speed <= 0 {
-                let p = calculateFirstTileToDraw(x: camera.X, y: camera.Y - camera.height)
+            if (camera.y - camera.speed) >= (camera.height - height * tileHeight) &&
+               camera.y - camera.speed <= 0 {
+                let p = calculateFirstTileToDraw(x: camera.x, y: camera.y - camera.height)
                 if p.y > height + 13 {
-                    camera.Y -= camera.speed / 2
-                    camera.X -= camera.speed
+                    camera.y -= camera.speed / 2
+                    camera.x -= camera.speed
                 } else {
-                    let p2 = calculateFirstTileToDraw(x: camera.X - camera.width, y: camera.Y - camera.height)
+                    let p2 = calculateFirstTileToDraw(x: camera.x - camera.width, y: camera.y - camera.height)
                     if p2.x > width + 13 {
-                        camera.Y -= camera.speed / 2
-                        camera.X += camera.speed
+                        camera.y -= camera.speed / 2
+                        camera.x += camera.speed
                     } else {
-                        camera.Y -= camera.speed
+                        camera.y -= camera.speed
                     }
                 }
             }
         }
 
         if my < camera.border {
-            if camera.Y + camera.speed <= 0 {
-                let p = calculateFirstTileToDraw(x: camera.X, y: camera.Y)
+            if camera.y + camera.speed <= 0 {
+                let p = calculateFirstTileToDraw(x: camera.x, y: camera.y)
                 if p.x < -13 {
-                    camera.X -= camera.speed
-                    camera.Y += camera.speed / 2
+                    camera.x -= camera.speed
+                    camera.y += camera.speed / 2
                 } else {
-                    let p2 = calculateFirstTileToDraw(x: camera.X - camera.width, y: camera.Y)
+                    let p2 = calculateFirstTileToDraw(x: camera.x - camera.width, y: camera.y)
                     if p2.y < -13 {
-                        camera.X += camera.speed
-                        camera.Y += camera.speed / 2
+                        camera.x += camera.speed
+                        camera.y += camera.speed / 2
                     } else {
-                        camera.Y += camera.speed
+                        camera.y += camera.speed
                     }
                 }
             }
         }
 
         if mx > camera.width - camera.border {
-            let p = calculateFirstTileToDraw(x: camera.X - camera.width, y: camera.Y)
-            if (camera.X - camera.width - camera.speed + tileWidth)
+            let p = calculateFirstTileToDraw(x: camera.x - camera.width, y: camera.y)
+            if (camera.x - camera.width - camera.speed + tileWidth)
                 >= -(width * tileWidth) / 2 ||
-               (camera.X - camera.speed) > 0 {
+               (camera.x - camera.speed) > 0 {
                 if p.y < -13 {
-                    camera.Y -= camera.speed / 2
+                    camera.y -= camera.speed / 2
                 } else {
-                    let p2 = calculateFirstTileToDraw(x: camera.X - camera.width, y: camera.Y - camera.height)
-                    if p2.x > height + 13 { camera.Y += camera.speed / 2 }
+                    let p2 = calculateFirstTileToDraw(x: camera.x - camera.width, y: camera.y - camera.height)
+                    if p2.x > height + 13 { camera.y += camera.speed / 2 }
                 }
-                camera.X -= camera.speed
+                camera.x -= camera.speed
             }
         }
 
@@ -346,27 +346,27 @@ class Map {
 
     private func updateMouseCoords() {
         guard mapLoaded else { return }
-        let p = tilePositionFromXY(x: Int(Mouse.shared.X), y: Int(Mouse.shared.Y))
+        let p = tilePositionFromXY(x: Int(Mouse.shared.x), y: Int(Mouse.shared.y))
         tileUnderMouse = p
     }
 
     private func tilePositionFromXY(x: Int, y: Int) -> (x: Int, y: Int) {
         guard tileHeight > 0, tileWidth > 0 else { return (0, 0) }
         // Logical tile coords (for tileUnderMouse — buildings, obstacles)
-        let a = (y - camera.Y - camera.startY) / tileHeight
+        let a = (y - camera.y - camera.startY) / tileHeight
         let b: Int
-        if x - camera.X > 0 {
-            b = (x - camera.X - camera.startX) / tileWidth
+        if x - camera.x > 0 {
+            b = (x - camera.x - camera.startX) / tileWidth
         } else {
-            b = (x - camera.X - camera.startX - tileWidth) / tileWidth
+            b = (x - camera.x - camera.startX - tileWidth) / tileWidth
         }
         // Physical tile coords (2× resolution — for smallTileUnderMouse, pathfinding, movement)
-        let aF = (y - camera.Y - camera.startY) / physicalTileHeight
+        let aF = (y - camera.y - camera.startY) / physicalTileHeight
         let bF: Int
-        if x - camera.X > 0 {
-            bF = (x - camera.X - camera.startX) / physicalTileWidth
+        if x - camera.x > 0 {
+            bF = (x - camera.x - camera.startX) / physicalTileWidth
         } else {
-            bF = (x - camera.X - camera.startX - physicalTileWidth) / physicalTileWidth
+            bF = (x - camera.x - camera.startX - physicalTileWidth) / physicalTileWidth
         }
         smallTileUnderMouse = (aF + bF, aF - bF)
         return (a + b, a - b)
@@ -390,8 +390,8 @@ class Map {
         height = d.height; physicalHeight = d.height * 2
         tileWidth = d.tileWidth; physicalTileWidth = d.tileWidth / 2
         tileHeight = d.tileHeight; physicalTileHeight = d.tileHeight / 2
-        camera.X = ((d.tileCamaraJ - d.tileCamaraI) * tileWidth) >> 1
-        camera.Y = -((d.tileCamaraJ + d.tileCamaraI) * tileHeight) >> 1
+        camera.x = ((d.tileCamaraJ - d.tileCamaraI) * tileWidth) >> 1
+        camera.y = -((d.tileCamaraJ + d.tileCamaraI) * tileHeight) >> 1
     }
 
     private func readTilesets(_ mapPath: String, paths: [String?]) throws {

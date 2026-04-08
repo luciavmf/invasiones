@@ -124,17 +124,17 @@ class Episode {
 
     // MARK: - Draw
 
-    func draw(_ g: Video) {
+    func draw(_ video: Video) {
         switch stateValue {
-        case .loading: drawLoadingState(g)
-        case .showObjectives: drawShowObjectiveState(g)
-        case .playing: drawPlayingState(g)
-        case .showIntro: drawShowIntroState(g)
-        case .won: drawWonState(g)
-        case .lost: drawLostState(g)
+        case .loading: drawLoadingState(video)
+        case .showObjectives: drawShowObjectiveState(video)
+        case .playing: drawPlayingState(video)
+        case .showIntro: drawShowIntroState(video)
+        case .won: drawWonState(video)
+        case .lost: drawLostState(video)
         case .end: break
         }
-        g.setColor(GameColor.white)
+        video.setColor(GameColor.white)
     }
 
     // MARK: - LOADING state
@@ -153,12 +153,12 @@ class Episode {
         }
     }
 
-    private func drawLoadingState(_ g: Video) {
-        g.fillRect(0)
-        g.setColor(UIColors.title)
-        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+    private func drawLoadingState(_ video: Video) {
+        video.fillRect(0)
+        video.setColor(UIColors.title)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
                        UIColors.title)
-        g.write(Res.STR_CARGANDO, 0, Constants.loadingY, Surface.centerHorizontal)
+        video.write(Res.STR_CARGANDO, 0, Constants.loadingY, Surface.centerHorizontal)
     }
 
     private func loadSprites() {
@@ -281,12 +281,12 @@ class Episode {
         }
     }
 
-    private func drawShowIntroState(_ g: Video) {
-        drawPlayingState(g)
+    private func drawShowIntroState(_ video: Video) {
+        drawPlayingState(video)
 
-        g.setColor(UIColors.objectivesText)
+        video.setColor(UIColors.objectivesText)
         let hudHeight = hud?.height ?? 0
-        g.fillRect(
+        video.fillRect(
             0, -(hudHeight >> 1),
             Video.width - (Constants.objectivesBorder << 1),
             Video.height  - (Constants.objectivesBorder << 1) - hudHeight,
@@ -295,17 +295,17 @@ class Episode {
         )
 
         if currentPage == 0 {
-            g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+            video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
                            UIColors.text)
         } else {
-            g.setFont(ResourceManager.shared.fonts[FontConstants.objectivesFont],
+            video.setFont(ResourceManager.shared.fonts[FontConstants.objectivesFont],
                            UIColors.text)
         }
 
         let strIdx = Res.STR_PRIMER_BATALLA + currentPage +
                      ((currentLevel?.currentBattleIndex ?? 0) * Constants.pagesPerIntro)
-        g.write(strIdx, 0, -(hudHeight >> 1), Surface.centerVertical | Surface.centerHorizontal)
-        button?.draw(g)
+        video.write(strIdx, 0, -(hudHeight >> 1), Surface.centerVertical | Surface.centerHorizontal)
+        button?.draw(video)
     }
 
     // MARK: - SHOW OBJECTIVES state
@@ -326,31 +326,31 @@ class Episode {
         }
     }
 
-    private func drawShowObjectiveState(_ g: Video) {
-        drawPlayingState(g)
+    private func drawShowObjectiveState(_ video: Video) {
+        drawPlayingState(video)
 
         let hudHeight = hud?.height ?? 0
-        g.setColor(UIColors.objectivesText)
-        g.fillRect(
+        video.setColor(UIColors.objectivesText)
+        video.fillRect(
             0, -(hudHeight / 2),
             Constants.objectivesBoxWidth, Constants.objectivesBoxHeight,
             UIColors.alpha,
             Surface.centerVertical | Surface.centerHorizontal
         )
 
-        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.text)
-        g.write(
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.text)
+        video.write(
             Res.STR_OBJETIVOS, 0,
             -(hudHeight / 2) - Constants.objectivesBoxHeight / 2 + 50,
             Surface.centerVertical | Surface.centerHorizontal
         )
 
-        g.setFont(ResourceManager.shared.fonts[FontConstants.objectivesFont], UIColors.text)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.objectivesFont], UIColors.text)
         let strIdx = Res.STR_PRIMER_BATALLA + currentPage +
                      ((currentLevel?.currentBattleIndex ?? 0) * Constants.pagesPerIntro)
-        g.write(strIdx, 0, -(hudHeight >> 1) + 30, Surface.centerVertical | Surface.centerHorizontal)
+        video.write(strIdx, 0, -(hudHeight >> 1) + 30, Surface.centerVertical | Surface.centerHorizontal)
 
-        acceptButton?.draw(g)
+        acceptButton?.draw(video)
     }
 
     // MARK: - PLAYING state
@@ -395,18 +395,18 @@ class Episode {
         }
     }
 
-    private func drawPlayingState(_ g: Video) {
-        g.fillRect(GameColor.black)
+    private func drawPlayingState(_ video: Video) {
+        video.fillRect(GameColor.black)
 
-        if let map = map { map.drawLayer(g: g, layer: map.layers.terrain) }
+        if let map = map { map.drawLayer(video: video, layer: map.layers.terrain) }
 
-        dibujarObjetos(g)
+        dibujarObjetos(video)
 
-        drawSemiTransparentLayer(g)
+        drawSemiTransparentLayer(video)
 
-        hud?.draw(g)
+        hud?.draw(video)
 
-        player?.drawOrientationArrow(g)
+        player?.drawOrientationArrow(video)
 
         if showObjectivePopup &&
            objectiveShowCount > Constants.objectiveShowStartCount {
@@ -415,34 +415,34 @@ class Episode {
                   objectiveShowCount > Constants.objectiveShowStartCount {
             let hudHeight = hud?.height ?? 0
             let cameraHeight = camera?.height ?? Video.height
-            g.setFont(ResourceManager.shared.fonts[FontConstants.objectivesReminderFont],
+            video.setFont(ResourceManager.shared.fonts[FontConstants.objectivesReminderFont],
                       UIColors.title)
-            g.write(Res.STR_OBJETIVOS,
+            video.write(Res.STR_OBJETIVOS,
                        Layout.objectivesOffset << 1,
                        cameraHeight - (Layout.objectivesHeight + Layout.objectivesOffset * 2) - 10, 0)
             let strIdx = Res.STR_OBJETIVO_BATALLA_1_1 + (currentLevel?.completedObjectiveCount ?? 0)
-            g.write(strIdx,
+            video.write(strIdx,
                        Layout.objectivesOffset << 1,
                        cameraHeight - (Layout.objectivesHeight + Layout.objectivesOffset * 2) + 5, 0)
             _ = hudHeight  // suppress warning
         }
 
         if Mouse.shared.isDragging() {
-            g.setColor(GameColor.green)
+            video.setColor(GameColor.green)
             let r = Mouse.shared.dragRect
-            g.drawRect(Int(r.minX), Int(r.minY), Int(r.width), Int(r.height), 0)
+            video.drawRect(Int(r.minX), Int(r.minY), Int(r.width), Int(r.height), 0)
         }
     }
 
-    private func drawSemiTransparentLayer(_ g: Video) {
+    private func drawSemiTransparentLayer(_ video: Video) {
         guard let map = map, let camera = camera, let player = player else { return }
 
-        let oldClip = g.getClip()
-        g.setClip(x: camera.startX, y: camera.startY, w: camera.width, h: camera.height)
+        let oldClip = video.getClip()
+        video.setClip(x: camera.startX, y: camera.startY, w: camera.width, h: camera.height)
 
         let rect = player.getPaintCoordinates()
-        var XX = rect.x
-        var YY = rect.y
+        var startCol = rect.x
+        var startRow = rect.y
         let endI = rect.w
         let endJ = rect.h
 
@@ -451,32 +451,32 @@ class Episode {
 
         while tileY <= endJ {
             var tileX = 0
-            var i = XX, j = YY
+            var i = startCol, j = startRow
             while tileX <= endI && j >= 0 {
                 if i >= 0 && i < map.physicalMapHeight && j < map.physicalMapWidth {
                     if map.visibleTilesLayer[i][j] == 0 {
-                        map.drawSmallTile(g: g, i: i, j: j, semiTransparent: true)
+                        map.drawSmallTile(video: video, i: i, j: j, semiTransparent: true)
                     }
                 }
                 tileX += 1; i += 1; j -= 1
             }
             tileY += 1
-            if toggle { XX += 1; toggle = false }
-            else       { YY += 1; toggle = true  }
+            if toggle { startCol += 1; toggle = false }
+            else       { startRow += 1; toggle = true  }
         }
 
-        g.setClip(x: oldClip.x, y: oldClip.y, w: oldClip.w, h: oldClip.h)
+        video.setClip(x: oldClip.x, y: oldClip.y, w: oldClip.w, h: oldClip.h)
     }
 
-    private func dibujarObjetos(_ g: Video) {
+    private func dibujarObjetos(_ video: Video) {
         guard let map = map, let camera = camera, let player = player else { return }
 
-        let oldClip = g.getClip()
-        g.setClip(x: camera.startX, y: camera.startY, w: camera.width, h: camera.height)
+        let oldClip = video.getClip()
+        video.setClip(x: camera.startX, y: camera.startY, w: camera.width, h: camera.height)
 
         let rect = player.getPaintCoordinates()
-        var XX = rect.x
-        var YY = rect.y
+        var startCol = rect.x
+        var startRow = rect.y
         let endI = rect.w
         let endJ = rect.h
 
@@ -485,25 +485,25 @@ class Episode {
 
         while tileY <= endJ {
             var tileX = 0
-            var i = XX, j = YY
+            var i = startCol, j = startRow
             while tileX <= endI && j >= 0 {
                 if i >= 0 && i < map.physicalMapHeight && j < map.physicalMapWidth {
                     if let obj = objectsToDraw.tabla[i][j] {
-                        if let uni = obj as? Unit  { uni.draw(g) }
-                        if let obs = obj as? Obstacle { obs.draw(g) }
+                        if let uni = obj as? Unit  { uni.draw(video) }
+                        if let obs = obj as? Obstacle { obs.draw(video) }
                     }
                 }
                 tileX += 1; i += 1; j -= 1
             }
             tileY += 1
-            if toggle { XX += 1; toggle = false }
-            else       { YY += 1; toggle = true  }
+            if toggle { startCol += 1; toggle = false }
+            else       { startRow += 1; toggle = true  }
         }
 
         // Fueguitos del jugador se dibujan encima (delegado a ArgentineFaction via Player)
         // player.Dibujar(g) — in the original it drew fire effects; delegated if needed
 
-        g.setClip(x: oldClip.x, y: oldClip.y, w: oldClip.w, h: oldClip.h)
+        video.setClip(x: oldClip.x, y: oldClip.y, w: oldClip.w, h: oldClip.h)
     }
 
     // MARK: - WON state
@@ -514,12 +514,12 @@ class Episode {
         }
     }
 
-    private func drawWonState(_ g: Video) {
-        drawPlayingState(g)
-        button?.draw(g)
-        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
+    private func drawWonState(_ video: Video) {
+        drawPlayingState(video)
+        button?.draw(video)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
                        UIColors.title)
-        g.write(Res.STR_GANASTE, 0, 0, Surface.centerHorizontal | Surface.centerVertical)
+        video.write(Res.STR_GANASTE, 0, 0, Surface.centerHorizontal | Surface.centerVertical)
     }
 
     // MARK: - LOST state
@@ -537,12 +537,12 @@ class Episode {
         }
     }
 
-    private func drawLostState(_ g: Video) {
-        drawPlayingState(g)
-        g.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.title)
-        g.write(Res.STR_PERDISTE, 0, -100, Surface.centerHorizontal | Surface.centerVertical)
+    private func drawLostState(_ video: Video) {
+        drawPlayingState(video)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.title)
+        video.write(Res.STR_PERDISTE, 0, -100, Surface.centerHorizontal | Surface.centerVertical)
         if count > Constants.countdownToRestart {
-            gameOverMenu.draw(g)
+            gameOverMenu.draw(video)
         }
     }
 

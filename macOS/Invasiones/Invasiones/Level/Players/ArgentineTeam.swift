@@ -87,23 +87,23 @@ class ArgentineTeam: Player {
     // MARK: - Draw (llamado desde Episode)
 
     /// Draws the objective ring, the collectible object, fire effects, the destination arrow, and the orientation arrow.
-    func drawOrientationArrow(_ g: Video) {
+    func drawOrientationArrow(_ video: Video) {
         guard stateValue == .game else { return }
 
         // Draw objective ring, object to grab, and fire effects
-        ring?.draw(g)
-        objectToTake?.draw(g)
-        fireEffects?.forEach { $0.draw(g) }
+        ring?.draw(video)
+        objectToTake?.draw(video)
+        fireEffects?.forEach { $0.draw(video) }
 
         // Draw static destination arrow if there's a recent order
         if count < arrowMaxCount {
-            arrowObj?.draw(g)
+            arrowObj?.draw(video)
         }
 
         // Draw orientation arrow only if objective is off-screen
         guard command != nil, orientationArrow != nil else { return }
         guard !isObjectiveVisible() else { return }
-        orientationArrow?.draw(g: g, x: arrowPos.x, y: arrowPos.y, anchor: 0)
+        orientationArrow?.draw(video: video, x: arrowPos.x, y: arrowPos.y, anchor: 0)
     }
 
     // MARK: - Rendering coordinates for Episode
@@ -115,7 +115,7 @@ class ArgentineTeam: Player {
         guard let cam = MapObject.camera else {
             return (0, 0, map.physicalMapHeight, map.physicalMapWidth)
         }
-        let p = calculateFirstTileToDraw(x: cam.X, y: cam.Y)
+        let p = calculateFirstTileToDraw(x: cam.x, y: cam.y)
         let tw = map.physicalTileWidth > 0 ? map.physicalTileWidth : 1
         let th = map.physicalTileHeight > 0 ? map.physicalTileHeight : 1
         let w = (cam.width - cam.startX) / tw + 23
@@ -129,9 +129,9 @@ class ArgentineTeam: Player {
 
         // Center camera on the unit
         let u = units[unitToFindIdx]
-        camera.X = (((u.physicalTilePos.y - u.physicalTilePos.x) *
+        camera.x = (((u.physicalTilePos.y - u.physicalTilePos.x) *
                         map.physicalTileWidth) >> 1) + Video.width / 2
-        camera.Y = ((-(u.physicalTilePos.y + u.physicalTilePos.x) *
+        camera.y = ((-(u.physicalTilePos.y + u.physicalTilePos.x) *
                         map.physicalTileHeight) >> 1) + Video.height / 2
 
         selectedUnit?.isSelected = false
@@ -178,9 +178,9 @@ class ArgentineTeam: Player {
 
         // Screen position of the target tile
         commandTargetPos.x = (((ord.point.x - ord.point.y) * map.tileWidth / 2) >> 1)
-                              + camera.startX + camera.X
+                              + camera.startX + camera.x
         commandTargetPos.y = (((ord.point.x + ord.point.y) * map.tileHeight  / 2) >> 1)
-                              + camera.startY + camera.Y
+                              + camera.startY + camera.y
 
         guard !isObjectiveVisible() else { return }
 
@@ -244,13 +244,13 @@ class ArgentineTeam: Player {
 
     private func getUnitUnderMouse() -> Unit? {
         let rect = getPaintCoordinates()
-        var XX = rect.x, YY = rect.y
+        var startCol = rect.x, startRow = rect.y
         let endI = rect.w, endJ = rect.h
         var tileY = 0, toggle = true
 
         while tileY <= endJ {
             var tileX = 0
-            var i = XX, j = YY
+            var i = startCol, j = startRow
             while tileX <= endI && j >= 0 {
                 if i >= 0 && i < map.physicalMapHeight && j < map.physicalMapWidth {
                     if let uni = objectsToDraw.tabla[i][j] as? Unit,
@@ -261,8 +261,8 @@ class ArgentineTeam: Player {
                 tileX += 1; i += 1; j -= 1
             }
             tileY += 1
-            if toggle { XX += 1; toggle = false }
-            else       { YY += 1; toggle = true  }
+            if toggle { startCol += 1; toggle = false }
+            else       { startRow += 1; toggle = true  }
         }
         return nil
     }

@@ -68,22 +68,22 @@ class ConfirmationMenu: GUIBox {
         return Selection.none.rawValue
     }
 
-    override func draw(_ g: Video) {
-        g.setColor(UIColors.menus)
-        g.fillRect(posX, posY, width, height, Constants.alpha)
+    override func draw(_ video: Video) {
+        video.setColor(UIColors.menus)
+        video.fillRect(posX, posY, width, height, Constants.alpha)
 
-        g.setFont(
+        video.setFont(
             ResourceManager.shared.fonts[FontConstants.menuFont],
             UIColors.text
         )
-        g.write(
+        video.write(
             label,
             posX - (Video.width >> 1) + (width >> 1),
             posY + height / 5,
             Surface.centerHorizontal
         )
 
-        leftButton.draw(g)
-        rightButton.draw(g)
+        leftButton.draw(video)
+        rightButton.draw(video)
     }
 }

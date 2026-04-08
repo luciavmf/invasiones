@@ -196,21 +196,21 @@ class Unit: MapObject {
         return movedOnMap
     }
 
-    override func draw(_ g: Video) {
+    override func draw(_ video: Video) {
         // Selection (health bar) is drawn here
         if isSelected {
             let healthFraction = Double(health) / Double(max(resistancePoints, 1))
             let barWidth = Int(Double(Constants.selectionBarWidth) * healthFraction)
-            g.setColor(GameColor.green)
-            g.fillRect(x - Constants.selectionBarWidth / 2,
+            video.setColor(GameColor.green)
+            video.fillRect(x - Constants.selectionBarWidth / 2,
                                y + Constants.selectionBarY,
                                barWidth, 3)
-            g.setColor(GameColor.red)
-            g.fillRect(x - Constants.selectionBarWidth / 2 + barWidth,
+            video.setColor(GameColor.red)
+            video.fillRect(x - Constants.selectionBarWidth / 2 + barWidth,
                                y + Constants.selectionBarY,
                                Constants.selectionBarWidth - barWidth, 3)
         }
-        sprite?.draw(g: g, x: x - (sprite?.frameWidth ?? 0) / 2,
+        sprite?.draw(video: video, x: x - (sprite?.frameWidth ?? 0) / 2,
                      y: y - (sprite?.frameHeight ?? 0))
     }
 
@@ -447,8 +447,8 @@ class Unit: MapObject {
 
     /// Returns `true` if the mouse cursor is currently over this unit's sprite bounding box.
     func isUnderMouse() -> Bool {
-        let mx = Int(Mouse.shared.X)
-        let my = Int(Mouse.shared.Y)
+        let mx = Int(Mouse.shared.x)
+        let my = Int(Mouse.shared.y)
         let fw = sprite?.frameWidth ?? (frameWidth > 0 ? frameWidth : 20)
         let fh = sprite?.frameHeight  ?? (frameHeight  > 0 ? frameHeight  : 30)
         let hw = fw / 2

@@ -48,9 +48,9 @@ class Menu: GUIBox {
 
     // MARK: - Methods
 
-    override func draw(_ g: Video) {
+    override func draw(_ video: Video) {
         if let img = image {
-            g.draw(img, posX, posY - 6, 0)
+            video.draw(img, posX, posY - 6, 0)
         }
 
         var y = posY
@@ -58,11 +58,11 @@ class Menu: GUIBox {
             let flags = (items[i] & 0xFF00) >> 8
             if flags != Constants.itemHidden {
                 if (flags & Constants.itemHover) != 0 {
-                    g.setColor(GameColor.black)
-                    g.fillRect(posX + 2, y, buttonWidth, buttonHeight)
+                    video.setColor(GameColor.black)
+                    video.fillRect(posX + 2, y, buttonWidth, buttonHeight)
                 }
-                g.setFont(font, UIColors.text)
-                g.write(items[i] & 0xFF,
+                video.setFont(font, UIColors.text)
+                video.write(items[i] & 0xFF,
                            posX - (Video.width >> 1) + (buttonWidth >> 1),
                            y   - (Video.height  >> 1) + (buttonHeight  >> 1),
                            Surface.centerHorizontal | Surface.centerVertical)
@@ -79,8 +79,8 @@ class Menu: GUIBox {
         for i in 0..<itemCount {
             let flags = (items[i] & 0xFF00) >> 8
             if flags != Constants.itemHidden {
-                let mx = Int(Mouse.shared.X)
-                let my = Int(Mouse.shared.Y)
+                let mx = Int(Mouse.shared.x)
+                let my = Int(Mouse.shared.y)
                 if mx > posX && mx < posX + buttonWidth && my > y && my < y + buttonHeight {
                     items[i] |= (Constants.itemHover << 8)
                     if Mouse.shared.pressedButtons.contains(Mouse.Constants.leftButton) {

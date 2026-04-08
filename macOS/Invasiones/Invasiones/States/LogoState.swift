@@ -44,14 +44,14 @@ class LogoState: State {
         count += 1
     }
 
-    override func draw(_ g: Video) {
-        g.fillRect(GameColor.black)
+    override func draw(_ video: Video) {
+        video.fillRect(GameColor.black)
 
         if count > logoStartTick && count < logoEndTick {
             if alpha < 255 - 10 {
                 alpha += 10
             }
-            g.draw(logo, 0, 0, alpha, Surface.centerHorizontal | Surface.centerVertical)
+            video.draw(logo, 0, 0, alpha, Surface.centerHorizontal | Surface.centerVertical)
         }
     }
 
