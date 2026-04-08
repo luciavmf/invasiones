@@ -14,7 +14,7 @@ The original project was hosted in an SVN repository on Assembla, so the develop
 | Gameplay   |
 |![Gameplay](screenshots/Gameplay.jpg) |
 | Battle Intro |
-| ![Battle Intro](screenshots/Objectives0.png) | 
+| ![Battle Intro](screenshots/Objectives0.jpg) | 
 | Objectives |
 | ![Objectives](screenshots/Objectives.jpg) |
 
