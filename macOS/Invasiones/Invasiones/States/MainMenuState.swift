@@ -24,7 +24,8 @@ class MainMenuState: State {
         case newGame = 0
         case help    = 1
         case options = 2
-        case quit    = 3
+        case credits = 3
+        case quit    = 4
     }
 
     private enum Constants {
@@ -57,16 +58,17 @@ class MainMenuState: State {
 
         let newMenu = Menu(
             image: nil,
-            itemCount: 4,
+            itemCount: 5,
             x: 0,
             y: Video.height - Constants.mainMenuYOffset,
             anchor: Surface.centerHorizontal
         )
 
-        newMenu.addItem(index: Item.newGame.rawValue, stringId: Res.STR_MENU_NUEVO_JUEGO, flag: Menu.Constants.itemVisible)
-        newMenu.addItem(index: Item.help.rawValue,    stringId: Res.STR_MENU_AYUDA, flag: Menu.Constants.itemVisible)
-        newMenu.addItem(index: Item.options.rawValue, stringId: Res.STR_MENU_OPCIONES, flag: Menu.Constants.itemVisible)
-        newMenu.addItem(index: Item.quit.rawValue,    stringId: Res.STR_MENU_SALIR, flag: Menu.Constants.itemVisible)
+        newMenu.addItem(index: Item.newGame.rawValue,  stringId: Res.STR_MENU_NUEVO_JUEGO, flag: Menu.Constants.itemVisible)
+        newMenu.addItem(index: Item.help.rawValue,     stringId: Res.STR_MENU_AYUDA,       flag: Menu.Constants.itemVisible)
+        newMenu.addItem(index: Item.options.rawValue,  stringId: Res.STR_MENU_OPCIONES,    flag: Menu.Constants.itemVisible)
+        newMenu.addItem(index: Item.credits.rawValue,  stringId: Res.STR_MENU_CREDITOS,    flag: Menu.Constants.itemVisible)
+        newMenu.addItem(index: Item.quit.rawValue,     stringId: Res.STR_MENU_SALIR,       flag: Menu.Constants.itemVisible)
 
         if firstBuild {
             firstBuild = false
@@ -102,6 +104,8 @@ class MainMenuState: State {
             stateMachine.setNextState(.help)
         case Item.options.rawValue:
             stateMachine.setNextState(.options)
+        case Item.credits.rawValue:
+            stateMachine.setNextState(.credits)
         case Item.quit.rawValue:
             stateMachine.setNextState(.quit)
         default:

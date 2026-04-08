@@ -72,6 +72,7 @@ class GameFrame {
         stateMachine.addState(key: .game, state: GameState(stateMachine))
         stateMachine.addState(key: .end, state: nil)
         stateMachine.addState(key: .help, state: HelpState(stateMachine))
+        stateMachine.addState(key: .credits, state: CreditsState(stateMachine))
         stateMachine.addState(key: .options, state: OptionsState(stateMachine))
         stateMachine.addState(key: .quit, state: ExitState(stateMachine))
 
