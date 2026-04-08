@@ -147,7 +147,7 @@ class Video {
             .paragraphStyle: paraStyle
         ]
         label.attributedText = NSAttributedString(string: text, attributes: attrs)
-        label.horizontalAlignmentMode = .center
+        label.horizontalAlignmentMode = (anchor & Surface.centerHorizontal) != 0 ? .center : .left
         label.verticalAlignmentMode = (anchor & Surface.centerVertical) != 0 ? .center : .top
         label.numberOfLines = 0      // allows line breaks with \n
         label.preferredMaxLayoutWidth = CGFloat(Video.width - 80)  // enables word-wrap and avoids clipping
