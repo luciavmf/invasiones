@@ -17,7 +17,7 @@ enum ResourcePath {
     static let iconPath = "imagenes/icono.png"
 
     static let stringsPath = "strings.xml"
-    static let resourcesPath = "res.xml"
+    static let resourcesPath = "res.json"
 }
 
 enum ScreenSize {

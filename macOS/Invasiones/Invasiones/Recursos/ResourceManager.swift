@@ -20,7 +20,7 @@ class ResourceManager {
     private var imageById: [Int: Surface] = [:]
     private var imageByName: [String: Surface] = [:]
 
-    /// Resolved (absolute) paths read from res.xml.
+    /// Resolved (absolute) paths read from res.json.
     private(set) var fontPaths: [String?] = []
     private(set) var imagePaths: [String?] = []
     private(set) var scenarioPaths: [String?] = []
@@ -49,25 +49,16 @@ class ResourceManager {
         imageByName.removeAll()
     }
 
-    // MARK: - Load paths from res.xml
+    // MARK: - Load paths from res.json
 
     func loadResourcePaths() throws {
-        guard let path = Utils.getPath(ResourcePath.resourcesPath) else {
-            throw GameError.fileNotFound("No existe el archivo \(ResourcePath.resourcesPath).")
-        }
+        let res = try decodeResJSON()
 
-        let parser = ResXMLParser()
-        let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
-        xmlParser?.delegate = parser
-        guard xmlParser?.parse() == true else {
-            throw GameError.parsingFailed("Error al parsear \(ResourcePath.resourcesPath).")
-        }
-
-        fontPaths = parser.fonts
-        imagePaths = parser.images
-        scenarioPaths = parser.scenarios
-        soundPaths = parser.sounds
-        unitPaths = parser.units
+        fontPaths     = res.fuentes.map { Utils.getPath($0) }
+        imagePaths    = res.imagenes.map { Utils.getPath($0) }
+        scenarioPaths = (res.escenarios.tilesets + res.escenarios.mapas).map { Utils.getPath($0) }
+        soundPaths    = res.sonidos.sfx.map { Utils.getPath($0) }
+        unitPaths     = res.unidades.map { Utils.getPath($0.file) }
 
         let hasErrors = fontPaths.contains(where: { $0 == nil })
                       || imagePaths.contains(where: { $0 == nil })
@@ -149,233 +140,111 @@ class ResourceManager {
         }
     }
 
-    // MARK: - Sprites (reads <sprites> section of res.xml)
+    // MARK: - Sprites (reads "sprites" section of res.json)
 
     func readSpriteInfo() throws {
-        guard let path = Utils.getPath(ResourcePath.resourcesPath) else {
-            throw GameError.fileNotFound("No existe el archivo \(ResourcePath.resourcesPath).")
-        }
+        let res = try decodeResJSON()
 
-        let parser = SpritesXMLParser()
-        let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
-        xmlParser?.delegate = parser
-        guard xmlParser?.parse() == true else {
-            throw GameError.parsingFailed("Error al parsear sprites de \(ResourcePath.resourcesPath).")
+        sprites = Array(repeating: nil, count: Res.SPR_COUNT)
+        for (i, sprJSON) in res.sprites.prefix(Res.SPR_COUNT).enumerated() {
+            let anims = sprJSON.animpaks.map { pak -> Animation in
+                let img = pak.image
+                let path = Utils.getPath(img.path) ?? ""
+                return Animation(idx: 0, path: path, ticks: img.frameticks,
+                                 frameWidth: img.framewidth, frameHeight: img.frameheight,
+                                 offsetX: img.offsetX, offsetY: img.offsetY)
+            }
+            let spr = Sprite()
+            spr.reserveSlots(anims.count)
+            for (j, anim) in anims.enumerated() {
+                spr.addAnimation(i: j, anim: anim)
+            }
+            try? spr.load()
+            sprites[i] = spr
         }
-
-        sprites = parser.sprites
     }
 
-    // MARK: - Animations (reads <anims> section of res.xml)
+    // MARK: - Animations (reads "anims" section of res.json)
 
     func readAnimationInfo() throws {
+        let res = try decodeResJSON()
+
+        animations = Array(repeating: nil, count: Res.ANIM_COUNT)
+        for (i, animJSON) in res.anims.prefix(Res.ANIM_COUNT).enumerated() {
+            let path = Utils.getPath(animJSON.imagepath) ?? ""
+            animations[i] = Animation(idx: 0, path: path, ticks: animJSON.frameticks,
+                                      frameWidth: animJSON.framewidth, frameHeight: animJSON.frameheight,
+                                      offsetX: animJSON.offsetX, offsetY: animJSON.offsetY)
+        }
+    }
+
+    // MARK: - Private JSON decoding
+
+    private func decodeResJSON() throws -> ResJSON {
         guard let path = Utils.getPath(ResourcePath.resourcesPath) else {
             throw GameError.fileNotFound("No existe el archivo \(ResourcePath.resourcesPath).")
         }
-
-        let parser = AnimsXMLParser()
-        let xmlParser = XMLParser(contentsOf: URL(fileURLWithPath: path))
-        xmlParser?.delegate = parser
-        guard xmlParser?.parse() == true else {
-            throw GameError.parsingFailed("Error al parsear animaciones de \(ResourcePath.resourcesPath).")
+        let data = try Data(contentsOf: URL(fileURLWithPath: path))
+        do {
+            return try JSONDecoder().decode(ResJSON.self, from: data)
+        } catch {
+            throw GameError.parsingFailed("ResourceManager: failed to parse \(ResourcePath.resourcesPath): \(error).")
         }
-
-        animations = parser.animations
     }
 }
 
-// MARK: - Internal res.xml parser
+// MARK: - res.json Codable model
 
-/// Parses res.xml and extracts the resolved paths for each section.
-private class ResXMLParser: NSObject, XMLParserDelegate {
+private struct ResJSON: Decodable {
 
-    var fonts: [String?] = Array(repeating: nil, count: Res.FNT_COUNT)
-    var images: [String?] = Array(repeating: nil, count: Res.IMG_COUNT)
-    var scenarios: [String?] = Array(repeating: nil, count: Res.TLS_COUNT + Res.MAP_COUNT)
-    var sounds: [String?] = Array(repeating: nil, count: Res.SND_COUNT + Res.SFX_COUNT)
-    var units: [String?] = Array(repeating: nil, count: Res.UNIDAD_COUNT)
-
-    // Parser state
-    private enum Section { case none, fonts, images, tilesets, maps, sfx, units, anims }
-    private var section: Section = .none
-    private var currentText = ""
-    private var inLeafElement = false
-
-    // Per-section counters
-    private var iFonts = 0
-    private var iImages = 0
-    private var iScenarios = 0
-    private var iSounds = 0
-    private var iUnits = 0
-
-    // For units (file="..." attribute)
-    private var fileAttr: String?
-
-    func parser(_ parser: XMLParser, didStartElement name: String, namespaceURI: String?,
-                qualifiedName: String?, attributes: [String: String]) {
-        switch name {
-        case "fuentes": section = .fonts
-        case "imagenes": section = .images
-        case "tilesets": section = .tilesets
-        case "mapas": section = .maps
-        case "sfx": section = .sfx
-        case "unidades": section = .units
-        case "anims": section = .anims
-        case "musica": break  // ignore music section (was commented out in the original)
-        case "res", "escenarios", "sonidos", "sprites", "sprite", "animpak",
-             "animation", "image": break
-        default:
-            // Leaf element within a known section
-            if section == .units && name == "unidad" {
-                fileAttr = attributes["file"]
-                saveUnit()
-            } else if section != .none && section != .anims {
-                currentText = ""
-                inLeafElement = true
-            }
-        }
+    struct Escenarios: Decodable {
+        let tilesets: [String]
+        let mapas: [String]
     }
 
-    func parser(_ parser: XMLParser, foundCharacters string: String) {
-        if inLeafElement { currentText += string }
+    struct Sonidos: Decodable {
+        let sfx: [String]
     }
 
-    func parser(_ parser: XMLParser, didEndElement name: String, namespaceURI: String?,
-                qualifiedName: String?) {
-        if inLeafElement {
-            let value = currentText.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !value.isEmpty { saveValue(value) }
-            currentText = ""
-            inLeafElement = false
-        }
-        switch name {
-        case "fuentes": section = .none
-        case "imagenes": section = .none
-        case "tilesets": section = .none
-        case "mapas": section = .none
-        case "sfx": section = .none
-        case "unidades": section = .none
-        case "anims": section = .none
-        default: break
-        }
+    struct Unidad: Decodable {
+        let name: String
+        let file: String
     }
 
-    private func saveValue(_ value: String) {
-        let path = Utils.getPath(value)
-        switch section {
-        case .fonts:
-            if iFonts < fonts.count { fonts[iFonts] = path; iFonts += 1 }
-        case .images:
-            if iImages < images.count { images[iImages] = path; iImages += 1 }
-        case .tilesets, .maps:
-            if iScenarios < scenarios.count { scenarios[iScenarios] = path; iScenarios += 1 }
-        case .sfx:
-            if iSounds < sounds.count { sounds[iSounds] = path; iSounds += 1 }
-        default: break
-        }
+    struct ImagenAnim: Decodable {
+        let path: String
+        let framewidth: Int
+        let frameheight: Int
+        let frameticks: Int
+        let offsetX: Int
+        let offsetY: Int
     }
 
-    private func saveUnit() {
-        guard let file = fileAttr else { return }
-        let path = Utils.getPath(file)
-        if iUnits < units.count { units[iUnits] = path; iUnits += 1 }
-        fileAttr = nil
-    }
-}
-
-// MARK: - <sprites> parser for res.xml
-
-private class SpritesXMLParser: NSObject, XMLParserDelegate {
-
-    var sprites: [Sprite?] = Array(repeating: nil, count: Res.SPR_COUNT)
-
-    private var inSprites = false
-    private var spriteIdx = 0
-    private var animations: [Animation] = []
-
-    // Current attributes of the <image> element
-    private var imgPath = ""
-    private var frameWidth = 0
-    private var frameHeight = 0
-    private var ticks = 0
-    private var offsetX = 0
-    private var offsetY = 0
-
-    func parser(_ parser: XMLParser, didStartElement name: String, namespaceURI: String?,
-                qualifiedName: String?, attributes: [String: String]) {
-        switch name {
-        case "sprites":
-            inSprites = true; spriteIdx = 0
-
-        case "sprite" where inSprites:
-            animations = []
-
-        case "image" where inSprites:
-            imgPath = Utils.getPath(attributes["path"] ?? "") ?? ""
-            frameWidth = Int(attributes["framewidth"] ?? "0") ?? 0
-            frameHeight = Int(attributes["frameheight"] ?? "0") ?? 0
-            ticks = Int(attributes["frameticks"] ?? "0") ?? 0
-            offsetX = Int(attributes["offsetX"] ?? "0") ?? 0
-            offsetY = Int(attributes["offsetY"] ?? "0") ?? 0
-            let anim = Animation(idx: 0, path: imgPath, ticks: ticks,
-                                   frameWidth: frameWidth, frameHeight: frameHeight,
-                                   offsetX: offsetX, offsetY: offsetY)
-            animations.append(anim)
-
-        default: break
-        }
+    struct Animpak: Decodable {
+        let name: String
+        let image: ImagenAnim
     }
 
-    func parser(_ parser: XMLParser, didEndElement name: String, namespaceURI: String?,
-                qualifiedName: String?) {
-        if name == "sprite", inSprites {
-            if spriteIdx < sprites.count {
-                let spr = Sprite()
-                spr.reserveSlots(animations.count)
-                for (i, anim) in animations.enumerated() {
-                    spr.addAnimation(i: i, anim: anim)
-                }
-                try? spr.load()
-                sprites[spriteIdx] = spr
-                spriteIdx += 1
-            }
-        }
-        if name == "sprites" { inSprites = false }
-    }
-}
-
-// MARK: - <anims> parser for res.xml
-
-private class AnimsXMLParser: NSObject, XMLParserDelegate {
-
-    var animations: [Animation?] = Array(repeating: nil, count: Res.ANIM_COUNT)
-
-    private var inAnims = false
-    private var animIdx = 0
-
-    func parser(_ parser: XMLParser, didStartElement name: String, namespaceURI: String?,
-                qualifiedName: String?, attributes: [String: String]) {
-        if name == "anims" { inAnims = true; animIdx = 0 }
-
-        if name == "animacion", inAnims {
-            let imgPath = Utils.getPath(attributes["imagepath"] ?? "") ?? ""
-            let frameWidth = Int(attributes["framewidth"] ?? "0") ?? 0
-            let frameHeight = Int(attributes["frameheight"] ?? "0") ?? 0
-            let ticks = Int(attributes["frameticks"] ?? "0") ?? 0
-            let offsetX = Int(attributes["offsetX"] ?? "0") ?? 0
-            let offsetY = Int(attributes["offsetY"] ?? "0") ?? 0
-
-            if animIdx < animations.count {
-                animations[animIdx] = Animation(idx: 0, path: imgPath, ticks: ticks,
-                                                   frameWidth: frameWidth, frameHeight: frameHeight,
-                                                   offsetX: offsetX, offsetY: offsetY)
-                animIdx += 1
-            }
-        }
+    struct SpriteJSON: Decodable {
+        let name: String
+        let animpaks: [Animpak]
     }
 
-    func parser(_ parser: XMLParser, didEndElement name: String, namespaceURI: String?,
-                qualifiedName: String?) {
-        if name == "anims" { inAnims = false }
+    struct AnimJSON: Decodable {
+        let name: String
+        let imagepath: String
+        let framewidth: Int
+        let frameheight: Int
+        let offsetX: Int
+        let offsetY: Int
+        let frameticks: Int
     }
+
+    let fuentes: [String]
+    let escenarios: Escenarios
+    let sonidos: Sonidos
+    let imagenes: [String]
+    let unidades: [Unidad]
+    let sprites: [SpriteJSON]
+    let anims: [AnimJSON]
 }
