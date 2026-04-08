@@ -15,9 +15,9 @@ class Hud {
     private enum Constants {
         static let avatarX = 61
         static let avatarY = 11
-        static let avatarNameX = 126
+        static let avatarNameX = 128
         static let avatarNameWidth = 82
-        static let avatarnNameY = 6
+        static let avatarNameY = 6
         static let attrsStartX1 = 141
         static let attrsStartX2 = 215
         static let attrsStartX3 = 338
@@ -85,22 +85,22 @@ class Hud {
         if let av = uni.avatar {
             video.draw(av, Constants.avatarX, posY + Constants.avatarY, 0)
         }
-        video.write(uni.name, Constants.avatarNameX, posY + Constants.avatarnNameY, 0)
+        video.write(uni.name, Constants.avatarNameX, posY + Constants.avatarNameY, 0)
 
         video.setColor(GameColor.black)
 
         let s = GameText.Strings
-        video.write("\(s[safe: Res.STR_ALCANCE] ?? ""):\(uni.range)",
+        video.write("\(s[safe: Res.STR_ALCANCE] ?? ""): \(uni.range)",
                 Constants.attrsStartX1, posY + Constants.attrsStartY, 0)
-        video.write("\(s[safe: Res.STR_PUNTERIA] ?? ""):\(uni.aim)",
+        video.write("\(s[safe: Res.STR_PUNTERIA] ?? ""): \(uni.aim)",
                 Constants.attrsStartX1, posY + Constants.attrsStartY + lineSpacing, 0)
-        video.write("\(s[safe: Res.STR_PUNTOS_DE_ATAQUE] ?? ""):\(uni.attackPoints)",
+        video.write("\(s[safe: Res.STR_PUNTOS_DE_ATAQUE] ?? ""): \(uni.attackPoints)",
                 Constants.attrsStartX2, posY + Constants.attrsStartY, 0)
-        video.write("\(s[safe: Res.STR_PUNTOS_DE_RESISTENCIA] ?? ""):\(uni.health)/\(uni.resistancePoints)",
+        video.write("\(s[safe: Res.STR_PUNTOS_DE_RESISTENCIA] ?? ""): \(uni.health)/\(uni.resistancePoints)",
                 Constants.attrsStartX2, posY + Constants.attrsStartY + lineSpacing, 0)
-        video.write("\(s[safe: Res.STR_VELOCIDAD] ?? ""):\(uni.defaultSpeed)",
+        video.write("\(s[safe: Res.STR_VELOCIDAD] ?? ""): \(uni.defaultSpeed)",
                 Constants.attrsStartX3, posY + Constants.attrsStartY, 0)
-        video.write("\(s[safe: Res.STR_VISIBILIDAD] ?? ""):\(uni.visibility)",
+        video.write("\(s[safe: Res.STR_VISIBILIDAD] ?? ""): \(uni.visibility)",
                 Constants.attrsStartX3, posY + Constants.attrsStartY + lineSpacing, 0)
     }
 }
