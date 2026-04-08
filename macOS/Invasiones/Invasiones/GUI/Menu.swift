@@ -39,9 +39,7 @@ class Menu: GUIBox {
         super.init()
 
         self.image = img
-        if itemCount == 3 {
-            self.image = ResourceManager.shared.getAlphaImage(Res.IMG_MENU_3)
-        } else if itemCount == 2 {
+        if itemCount == 2 {
             self.image = ResourceManager.shared.getAlphaImage(Res.IMG_MENU_2)
         }
     }
@@ -51,6 +49,13 @@ class Menu: GUIBox {
     override func draw(_ video: Video) {
         if let img = image {
             video.draw(img, posX, posY - 6, 0)
+        } else {
+            let padding = 6
+            let totalHeight = (buttonHeight + lineSpacing) * itemCount - lineSpacing
+            video.setColor(UIColors.menus)
+            video.fillRoundedRect(posX - padding, posY - padding,
+                                  buttonWidth + padding * 2, totalHeight + padding * 2,
+                                  10, UIColors.alpha)
         }
 
         var y = posY
@@ -132,8 +137,8 @@ class Menu: GUIBox {
                     - lineSpacing) >> 1)
         }
 
-        height = image?.height ?? 0
-        width = image?.width ?? 0
+        height = (buttonHeight + lineSpacing) * itemCount - lineSpacing
+        width = image?.width ?? buttonWidth
 
         return true
     }
