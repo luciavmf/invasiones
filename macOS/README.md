@@ -39,6 +39,20 @@ Cheats are only active during gameplay (not in menus). Each code is entered one 
 
 Additionally, pressing **U** at any time during gameplay cycles the camera to the next Argentine unit.
 
+## Data files
+
+Game data lives in `Invasiones/data/`:
+
+| File | Format | Purpose |
+|------|--------|---------|
+| `res.json` | JSON | Resource manifest — all asset paths, sprite and animation definitions |
+| `strings.json` | JSON | Localised text strings, keyed by English snake_case identifiers |
+| `nivel/nivel_N.xml` | XML | Level definitions (objectives, units, starting orders) |
+| `nivel/orden_nv*.xml` | XML | Scripted AI movement orders |
+| `unidades/*.csv` | CSV | Unit animation frame data |
+
+`res.json` and `strings.json` replaced the original `res.xml` and `strings.xml` from the C# version. Map and level files remain XML because they use the [Tiled](https://www.mapeditor.org/) format (`.tmx`/`.tsx`).
+
 ## Status
 
 Work in progress — actively being ported, debugged, and Swiftified.
