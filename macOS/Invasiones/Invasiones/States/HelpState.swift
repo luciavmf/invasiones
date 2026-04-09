@@ -86,17 +86,17 @@ class HelpState: State {
         video.draw(background, 0, 0, 0)
 
         video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
-                       UIColors.title)
+                       Theme.title)
         video.write(Res.STR_MENU_AYUDA, 0, Layout.titleYPosition, Surface.centerHorizontal)
 
         if substate.rawValue < Substate.total {
             video.setFont(ResourceManager.shared.fonts[FontConstants.helpTitleFont],
-                           UIColors.text)
+                           Theme.text)
             video.write(Res.STR_MENU_AYUDA_TEXTO_SELECCIONAR_01 + substate.rawValue * 2,
                        0, Constants.helpItemY, Surface.centerHorizontal)
 
             video.setFont(ResourceManager.shared.fonts[FontConstants.helpFont],
-                           UIColors.text)
+                           Theme.text)
             video.write(Res.STR_MENU_AYUDA_TEXTO_SELECCIONAR_02 + substate.rawValue * 2,
                        0, Constants.helpTextY, Surface.centerHorizontal)
         }

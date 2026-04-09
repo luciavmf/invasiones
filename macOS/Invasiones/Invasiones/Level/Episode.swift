@@ -155,9 +155,9 @@ class Episode {
 
     private func drawLoadingState(_ video: Video) {
         video.fillRect(0)
-        video.setColor(UIColors.title)
+        video.setColor(Theme.title)
         video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
-                       UIColors.title)
+                       Theme.title)
         video.write(Res.STR_CARGANDO, 0, Constants.loadingY, Surface.centerHorizontal)
     }
 
@@ -284,22 +284,22 @@ class Episode {
     private func drawShowIntroState(_ video: Video) {
         drawPlayingState(video)
 
-        video.setColor(UIColors.objectivesText)
+        video.setColor(Theme.objectivesText)
         let hudHeight = hud?.height ?? 0
         video.fillRect(
             0, -(hudHeight >> 1),
             Video.width - (Constants.objectivesBorder << 1),
             Video.height  - (Constants.objectivesBorder << 1) - hudHeight,
-            UIColors.alpha,
+            Theme.alpha,
             Surface.centerVertical | Surface.centerHorizontal
         )
 
         if currentPage == 0 {
             video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
-                           UIColors.text)
+                           Theme.text)
         } else {
             video.setFont(ResourceManager.shared.fonts[FontConstants.objectivesFont],
-                           UIColors.text)
+                           Theme.text)
         }
 
         let strIdx = Res.STR_PRIMER_BATALLA + currentPage +
@@ -330,22 +330,22 @@ class Episode {
         drawPlayingState(video)
 
         let hudHeight = hud?.height ?? 0
-        video.setColor(UIColors.objectivesText)
+        video.setColor(Theme.objectivesText)
         video.fillRect(
             0, -(hudHeight / 2),
             Constants.objectivesBoxWidth, Constants.objectivesBoxHeight,
-            UIColors.alpha,
+            Theme.alpha,
             Surface.centerVertical | Surface.centerHorizontal
         )
 
-        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.text)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], Theme.text)
         video.write(
             Res.STR_OBJETIVOS, 0,
             -(hudHeight / 2) - Constants.objectivesBoxHeight / 2 + 50,
             Surface.centerVertical | Surface.centerHorizontal
         )
 
-        video.setFont(ResourceManager.shared.fonts[FontConstants.objectivesFont], UIColors.text)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.objectivesFont], Theme.text)
         let strIdx = Res.STR_PRIMER_BATALLA + currentPage +
                      ((currentLevel?.currentBattleIndex ?? 0) * Constants.pagesPerIntro)
         video.write(strIdx, 0, -(hudHeight >> 1) + 30, Surface.centerVertical | Surface.centerHorizontal)
@@ -416,7 +416,7 @@ class Episode {
             let hudHeight = hud?.height ?? 0
             let cameraHeight = camera?.height ?? Video.height
             video.setFont(ResourceManager.shared.fonts[FontConstants.objectivesReminderFont],
-                      UIColors.title)
+                      Theme.title)
             video.write(Res.STR_OBJETIVOS,
                        Layout.objectivesOffset << 1,
                        cameraHeight - (Layout.objectivesHeight + Layout.objectivesOffset * 2) - 10, 0)
@@ -518,7 +518,7 @@ class Episode {
         drawPlayingState(video)
         button?.draw(video)
         video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont],
-                       UIColors.title)
+                       Theme.title)
         video.write(Res.STR_GANASTE, 0, 0, Surface.centerHorizontal | Surface.centerVertical)
     }
 
@@ -539,7 +539,7 @@ class Episode {
 
     private func drawLostState(_ video: Video) {
         drawPlayingState(video)
-        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.title)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], Theme.title)
         video.write(Res.STR_PERDISTE, 0, -100, Surface.centerHorizontal | Surface.centerVertical)
         if count > Constants.countdownToRestart {
             gameOverMenu.draw(video)
