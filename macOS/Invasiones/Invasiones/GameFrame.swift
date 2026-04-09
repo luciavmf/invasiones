@@ -37,6 +37,9 @@ class GameFrame {
 
     /// The current frames per second (updated each interval).
     static var fps: Double = 0
+#if DEBUG
+    static var showNodeIndices = false
+#endif
     /// The current updates per second (updated each interval).
     static var ups: Double = 0
 
@@ -97,6 +100,9 @@ class GameFrame {
         v.clear()
         stateMachine.draw(v)
         Mouse.shared.drawCursor(v)
+#if DEBUG
+        if GameFrame.showNodeIndices { v.annotateNodes() }
+#endif
     }
 
     // MARK: - Exit

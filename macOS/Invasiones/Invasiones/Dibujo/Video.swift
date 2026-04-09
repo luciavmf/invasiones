@@ -220,6 +220,27 @@ class Video {
     }
 
 
+
+    // MARK: - Debug
+
+#if DEBUG
+    /// Overlays a small numbered label on every node in the canvas.
+    /// Call once per frame after all draw calls to visualise node count.
+    func annotateNodes() {
+        let children = canvasNode.children
+        for (i, node) in children.enumerated() {
+            let lbl = SKLabelNode(text: "\(i)")
+            lbl.fontName  = "Menlo-Bold"
+            lbl.fontSize  = 9
+            lbl.fontColor = .yellow
+            lbl.position  = CGPoint(x: node.frame.midX - canvasNode.position.x,
+                                    y: node.frame.midY - canvasNode.position.y)
+            lbl.zPosition = 10000 + CGFloat(i)
+            canvasNode.addChild(lbl)
+        }
+    }
+#endif
+
     // MARK: - Helpers
 
     private func skColor(_ rgb: Int) -> SKColor {
