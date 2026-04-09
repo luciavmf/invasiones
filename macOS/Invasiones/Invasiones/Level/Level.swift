@@ -134,8 +134,7 @@ private class NivelXMLDelegate: NSObject, XMLParserDelegate {
             inBattle = true
             batallas.append(BattleData())
         case "objetivo":
-            let imgPath = a["imagen"]
-            currentObj = Objective(pathImagen: imgPath)
+            currentObj = Objective()
             currentCommands = []
             inObjective = true
         case "tomar", "llegar", "trigger", "matar":

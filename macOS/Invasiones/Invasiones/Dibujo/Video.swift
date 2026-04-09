@@ -219,8 +219,6 @@ class Video {
         canvasNode.addChild(shape)
     }
 
-    /// No-op: SpriteKit manages double-buffering automatically.
-    func refresh() {}
 
     // MARK: - Helpers
 

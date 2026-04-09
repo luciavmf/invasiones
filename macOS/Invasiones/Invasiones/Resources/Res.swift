@@ -28,13 +28,10 @@ enum Res {
     static let STR_MENU_PRINCIPAL = 13
     static let STR_MENU_CONTINUAR = 14
     static let STR_MENU_NUEVO_JUEGO = 15
-    static let STR_MENU_CARGAR_PARTIDA = 16
     static let STR_MENU_OPCIONES = 17
     static let STR_MENU_CREDITOS = 18
     static let STR_MENU_AYUDA = 19
     static let STR_MENU_SALIR = 20
-    static let STR_MENU_GUARDAR = 21
-    static let STR_MENU_REINICIAR = 22
     static let STR_BOTON_MENU = 23
     static let STR_BOTON_MENU_DEL_JUEGO = 24
     static let STR_JUEGO_PAUSADO = 25
@@ -48,8 +45,6 @@ enum Res {
     static let STR_CONFIRMACION_SALIR = 33
     static let STR_SI = 34
     static let STR_NO = 35
-    static let STR_INGRESE_NOMBRE = 36
-    static let STR_LISTO = 37
     static let STR_CREDITOS_PROGRAMACION = 38
     static let STR_CREDITOS_PROGRAMADOR_1 = 39
     static let STR_CREDITOS_DISENO_DE_NIVEL = 40
@@ -154,41 +149,17 @@ enum Res {
 
     // MARK: - Sprite Ids
     static let SPR_PATRICIO = 0
-    static let SPR_ANIM_PATRICIO_QUIETO_N = 0;  static let SPR_ANIM_PATRICIO_QUIETO_NE = 1
-    static let SPR_ANIM_PATRICIO_QUIETO_E = 2;  static let SPR_ANIM_PATRICIO_QUIETO_SE = 3
-    static let SPR_ANIM_PATRICIO_QUIETO_S = 4;  static let SPR_ANIM_PATRICIO_QUIETO_SO = 5
-    static let SPR_ANIM_PATRICIO_QUIETO_O = 6;  static let SPR_ANIM_PATRICIO_QUIETO_NO = 7
-    static let SPR_ANIM_PATRICIO_CAMINA_N = 8;  static let SPR_ANIM_PATRICIO_CAMINA_NE = 9
-    static let SPR_ANIM_PATRICIO_CAMINA_E = 10; static let SPR_ANIM_PATRICIO_CAMINA_SE = 11
-    static let SPR_ANIM_PATRICIO_CAMINA_S = 12; static let SPR_ANIM_PATRICIO_CAMINA_SO = 13
-    static let SPR_ANIM_PATRICIO_CAMINA_O = 14; static let SPR_ANIM_PATRICIO_CAMINA_NO = 15
-    static let SPR_ANIM_PATRICIO_MUERE_N = 16; static let SPR_ANIM_PATRICIO_MUERE_NE = 17
-    static let SPR_ANIM_PATRICIO_MUERE_E = 18; static let SPR_ANIM_PATRICIO_MUERE_SE = 19
-    static let SPR_ANIM_PATRICIO_MUERE_S = 20; static let SPR_ANIM_PATRICIO_MUERE_SO = 21
-    static let SPR_ANIM_PATRICIO_MUERE_O = 22; static let SPR_ANIM_PATRICIO_MUERE_NO = 23
-    static let SPR_ANIM_PATRICIO_ATACA_N = 24; static let SPR_ANIM_PATRICIO_ATACA_NE = 25
-    static let SPR_ANIM_PATRICIO_ATACA_E = 26; static let SPR_ANIM_PATRICIO_ATACA_SE = 27
-    static let SPR_ANIM_PATRICIO_ATACA_S = 28; static let SPR_ANIM_PATRICIO_ATACA_SO = 29
-    static let SPR_ANIM_PATRICIO_ATACA_O = 30; static let SPR_ANIM_PATRICIO_ATACA_NO = 31
+    static let SPR_ANIM_PATRICIO_QUIETO_N = 0
+    static let SPR_ANIM_PATRICIO_CAMINA_N = 8
+    static let SPR_ANIM_PATRICIO_MUERE_N = 16
+    static let SPR_ANIM_PATRICIO_ATACA_N = 24
     static let SPR_PATRICIO_PACK_COUNT = 4
 
     static let SPR_INGLES = 1
-    static let SPR_ANIM_INGLES_QUIETO_N = 0;  static let SPR_ANIM_INGLES_QUIETO_NE = 1
-    static let SPR_ANIM_INGLES_QUIETO_E = 2;  static let SPR_ANIM_INGLES_QUIETO_SE = 3
-    static let SPR_ANIM_INGLES_QUIETO_S = 4;  static let SPR_ANIM_INGLES_QUIETO_SO = 5
-    static let SPR_ANIM_INGLES_QUIETO_O = 6;  static let SPR_ANIM_INGLES_QUIETO_NO = 7
-    static let SPR_ANIM_INGLES_CAMINA_N = 8;  static let SPR_ANIM_INGLES_CAMINA_NE = 9
-    static let SPR_ANIM_INGLES_CAMINA_E = 10; static let SPR_ANIM_INGLES_CAMINA_SE = 11
-    static let SPR_ANIM_INGLES_CAMINA_S = 12; static let SPR_ANIM_INGLES_CAMINA_SO = 13
-    static let SPR_ANIM_INGLES_CAMINA_O = 14; static let SPR_ANIM_INGLES_CAMINA_NO = 15
-    static let SPR_ANIM_INGLES_MUERE_N = 16; static let SPR_ANIM_INGLES_MUERE_NE = 17
-    static let SPR_ANIM_INGLES_MUERE_E = 18; static let SPR_ANIM_INGLES_MUERE_SE = 19
-    static let SPR_ANIM_INGLES_MUERE_S = 20; static let SPR_ANIM_INGLES_MUERE_SO = 21
-    static let SPR_ANIM_INGLES_MUERE_O = 22; static let SPR_ANIM_INGLES_MUERE_NO = 23
-    static let SPR_ANIM_INGLES_ATACA_N = 24; static let SPR_ANIM_INGLES_ATACA_NE = 25
-    static let SPR_ANIM_INGLES_ATACA_E = 26; static let SPR_ANIM_INGLES_ATACA_SE = 27
-    static let SPR_ANIM_INGLES_ATACA_S = 28; static let SPR_ANIM_INGLES_ATACA_SO = 29
-    static let SPR_ANIM_INGLES_ATACA_O = 30; static let SPR_ANIM_INGLES_ATACA_NO = 31
+    static let SPR_ANIM_INGLES_QUIETO_N = 0
+    static let SPR_ANIM_INGLES_CAMINA_N = 8
+    static let SPR_ANIM_INGLES_MUERE_N = 16
+    static let SPR_ANIM_INGLES_ATACA_N = 24
     static let SPR_INGLES_PACK_COUNT = 4
 
     static let SPR_COUNT = 2

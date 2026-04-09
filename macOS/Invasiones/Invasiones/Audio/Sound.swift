@@ -76,37 +76,4 @@ class Sound {
         }
     }
 
-    func pause(_ id: Int) {
-        if id == -1 {
-            sfxPlayers.compactMap { $0 }.forEach { $0.pause() }
-            musicPlayer?.pause(); return
-        }
-        if id >= Res.SND_COUNT { sfxPlayers[id - Res.SND_COUNT]?.pause() }
-        else { musicPlayer?.pause() }
-    }
-
-    func resume(_ id: Int) {
-        if id == -1 {
-            sfxPlayers.compactMap { $0 }.forEach { $0.play() }
-            musicPlayer?.play(); return
-        }
-        if id >= Res.SND_COUNT { sfxPlayers[id - Res.SND_COUNT]?.play() }
-        else { musicPlayer?.play() }
-    }
-
-    func stopBackgroundMusic() {
-        musicPlayer?.stop(); currentMusic = -1
-    }
-
-    func setVolume(id: Int, volume: Int) {
-        let v = Float(max(0, min(volume, 128))) / 128.0
-        if id == -1 {
-            sfxPlayers.compactMap { $0 }.forEach { $0.volume = v }
-            musicPlayer?.volume = v
-        } else if id >= Res.SND_COUNT {
-            sfxPlayers[id - Res.SND_COUNT]?.volume = v
-        } else {
-            musicPlayer?.volume = v
-        }
-    }
 }
