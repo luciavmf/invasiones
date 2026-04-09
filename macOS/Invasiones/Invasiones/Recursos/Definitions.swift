@@ -26,9 +26,8 @@ enum FontIndex: Int {
 }
 
 /// Eight compass directions used for unit sprite animation.
-enum Direction: Int {
+enum Direction: Int, CaseIterable {
     case north = 0, northEast, east, southEast, south, southWest, west, northWest
-    static let count = 8
 }
 
 /// RGB hex colour constants used by the `Video` drawing API.
