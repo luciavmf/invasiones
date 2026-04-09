@@ -8,6 +8,7 @@
 //
 
 import Foundation
+import SpriteKit
 
 class Tileset {
 
@@ -44,6 +45,7 @@ class Tileset {
         }
     }
     var tiles: [Tile?] = []
+    private var textureCache: [Int: SKTexture] = [:]
 
     // MARK: - Initializer
     init() {}
@@ -66,13 +68,34 @@ class Tileset {
 
     // MARK: - Helpers
 
-    /// Returns the (x, y, w, h) rectangle within the tileset image for the given tile.
+    /// Returns the (x, y, w, h) rectangle within the tileset image for the given local tile ID.
     func getTileRect(_ tileId: Int) -> (x: Int, y: Int, w: Int, h: Int) {
         guard let img = image, tileWidth > 0, tileHeight > 0 else { return (0, 0, 0, 0) }
         let cols = img.width / tileWidth
         let col = cols > 0 ? tileId % cols : 0
         let row = cols > 0 ? tileId / cols : 0
         return (col * tileWidth, row * tileHeight, tileWidth, tileHeight)
+    }
+
+    /// Returns a cached SKTexture sub-rect for the given local tile ID.
+    /// The texture is created once and reused every frame.
+    func getTileTexture(_ tileId: Int) -> SKTexture? {
+        if let cached = textureCache[tileId] { return cached }
+        guard let tex = image?.texture, tileWidth > 0, tileHeight > 0 else { return nil }
+        let texW = tex.size().width
+        let texH = tex.size().height
+        guard texW > 0, texH > 0 else { return nil }
+        let cols = max(1, Int(texW) / tileWidth)
+        let col  = tileId % cols
+        let row  = tileId / cols
+        let nx = CGFloat(col * tileWidth) / texW
+        let ny = 1.0 - CGFloat((row + 1) * tileHeight) / texH
+        let nw = CGFloat(tileWidth) / texW
+        let nh = CGFloat(tileHeight) / texH
+        let subTex = SKTexture(rect: CGRect(x: nx, y: ny, width: nw, height: nh), in: tex)
+        subTex.filteringMode = .nearest
+        textureCache[tileId] = subTex
+        return subTex
     }
 
 }

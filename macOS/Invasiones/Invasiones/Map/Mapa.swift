@@ -140,9 +140,11 @@ class Map {
                     let tileId = mapData[layer][i][j]
                     if tileId != 0, let ts = getTileset(tileId) {
                         let localId = tileId - ts.firstGid
-                        let rect = ts.getTileRect(localId)
-                        video.draw(ts.image, rect.x, rect.y, rect.w, rect.h,
-                                  tileX * tileWidth + startPosX, startPosY)
+                        if let tex = ts.getTileTexture(localId) {
+                            video.draw(cachedTexture: tex,
+                                       x: tileX * tileWidth + startPosX,
+                                       y: startPosY)
+                        }
                     }
                 }
                 tileX += 1; i += 1; j -= 1
