@@ -99,9 +99,6 @@ class Episode {
         setState(.loading)
     }
 
-    /// Saves the current battle (stub — not implemented).
-    /// - Returns: Always `false`.
-    func save() -> Bool { false }
 
     /// Called when leaving the battle state (no-op).
     func exit() {}

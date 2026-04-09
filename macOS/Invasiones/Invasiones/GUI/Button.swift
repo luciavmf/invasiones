@@ -85,11 +85,4 @@ class Button: GUIBox {
                    Surface.centerHorizontal | Surface.centerVertical)
     }
 
-    func setHeight(_ h: Int) {
-        if image == nil { height = h }
-    }
-
-    func setWidth(_ w: Int) {
-        if image == nil { width = w }
-    }
 }
