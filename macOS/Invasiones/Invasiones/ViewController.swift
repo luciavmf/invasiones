@@ -7,34 +7,31 @@
 
 import Cocoa
 import SpriteKit
-import GameplayKit
 
 class ViewController: NSViewController {
 
-    @IBOutlet var skView: SKView!
-    
+    private var skView: SKView!
+
+    override func loadView() {
+        skView = SKView(frame: NSRect(x: 0, y: 0, width: ScreenSize.width, height: ScreenSize.height))
+        view = skView
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if let view = self.skView {
-            let scene = GameScene(
-                size: CGSize(width: ScreenSize.width,
-                             height: ScreenSize.height)
-            )
-            scene.anchorPoint = CGPoint(x: 0, y: 0)
-            scene.scaleMode = .aspectFit
-            view.presentScene(scene)
-
-            view.ignoresSiblingOrder = true
-            // Fondo negro para las barras de letterbox cuando la ventana no es exactamente 4:3.
-            view.wantsLayer = true
-            view.layer?.backgroundColor = NSColor.black.cgColor
+        let scene = GameScene(size: CGSize(width: ScreenSize.width, height: ScreenSize.height))
+        scene.anchorPoint = CGPoint(x: 0, y: 0)
+        scene.scaleMode = .aspectFit
+        skView.presentScene(scene)
+        skView.ignoresSiblingOrder = true
+        // Black background for letterbox bars when window aspect ratio doesn't match 4:3.
+        skView.wantsLayer = true
+        skView.layer?.backgroundColor = NSColor.black.cgColor
 
 #if DEBUG
-            view.showsFPS = true
-            view.showsNodeCount = true
+        skView.showsFPS = true
+        skView.showsNodeCount = true
 #endif
-        }
     }
 }
-
