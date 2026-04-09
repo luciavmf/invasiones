@@ -66,19 +66,19 @@ class Button: GUIBox {
             if selectedImage != nil {
                 video.draw(selectedImage, posX, posY, 0)
             } else {
-                video.setColor(UIColors.selection)
-                video.fillRect(posX, posY, width, height, UIColors.alpha)
+                video.setColor(Theme.selection)
+                video.fillRect(posX, posY, width, height, Theme.alpha)
             }
         } else {
             if image != nil {
                 video.draw(image, posX, posY, 0)
             } else {
-                video.setColor(UIColors.menus)
-                video.fillRect(posX, posY, width, height, UIColors.alpha)
+                video.setColor(Theme.menus)
+                video.fillRect(posX, posY, width, height, Theme.alpha)
             }
         }
 
-        video.setFont(font, UIColors.text)
+        video.setFont(font, Theme.text)
         video.write(label,
                    posX - Video.width / 2 + width / 2,
                    posY - Video.height  / 2 + height  / 2,

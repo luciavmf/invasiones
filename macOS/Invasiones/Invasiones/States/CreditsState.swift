@@ -30,21 +30,21 @@ class CreditsState: State {
         video.draw(background, 0, 0, 0)
 
         // Title
-        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.text)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], Theme.text)
         video.write(Res.STR_MENU_CREDITOS, 0, Layout.titleYPosition, Surface.centerHorizontal)
 
         // Programming
-        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.text)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], Theme.text)
         video.write(Res.STR_CREDITOS_PROGRAMACION, 0, 260, Surface.centerHorizontal)
 
-        video.setFont(ResourceManager.shared.fonts[FontConstants.buttonFont], UIColors.text)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.buttonFont], Theme.text)
         video.write(Res.STR_CREDITOS_PROGRAMADOR_1, 0, 310, Surface.centerHorizontal)
 
         // Level design
-        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.text)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], Theme.text)
         video.write(Res.STR_CREDITOS_DISENO_DE_NIVEL, 0, 400, Surface.centerHorizontal)
 
-        video.setFont(ResourceManager.shared.fonts[FontConstants.buttonFont], UIColors.text)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.buttonFont], Theme.text)
         video.write(Res.STR_CREDITOS_DISENADOR_DE_NIVEL_1, 0, 450, Surface.centerHorizontal)
 
         button?.draw(video)

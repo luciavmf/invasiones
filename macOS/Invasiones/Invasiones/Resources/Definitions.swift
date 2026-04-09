@@ -44,7 +44,7 @@ enum GameColor {
 }
 
 /// Colors used in the UI
-enum UIColors {
+enum Theme {
     static let menus = GameColor.black
     static let selection = GameColor.red
     static let text = GameColor.white

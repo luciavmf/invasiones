@@ -68,11 +68,11 @@ class OptionsState: State {
         video.draw(background, 0, 0, 0)
 
         // Title
-        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], UIColors.text)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.titleFont], Theme.text)
         video.write(Res.STR_MENU_OPCIONES, 0, Layout.titleYPosition, Surface.centerHorizontal)
 
         // "Language:" label above the list
-        video.setFont(ResourceManager.shared.fonts[FontConstants.buttonFont], UIColors.text)
+        video.setFont(ResourceManager.shared.fonts[FontConstants.buttonFont], Theme.text)
         video.write(Res.STR_LANGUAGE_LABEL, 0, RadioLayout.startY - 28, Surface.centerHorizontal)
 
         // Radio rows
@@ -82,14 +82,14 @@ class OptionsState: State {
 
             // Hover highlight
             if lang == hoveredLanguage {
-                video.setColor(UIColors.menus)
+                video.setColor(Theme.menus)
                 video.fillRoundedRect(RadioLayout.hoverX, rowY,
                                       RadioLayout.hoverW, RadioLayout.rowHeight - 2,
-                                      4, UIColors.alpha)
+                                      4, Theme.alpha)
             }
 
             // Indicator outline
-            video.setColor(UIColors.text)
+            video.setColor(Theme.text)
             video.drawRect(RadioLayout.indX, indY, RadioLayout.indSize, RadioLayout.indSize, 0)
 
             // Indicator fill when selected

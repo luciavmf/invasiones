@@ -83,11 +83,11 @@ class Tips: GUIBox {
         guard shouldShowTip else { return }
 
         if tipButton.isUnderCursor {
-            video.setColor(UIColors.menus)
+            video.setColor(Theme.menus)
             video.fillRect(posX, posY, width, height, Constants.alpha)
             video.setFont(
                 ResourceManager.shared.fonts[FontConstants.objectivesReminderFont],
-                UIColors.text)
+                Theme.text)
             video.write(label,
                        posX - (Video.width >> 1) + (width >> 1),
                        posY + height / 5,

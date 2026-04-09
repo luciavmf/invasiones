@@ -69,12 +69,12 @@ class ConfirmationMenu: GUIBox {
     }
 
     override func draw(_ video: Video) {
-        video.setColor(UIColors.menus)
+        video.setColor(Theme.menus)
         video.fillRect(posX, posY, width, height, Constants.alpha)
 
         video.setFont(
             ResourceManager.shared.fonts[FontConstants.menuFont],
-            UIColors.text
+            Theme.text
         )
         video.write(
             label,
