@@ -39,9 +39,6 @@ class Menu: GUIBox {
         super.init()
 
         self.image = img
-        if itemCount == 2 {
-            self.image = ResourceManager.shared.getAlphaImage(Res.IMG_MENU_2)
-        }
     }
 
     // MARK: - Methods
