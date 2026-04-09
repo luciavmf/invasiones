@@ -61,7 +61,7 @@ class Menu: GUIBox {
             if flags != Constants.itemHidden {
                 if (flags & Constants.itemHover) != 0 {
                     video.setColor(GameColor.black)
-                    video.fillRect(posX + 2, y, buttonWidth, buttonHeight)
+                    video.fillRect(posX, y, buttonWidth, buttonHeight)
                 }
                 video.setFont(font, Theme.text)
                 video.write(items[i] & 0xFF,
