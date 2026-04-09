@@ -11,6 +11,9 @@
 import SpriteKit
 
 class GameScene: SKScene {
+    private enum Constants {
+        static let defaultFPS: Int = 30
+    }
 
     // MARK: - Declarations
     private var gameFrame = GameFrame()
@@ -26,7 +29,7 @@ class GameScene: SKScene {
         backgroundColor = .black
 
         // The original ran at 20 FPS with SDL_Delay; SpriteKit also accepts mouseMoved.
-        view.preferredFramesPerSecond = Program.DEFAULT_FPS
+        view.preferredFramesPerSecond = Constants.defaultFPS
         view.window?.acceptsMouseMovedEvents = true
         // Make the SKView the first responder to receive mouseMoved without a prior click.
         view.window?.makeFirstResponder(view)

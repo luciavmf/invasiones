@@ -1,5 +1,5 @@
 //
-//  Program.swift
+//  Constants.swift
 //  Invasiones
 //
 //  Created by Lucia Medina Fretes on 06.04.26.
@@ -15,22 +15,10 @@ enum ResourcePath {
     static let scenariosPath = "escenarios"
     static let levelPath = "nivel"
     static let iconPath = "imagenes/icono.png"
-
     static let resourcesPath = "res.json"
 }
 
 enum ScreenSize {
     static let width: Int = 1024
     static let height: Int = 768
-}
-
-enum Program {
-
-    static let DEFAULT_FPS: Int = 20
-
-#if DEBUG
-    static let FULLSCREEN = false
-#else
-    static let FULLSCREEN = true
-#endif
 }
