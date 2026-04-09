@@ -78,6 +78,17 @@ class Video {
         canvasNode.addChild(node)
     }
 
+
+    /// Draws a pre-cached SKTexture at C# coordinates. Skips sub-texture creation — use for tiles.
+    func draw(cachedTexture tex: SKTexture, x: Int, y: Int, alpha: CGFloat = 1.0) {
+        let node = SKSpriteNode(texture: tex)
+        node.anchorPoint = CGPoint(x: 0, y: 1)
+        node.position    = CGPoint(x: x, y: Video.height - y)
+        node.alpha       = alpha
+        node.zPosition   = zPos; zPos += 1
+        canvasNode.addChild(node)
+    }
+
     /// Draws a sub-region of a surface at a destination position (tile blit).
     func draw(_ superficie: Surface?, _ srcX: Int, _ srcY: Int, _ srcW: Int, _ srcH: Int,
                  _ destX: Int, _ destY: Int) {
