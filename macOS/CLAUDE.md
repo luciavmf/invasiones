@@ -140,13 +140,19 @@ In progress / not yet done:
 
 **SourceKit false positives:** Xcode's indexer frequently shows "Cannot find type X in scope" errors after edits. These are **always** false positives in this project — a clean `xcodebuild` produces zero errors. Do not act on SourceKit diagnostics without verifying with a real build.
 
-## Known Dead Code
+## Web Port
 
-- `Button.setHeight` / `Button.setWidth` — never called
-- `Video.refresh()` — SpriteKit no-op stub
-- `Objective.imagePath` — write-only, never read
-- 56 sprite animation direction variants (`_NE`, `_E`, `_SE`, etc.) — units only face North; multi-direction was never completed
-- Various `Res` string constants for unimplemented features: credits screen, save/load, multi-level battles
+A complete TypeScript/PixiJS port lives at https://github.com/luciavmf/invasiones-web. It mirrors this codebase 1-to-1 with these differences:
+
+- Rendering: PixiJS v8 instead of SpriteKit. `Video` wraps a `PIXI.Container` canvas rebuilt each frame.
+- Coordinate origin: top-left (Y down), matching C#/SDL — no Y-flip needed unlike SpriteKit.
+- Resource manifest: `data/res.json` replaces `data/res.xml` (same structure, JSON format).
+- String tables: `data/strings_es.json` / `strings_en.json` / `strings_de.json` replace `data/strings.xml`.
+- All loading is async (`fetch` + `DOMParser` / `PIXI.Assets`).
+- No `Log`, `GameError`, `Utils`, `AppDelegate`, `ViewController`, or `GameScene` — browser equivalents used directly.
+- `erasableSyntaxOnly` TypeScript config: no `enum`, uses `const` objects + type aliases.
+- Episode loading uses an `asyncBusy` guard because `update()` is fire-and-forget in the PixiJS ticker.
+- `Animation.clone()` creates an independent `Surface` (same GPU texture source, independent clip state) so cloned units don't share animation clip state.
 
 ## Data Files (`data/`)
 
