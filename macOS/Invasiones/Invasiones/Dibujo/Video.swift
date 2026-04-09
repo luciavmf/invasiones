@@ -36,6 +36,12 @@ class Video {
     private var clipW: Int = ScreenSize.width
     private var clipH: Int = ScreenSize.height
 
+    // MARK: - Node pool (reuse SKSpriteNodes across frames to avoid alloc/dealloc churn)
+    private var nodePool: [SKSpriteNode] = []
+    private var poolCursor: Int = 0
+    /// Shapes and labels are few per frame; track them separately and remove in clear().
+    private var ephemeralNodes: [SKNode] = []
+
     // MARK: - Initializer
     init(escena: SKScene) {
         canvasNode = SKNode()
@@ -44,10 +50,35 @@ class Video {
 
     // MARK: - Frame management
 
-    /// Removes all nodes from the previous frame and resets the Z order.
+    /// Resets pool cursor and removes non-pooled nodes from the previous frame.
     func clear() {
-        canvasNode.removeAllChildren()
+        for node in ephemeralNodes { node.removeFromParent() }
+        ephemeralNodes.removeAll(keepingCapacity: true)
+        poolCursor = 0
         zPos = 0
+    }
+
+    /// Hides pool nodes not used this frame. Call once after all draw calls.
+    func finalize() {
+        for i in poolCursor..<nodePool.count {
+            nodePool[i].isHidden = true
+        }
+    }
+
+    private func nextPoolNode() -> SKSpriteNode {
+        if poolCursor < nodePool.count {
+            let node = nodePool[poolCursor]
+            node.isHidden = false
+            node.colorBlendFactor = 0  // reset from any previous fillRect use
+            poolCursor += 1
+            return node
+        }
+        let node = SKSpriteNode()
+        node.anchorPoint = CGPoint(x: 0, y: 1)
+        canvasNode.addChild(node)
+        nodePool.append(node)
+        poolCursor += 1
+        return node
     }
 
     // MARK: - Draw surfaces
@@ -70,23 +101,23 @@ class Video {
         if (anchor & Surface.centerHorizontal) != 0 { px += Video.width / 2 - fw / 2 }
         if (anchor & Surface.centerVertical) != 0 { py += Video.height  / 2 - fh / 2 }
 
-        let node = SKSpriteNode(texture: tex)
-        node.anchorPoint = CGPoint(x: 0, y: 1)          // top-left anchor
-        node.position    = CGPoint(x: px, y: Video.height - py)
-        node.alpha       = CGFloat(max(0, min(alpha, 255))) / 255.0
-        node.zPosition   = zPos; zPos += 1
-        canvasNode.addChild(node)
+        let node = nextPoolNode()
+        node.texture   = tex
+        node.size      = tex.size()
+        node.position  = CGPoint(x: px, y: Video.height - py)
+        node.alpha     = CGFloat(max(0, min(alpha, 255))) / 255.0
+        node.zPosition = zPos; zPos += 1
     }
 
 
     /// Draws a pre-cached SKTexture at C# coordinates. Skips sub-texture creation — use for tiles.
     func draw(cachedTexture tex: SKTexture, x: Int, y: Int, alpha: CGFloat = 1.0) {
-        let node = SKSpriteNode(texture: tex)
-        node.anchorPoint = CGPoint(x: 0, y: 1)
-        node.position    = CGPoint(x: x, y: Video.height - y)
-        node.alpha       = alpha
-        node.zPosition   = zPos; zPos += 1
-        canvasNode.addChild(node)
+        let node = nextPoolNode()
+        node.texture   = tex
+        node.size      = tex.size()
+        node.position  = CGPoint(x: x, y: Video.height - y)
+        node.alpha     = alpha
+        node.zPosition = zPos; zPos += 1
     }
 
     /// Draws a sub-region of a surface at a destination position (tile blit).
@@ -105,12 +136,12 @@ class Video {
         let subTex = SKTexture(rect: CGRect(x: nx, y: ny, width: nw, height: nh), in: tex)
         subTex.filteringMode = .nearest
 
-        let node = SKSpriteNode(texture: subTex)
-        node.anchorPoint = CGPoint(x: 0, y: 1)
-        node.position    = CGPoint(x: destX, y: Video.height - destY)
-        node.alpha       = sup.currentAlpha
-        node.zPosition   = zPos; zPos += 1
-        canvasNode.addChild(node)
+        let node = nextPoolNode()
+        node.texture   = subTex
+        node.size      = subTex.size()
+        node.position  = CGPoint(x: destX, y: Video.height - destY)
+        node.alpha     = sup.currentAlpha
+        node.zPosition = zPos; zPos += 1
     }
 
     // MARK: - Clip
@@ -165,6 +196,7 @@ class Video {
         label.position = CGPoint(x: px, y: Video.height - py)
         label.zPosition = zPos; zPos += 1
         canvasNode.addChild(label)
+        ephemeralNodes.append(label)
     }
 
     // MARK: - Fill primitives
@@ -175,13 +207,14 @@ class Video {
         var px = x, py = y
         if (anchor & Surface.centerHorizontal) != 0 { px += Video.width / 2 - w / 2 }
         if (anchor & Surface.centerVertical) != 0 { py += Video.height  / 2 - h / 2 }
-        let node = SKSpriteNode(color: currentColor,
-                                size: CGSize(width: w, height: h))
-        node.anchorPoint = CGPoint(x: 0, y: 1)
-        node.position    = CGPoint(x: px, y: Video.height - py)
-        node.alpha       = CGFloat(max(0, min(alpha, 255))) / 255.0
-        node.zPosition   = zPos; zPos += 1
-        canvasNode.addChild(node)
+        let node = nextPoolNode()
+        node.texture   = nil
+        node.color     = currentColor
+        node.colorBlendFactor = 1.0
+        node.size      = CGSize(width: w, height: h)
+        node.position  = CGPoint(x: px, y: Video.height - py)
+        node.alpha     = CGFloat(max(0, min(alpha, 255))) / 255.0
+        node.zPosition = zPos; zPos += 1
     }
 
     /// Fills a rounded rectangle with the current colour, optional alpha and anchor.
@@ -197,6 +230,7 @@ class Video {
         shape.alpha       = CGFloat(max(0, min(alpha, 255))) / 255.0
         shape.zPosition   = zPos; zPos += 1
         canvasNode.addChild(shape)
+        ephemeralNodes.append(shape)
     }
 
     /// Fills the entire screen with a solid colour (overload without coordinates).
@@ -228,6 +262,7 @@ class Video {
         shape.lineWidth   = 1
         shape.zPosition   = zPos; zPos += 1
         canvasNode.addChild(shape)
+        ephemeralNodes.append(shape)
     }
 
 
@@ -235,11 +270,11 @@ class Video {
     // MARK: - Debug
 
 #if DEBUG
-    /// Overlays a small numbered label on every node in the canvas.
+    /// Overlays a small numbered label on every visible pool node.
     /// Call once per frame after all draw calls to visualise node count.
     func annotateNodes() {
-        let children = canvasNode.children
-        for (i, node) in children.enumerated() {
+        for i in 0..<poolCursor {
+            let node = nodePool[i]
             let lbl = SKLabelNode(text: "\(i)")
             lbl.fontName  = "Menlo-Bold"
             lbl.fontSize  = 9
@@ -248,6 +283,7 @@ class Video {
                                     y: node.frame.midY - canvasNode.position.y)
             lbl.zPosition = 10000 + CGFloat(i)
             canvasNode.addChild(lbl)
+            ephemeralNodes.append(lbl)
         }
     }
 #endif
