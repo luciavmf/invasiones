@@ -11,6 +11,7 @@ import Foundation
 
 /// Loads and caches all localised strings from strings.json.
 /// All strings are cached in a static array indexed by the `Res.STR_*` constants.
+/// Tips are stored separately in `GameText.tips` and are not part of the indexed table.
 enum GameText {
 
     // MARK: - Key order (must match Res.STR_* index values)
@@ -95,36 +96,14 @@ enum GameText {
         "help_tips_02",                     // 77
         "help_win_01",                      // 78
         "help_win_02",                      // 79
-        "tip_00",  // 80
-        "tip_01",  // 81
-        "tip_02",  // 82
-        "tip_03",  // 83
-        "tip_04",  // 84
-        "tip_05",  // 85
-        "tip_06",  // 86
-        "tip_07",  // 87
-        "tip_08",  // 88
-        "tip_09",  // 89
-        "tip_10",  // 90
-        "tip_11",  // 91
-        "tip_12",  // 92
-        "tip_13",  // 93
-        "tip_14",  // 94
-        "tip_15",  // 95
-        "tip_16",  // 96
-        "tip_17",  // 97
-        "tip_18",  // 98
-        "tip_19",  // 99
-        "tip_20",  // 100
-        "tip_21",        // 101
-        "tip_22",        // 102
-        "tip_23",        // 103
-        "language",      // 104
-        "language_label", // 105
+        "tip_00",                           // 80  ("Tip!" button label)
+        "language",                         // 81
+        "language_label",                   // 82
     ]
 
     // MARK: - Static storage
     private static var s_strings: [String]?
+    private static var s_tips: [String] = []
 
     // MARK: - Load
     static func loadStrings() throws {
@@ -133,18 +112,28 @@ enum GameText {
             throw GameError.fileNotFound("No se encuentra el archivo \(filename).")
         }
         let data = try Data(contentsOf: URL(fileURLWithPath: path))
-        let dict: [String: String]
+        let raw: [String: Any]
         do {
-            dict = try JSONDecoder().decode([String: String].self, from: data)
+            raw = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
         } catch {
             throw GameError.parsingFailed("GameText: failed to parse \(filename): \(error).")
         }
+        let dict = raw.compactMapValues { $0 as? String }
         s_strings = keyOrder.map { dict[$0] ?? "" }
+        s_tips = raw["tips"] as? [String] ?? []
     }
 
     // MARK: - Access
+
+    /// All indexed strings, accessed via Res.STR_* constants.
     static var Strings: [String] {
         if s_strings == nil { try? loadStrings() }
         return s_strings ?? []
+    }
+
+    /// All gameplay tips for the current language. Pick with randomElement().
+    static var tips: [String] {
+        if s_strings == nil { try? loadStrings() }
+        return s_tips
     }
 }

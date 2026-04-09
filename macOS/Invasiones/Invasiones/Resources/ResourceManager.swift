@@ -54,11 +54,11 @@ class ResourceManager {
     func loadResourcePaths() throws {
         let res = try decodeResJSON()
 
-        fontPaths     = res.fuentes.map { Utils.getPath($0) }
-        imagePaths    = res.imagenes.map { Utils.getPath($0) }
+        fontPaths = res.fuentes.map { Utils.getPath($0) }
+        imagePaths = res.imagenes.map { Utils.getPath($0) }
         scenarioPaths = (res.escenarios.tilesets + res.escenarios.mapas).map { Utils.getPath($0) }
-        soundPaths    = res.sonidos.sfx.map { Utils.getPath($0) }
-        unitPaths     = res.unidades.map { Utils.getPath($0.file) }
+        soundPaths = res.sonidos.sfx.map { Utils.getPath($0) }
+        unitPaths = res.unidades.map { Utils.getPath($0.file) }
 
         let hasErrors = fontPaths.contains(where: { $0 == nil })
                       || imagePaths.contains(where: { $0 == nil })

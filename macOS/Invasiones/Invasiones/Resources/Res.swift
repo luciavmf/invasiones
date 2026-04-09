@@ -92,17 +92,10 @@ enum Res {
     static let STR_MENU_AYUDA_TEXTO_TIPS_02 = 77
     static let STR_MENU_AYUDA_TEXTO_GANAR_01 = 78
     static let STR_MENU_AYUDA_TEXTO_GANAR_02 = 79
-    static let STR_TIP_00 = 80;  static let STR_TIP_01 = 81;  static let STR_TIP_02 = 82
-    static let STR_TIP_03 = 83;  static let STR_TIP_04 = 84;  static let STR_TIP_05 = 85
-    static let STR_TIP_06 = 86;  static let STR_TIP_07 = 87;  static let STR_TIP_08 = 88
-    static let STR_TIP_09 = 89;  static let STR_TIP_10 = 90;  static let STR_TIP_11 = 91
-    static let STR_TIP_12 = 92;  static let STR_TIP_13 = 93;  static let STR_TIP_14 = 94
-    static let STR_TIP_15 = 95;  static let STR_TIP_16 = 96;  static let STR_TIP_17 = 97
-    static let STR_TIP_18 = 98;  static let STR_TIP_19 = 99;  static let STR_TIP_20 = 100
-    static let STR_TIP_21 = 101; static let STR_TIP_22 = 102; static let STR_TIP_23 = 103
-    static let STR_LANGUAGE       = 104
-    static let STR_LANGUAGE_LABEL = 105
-    static let STR_COUNT = 106
+    static let STR_TIP_00         = 80   // "Tip!" button label
+    static let STR_LANGUAGE       = 81
+    static let STR_LANGUAGE_LABEL = 82
+    static let STR_COUNT          = 83
 
     // MARK: - Font Ids
     static let FNT_SANS = 0
