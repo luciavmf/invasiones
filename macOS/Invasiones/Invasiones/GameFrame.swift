@@ -103,6 +103,7 @@ class GameFrame {
 #if DEBUG
         if GameFrame.showNodeIndices { v.annotateNodes() }
 #endif
+        v.finalize()
     }
 
     // MARK: - Exit
