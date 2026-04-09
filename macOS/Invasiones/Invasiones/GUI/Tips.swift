@@ -23,6 +23,7 @@ class Tips: GUIBox {
 
     // MARK: - Declarations
     private var tipButton: Button
+    private var tipText: String = ""
     private var shouldShowTip: Bool = false
     private var tipCount: Int = 0
     private var blinkCount: Int = 0
@@ -88,7 +89,7 @@ class Tips: GUIBox {
             video.setFont(
                 ResourceManager.shared.fonts[FontConstants.objectivesReminderFont],
                 Theme.text)
-            video.write(label,
+            video.write(tipText,
                        posX - (Video.width >> 1) + (width >> 1),
                        posY + height / 5,
                        Surface.centerHorizontal)
@@ -104,6 +105,6 @@ class Tips: GUIBox {
     // MARK: - Private
 
     private func generateRandomTip() {
-        label = Int.random(in: Res.STR_TIP_01..<Res.STR_TIP_23)
+        tipText = GameText.tips.randomElement() ?? ""
     }
 }
