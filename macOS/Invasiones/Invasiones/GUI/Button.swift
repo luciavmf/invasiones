@@ -21,22 +21,15 @@ class Button: GUIBox {
     }
 
     // MARK: - Declarations
-    private var selectedImage: Surface?
     private(set) var isUnderCursor = false
 
     // MARK: - Initializer
     init(label: Int, font: GameFont?) {
         super.init()
-
         self.height = Constants.defaultHeight
-        self.width = Constants.defaultWidth
-
-        self.image = ResourceManager.shared.getAlphaImage(Res.IMG_BOTON)
-        self.height = self.image?.height ?? Constants.defaultHeight
-        self.width = self.image?.width ?? Constants.defaultWidth
-        selectedImage = ResourceManager.shared.getAlphaImage(Res.IMG_BOTON_SELECCION)
-        self.font = font ?? ResourceManager.shared.fonts[FontConstants.buttonFont]
-        self.label = label
+        self.width  = Constants.defaultWidth
+        self.font   = font ?? ResourceManager.shared.fonts[FontConstants.buttonFont]
+        self.label  = label
     }
 
     // MARK: - Methods
@@ -62,21 +55,9 @@ class Button: GUIBox {
     }
 
     override func draw(_ video: Video) {
-        if isUnderCursor {
-            if selectedImage != nil {
-                video.draw(selectedImage, posX, posY, 0)
-            } else {
-                video.setColor(Theme.selection)
-                video.fillRect(posX, posY, width, height, Theme.alpha)
-            }
-        } else {
-            if image != nil {
-                video.draw(image, posX, posY, 0)
-            } else {
-                video.setColor(Theme.menus)
-                video.fillRect(posX, posY, width, height, Theme.alpha)
-            }
-        }
+        let alpha = isUnderCursor ? 250 : Theme.alpha
+        video.setColor(isUnderCursor ? Theme.buttonHover : Theme.menus)
+        video.fillRoundedRect(posX, posY, width, height, 6, alpha)
 
         video.setFont(font, Theme.text)
         video.write(label,

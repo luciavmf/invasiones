@@ -137,9 +137,7 @@ enum Res {
     static let IMG_FONDO = 7
     static let IMG_TILE_GRIS = 8
     static let IMG_HUD = 9
-    static let IMG_BOTON = 10
-    static let IMG_BOTON_SELECCION = 11
-    static let IMG_COUNT = 12
+    static let IMG_COUNT = 10
 
     // MARK: - Unidades Ids
     static let UNIDAD_PATRICIO = 0

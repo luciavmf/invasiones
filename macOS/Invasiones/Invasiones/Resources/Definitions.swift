@@ -47,6 +47,7 @@ enum GameColor {
 enum Theme {
     static let menus = GameColor.black
     static let selection = GameColor.red
+    static let buttonHover = GameColor.black
     static let text = GameColor.white
     static let alpha = 128
     static let title = GameColor.white
