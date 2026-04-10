@@ -71,6 +71,14 @@ Battle lifecycle: `LOADING → SHOW_INTRO → PLAYING → WON/LOST`
 
 Screen dimensions live on `Video` as `Video.width` / `Video.height` — do not add a separate constants file for these.
 
+### GUI (`GUI/`)
+
+GUI components use composition: each embeds `var frame: Frame` (defined in `GUI/Frame.swift`) instead of inheriting from a base class.
+
+`Frame` is a plain struct holding `posX`, `posY`, `width`, `height` and a `mutating setPosition(x:y:anchor:)` helper. Styling (font, image, label) lives on each component individually.
+
+Components: `Button` (struct), `Menu` (class), `ConfirmationMenu` (class), `Tips` (class), `Hud`, `Ring`.
+
 Input from `NSEvent` flows through `GameScene` into `Mouse` and `Keyboard` singletons.
 
 ### Pathfinding
@@ -109,6 +117,8 @@ The codebase has been progressively Swiftified from the C# port style. Completed
 6. Argument labels added to game-logic functions (removing `_` suppression)
 7. C# XML doc comments restored as Swift `///` comments in English
 8. `Int16` → `Int` throughout (`Tile`, `Tileset`, `Map`, `PathFinder`, `Obstacle`, `Player`, `ArgentineTeam`, `EnemyTeam`)
+9. `GUIBox` abstract class → `Frame` struct (composition; each GUI component embeds `var frame: Frame`)
+10. `Button` converted from class to struct
 
 In progress / not yet done:
 - `throws` instead of `Bool` returns
