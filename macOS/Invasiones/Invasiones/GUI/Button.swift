@@ -4,48 +4,44 @@
 //
 //  Created by Lucia Medina Fretes on 06.04.26.
 //
-//  Port of Boton.cs — button with background image and centered text.
-//
 
 import Foundation
 
-class Button: GUIBox {
+struct Button {
 
     // MARK: - Constants
     enum Constants {
         static let screenEdgeOffset = 15
-        static let defaultHeight = 25
-        static let defaultWidth = 100
-        static let minWidth = 10
-        static let minHeight = 10
+        static let defaultHeight    = 25
+        static let defaultWidth     = 100
     }
 
     // MARK: - Declarations
+    var frame = Frame(width: Constants.defaultWidth, height: Constants.defaultHeight)
+    var font:  GameFont?
+    var image: Surface? = nil
+    var label: Int = 0
+
     private(set) var isUnderCursor = false
 
     // MARK: - Initializer
-    init(label: Int, font: GameFont?) {
-        super.init()
-        self.height = Constants.defaultHeight
-        self.width = Constants.defaultWidth
-        self.font = font ?? ResourceManager.shared.fonts[FontConstants.buttonFont]
+    init(label: Int, font: GameFont? = nil) {
         self.label = label
+        self.font  = font ?? ResourceManager.shared.fonts[FontConstants.buttonFont]
     }
 
     // MARK: - Methods
 
-    override func setPosition(x: Int, y: Int, anchor: Int) {
-        posX = x
-        posY = y
-        if (anchor & Surface.centerVertical) != 0 { posY += (Video.height >> 1) - (height >> 1) }
-        if (anchor & Surface.centerHorizontal) != 0 { posX += (Video.width >> 1) - (width >> 1) }
+    mutating func setPosition(x: Int, y: Int, anchor: Int) {
+        frame.setPosition(x: x, y: y, anchor: anchor)
     }
 
     @discardableResult
-    override func update() -> Int {
+    mutating func update() -> Int {
         let mx = Int(Mouse.shared.x)
         let my = Int(Mouse.shared.y)
-        isUnderCursor = mx > posX && mx < posX + width && my > posY && my < posY + height
+        isUnderCursor = mx > frame.posX && mx < frame.posX + frame.width
+                     && my > frame.posY && my < frame.posY + frame.height
 
         if isUnderCursor && Mouse.shared.pressedButtons.contains(Mouse.Constants.leftButton) {
             Mouse.shared.releaseButton(Mouse.Constants.leftButton)
@@ -54,18 +50,17 @@ class Button: GUIBox {
         return 0
     }
 
-    override func draw(_ video: Video) {
+    func draw(_ video: Video) {
         let alpha = isUnderCursor ? 250 : Theme.alpha
         video.setColor(isUnderCursor ? Theme.buttonHover : Theme.menus)
-        video.fillRoundedRect(posX, posY, width, height, 6, alpha)
+        video.fillRoundedRect(frame.posX, frame.posY, frame.width, frame.height, 6, alpha)
 
         video.setFont(font, Theme.text)
         video.write(
             label,
-            posX - Video.width / 2 + width / 2,
-            posY - Video.height  / 2 + height  / 2,
+            frame.posX - Video.width  / 2 + frame.width  / 2,
+            frame.posY - Video.height / 2 + frame.height / 2,
             Surface.centerHorizontal | Surface.centerVertical
         )
     }
-
 }

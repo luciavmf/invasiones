@@ -30,9 +30,11 @@ class OptionsState: State {
     override func start() {
         background = ResourceManager.shared.getImage(Res.IMG_FONDO)
         button = Button(label: Res.STR_BOTON_MENU, font: nil)
+        let bw = button?.frame.width  ?? 0
+        let bh = button?.frame.height ?? 0
         button?.setPosition(
-            x: Video.width  - (button?.width  ?? 0) - Button.Constants.screenEdgeOffset,
-            y: Video.height - (button?.height ?? 0) - Button.Constants.screenEdgeOffset,
+            x: Video.width  - bw - Button.Constants.screenEdgeOffset,
+            y: Video.height - bh - Button.Constants.screenEdgeOffset,
             anchor: 0)
     }
 
