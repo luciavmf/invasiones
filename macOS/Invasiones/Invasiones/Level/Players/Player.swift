@@ -311,10 +311,21 @@ class Player {
             }
 
             switch dir {
-            case 1: i += 2; if i == inc { dir = 2 }
-            case 2: j += 2; if j == inc { dir = 3 }
-            case 3: i -= 2; if i == -inc { dir = 0 }
-            case 0: j -= 2; if j == -inc { dir = 1; inc += 2 }
+            case 1:
+                i += 2
+                if i == inc { dir = 2 }
+            case 2:
+                j += 2
+                if j == inc { dir = 3 }
+            case 3:
+                i -= 2
+                if i == -inc { dir = 0 }
+            case 0:
+                j -= 2
+                if j == -inc {
+                    dir = 1
+                    inc += 2
+                }
             default: break
             }
         }

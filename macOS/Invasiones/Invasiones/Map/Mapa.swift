@@ -147,15 +147,21 @@ class Map {
                         }
                     }
                 }
-                tileX += 1; i += 1; j -= 1
+                tileX += 1
+                i += 1
+                j -= 1
             }
 
             startPosY += tileHeight >> 1
 
             if toggle {
-                startCol += 1; startPosX += tileWidth >> 1; toggle = false
+                startCol += 1
+                startPosX += tileWidth >> 1
+                toggle = false
             } else {
-                startRow += 1; startPosX -= tileWidth >> 1; toggle = true
+                startRow += 1
+                startPosX -= tileWidth >> 1
+                toggle = true
             }
         }
 
@@ -388,10 +394,14 @@ class Map {
         guard d.orientation == "isometric" else {
             throw GameError.invalidResource("Map: orientación no isométrica.")
         }
-        width = d.width; physicalWidth = d.width * 2
-        height = d.height; physicalHeight = d.height * 2
-        tileWidth = d.tileWidth; physicalTileWidth = d.tileWidth / 2
-        tileHeight = d.tileHeight; physicalTileHeight = d.tileHeight / 2
+        width = d.width
+        physicalWidth = d.width * 2
+        height = d.height
+        physicalHeight = d.height * 2
+        tileWidth = d.tileWidth
+        physicalTileWidth = d.tileWidth / 2
+        tileHeight = d.tileHeight
+        physicalTileHeight = d.tileHeight / 2
         camera.x = ((d.tileCamaraJ - d.tileCamaraI) * tileWidth) >> 1
         camera.y = -((d.tileCamaraJ + d.tileCamaraI) * tileHeight) >> 1
     }
@@ -503,9 +513,13 @@ class Map {
 // MARK: - Private XML delegates
 
 private class MapInfoDelegate: NSObject, XMLParserDelegate {
-    var orientation = ""; var width = 0; var height = 0
-    var tileWidth = 0; var tileHeight = 0
-    var tileCamaraI = 0; var tileCamaraJ = 0
+    var orientation = ""
+    var width = 0
+    var height = 0
+    var tileWidth = 0
+    var tileHeight = 0
+    var tileCamaraI = 0
+    var tileCamaraJ = 0
     private var enProperties = false
 
     func parser(_ parser: XMLParser, didStartElement name: String,

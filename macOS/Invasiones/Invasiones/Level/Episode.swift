@@ -200,7 +200,10 @@ class Episode {
             map = Map(camera: camera)
 
         } else if count == 1 {
-            guard let map = map else { count += 1; return false }
+                        guard let map = map else {
+                count += 1
+                return false
+            }
             try map.load(Res.MAP_NIVEL1 + levelIndex)
 
             MapObject.map = map
@@ -223,7 +226,8 @@ class Episode {
 
         } else if count == 5 {
             guard let map = map, let camera = camera, let hud = hud else {
-                count += 1; return false
+                count += 1
+                return false
             }
             player = ArgentineTeam(map: map, camera: camera,
                                        objectsToDraw: objectsToDraw, hud: hud)
@@ -455,11 +459,19 @@ class Episode {
                         map.drawSmallTile(video: video, i: i, j: j, semiTransparent: true)
                     }
                 }
-                tileX += 1; i += 1; j -= 1
+                tileX += 1
+                i += 1
+                j -= 1
             }
             tileY += 1
-            if toggle { startCol += 1; toggle = false }
-            else       { startRow += 1; toggle = true  }
+                        if toggle {
+                startCol += 1
+                toggle = false
+            }
+                        else {
+                startRow += 1
+                toggle = true
+            }
         }
 
         video.setClip(x: oldClip.x, y: oldClip.y, w: oldClip.w, h: oldClip.h)
@@ -490,11 +502,19 @@ class Episode {
                         if let obs = obj as? Obstacle { obs.draw(video) }
                     }
                 }
-                tileX += 1; i += 1; j -= 1
+                tileX += 1
+                i += 1
+                j -= 1
             }
             tileY += 1
-            if toggle { startCol += 1; toggle = false }
-            else       { startRow += 1; toggle = true  }
+                        if toggle {
+                startCol += 1
+                toggle = false
+            }
+                        else {
+                startRow += 1
+                toggle = true
+            }
         }
 
         // Fueguitos del jugador se dibujan encima (delegado a ArgentineFaction via Player)
@@ -557,7 +577,8 @@ class Episode {
         } else if keys.contains(Keyboard.Key.x.rawValue) && cheatWinIndex == 3 {
             cheatWinIndex += 1
         } else if keys.contains(Keyboard.Key.w.rawValue) && cheatWinIndex == 4 {
-            setState(.won); cheatWinIndex = 0
+            setState(.won)
+            cheatWinIndex = 0
         } else if keys.contains(Keyboard.Key.p.rawValue) && cheatLoseIndex == 0 {
             cheatLoseIndex += 1
         } else if keys.contains(Keyboard.Key.e.rawValue) && cheatLoseIndex == 1 {
@@ -567,7 +588,8 @@ class Episode {
         } else if keys.contains(Keyboard.Key.x.rawValue) && cheatLoseIndex == 3 {
             cheatLoseIndex += 1
         } else if keys.contains(Keyboard.Key.w.rawValue) && cheatLoseIndex == 4 {
-            setState(.lost); cheatLoseIndex = 0
+            setState(.lost)
+            cheatLoseIndex = 0
         } else if keys.contains(Keyboard.Key.o.rawValue) && cheatObjectiveIndex == 0 {
             cheatObjectiveIndex += 1
         } else if keys.contains(Keyboard.Key.b.rawValue) && cheatObjectiveIndex == 1 {
@@ -577,7 +599,8 @@ class Episode {
         } else if keys.contains(Keyboard.Key.x.rawValue) && cheatObjectiveIndex == 3 {
             cheatObjectiveIndex += 1
         } else if keys.contains(Keyboard.Key.w.rawValue) && cheatObjectiveIndex == 4 {
-            setNewObjective(); cheatObjectiveIndex = 0
+            setNewObjective()
+            cheatObjectiveIndex = 0
         } else if !keys.isEmpty {
             if keys.contains(Keyboard.Key.u.rawValue) { player?.selectNextUnit() }
             Log.shared.debug("Resetting all cheat indices.")
