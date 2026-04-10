@@ -30,10 +30,6 @@ class StateMachine {
     // MARK: - Initializer
     init() {}
 
-    deinit {
-        dispose()
-    }
-
     func dispose() {
         allStates.removeAll()
     }

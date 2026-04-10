@@ -86,12 +86,6 @@ class Episode {
         gameOverMenu.setPosition(x: 0, y: 0, anchor: Surface.centerVertical | Surface.centerHorizontal)
     }
 
-    deinit { dispose() }
-
-    func dispose() {
-        map = nil
-    }
-
     // MARK: - Public control
 
     /// Starts the battle by entering the loading state.
