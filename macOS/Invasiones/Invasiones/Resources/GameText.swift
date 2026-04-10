@@ -99,6 +99,7 @@ enum GameText {
         "tip_00",                           // 80  ("Tip!" button label)
         "language",                         // 81
         "language_label",                   // 82
+        "sound_label",                      // 83
     ]
 
     // MARK: - Static storage

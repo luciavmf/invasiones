@@ -90,7 +90,8 @@ enum Res {
     static let STR_TIP_00         = 80   // "Tip!" button label
     static let STR_LANGUAGE       = 81
     static let STR_LANGUAGE_LABEL = 82
-    static let STR_COUNT          = 83
+    static let STR_SOUND_LABEL    = 83
+    static let STR_COUNT          = 84
 
     // MARK: - Font Ids
     static let FNT_SANS = 0
