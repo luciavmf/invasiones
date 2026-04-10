@@ -7,6 +7,7 @@
 
 import Cocoa
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var window: NSWindow!
