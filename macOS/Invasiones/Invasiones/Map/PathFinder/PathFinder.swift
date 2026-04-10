@@ -21,7 +21,10 @@ class PathFinder {
         var i: Int
         var j: Int
 
-        init(_ i: Int = 0, _ j: Int = 0) { self.i = i; self.j = j }
+                init(_ i: Int = 0, _ j: Int = 0) {
+            self.i = i
+            self.j = j
+        }
 
         static func == (a: Node, b: Node) -> Bool { a.i == b.i && a.j == b.j }
     }

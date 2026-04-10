@@ -258,11 +258,19 @@ class ArgentineTeam: Player {
                         return uni
                     }
                 }
-                tileX += 1; i += 1; j -= 1
+                tileX += 1
+                i += 1
+                j -= 1
             }
             tileY += 1
-            if toggle { startCol += 1; toggle = false }
-            else       { startRow += 1; toggle = true  }
+                        if toggle {
+                startCol += 1
+                toggle = false
+            }
+                        else {
+                startRow += 1
+                toggle = true
+            }
         }
         return nil
     }

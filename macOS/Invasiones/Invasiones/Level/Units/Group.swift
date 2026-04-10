@@ -328,13 +328,20 @@ class Group {
             // spiral
             switch dir {
             case 1: // UP
-                i += 2; if i == inc { dir = 2 }
+                i += 2
+                if i == inc { dir = 2 }
             case 2: // RIGHT
-                j += 2; if j == inc { dir = 3 }
+                j += 2
+                if j == inc { dir = 3 }
             case 3: // DOWN
-                i -= 2; if i == -inc { dir = 0 }
+                i -= 2
+                if i == -inc { dir = 0 }
             case 0: // LEFT
-                j -= 2; if j == -inc { dir = 1; inc += 2 }
+                j -= 2
+                if j == -inc {
+                    dir = 1
+                    inc += 2
+                }
             default: break
             }
         }

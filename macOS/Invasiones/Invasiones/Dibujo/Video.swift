@@ -106,7 +106,8 @@ class Video {
         node.size      = tex.size()
         node.position  = CGPoint(x: px, y: Video.height - py)
         node.alpha     = CGFloat(max(0, min(alpha, 255))) / 255.0
-        node.zPosition = zPos; zPos += 1
+        node.zPosition = zPos
+        zPos += 1
     }
 
 
@@ -117,7 +118,8 @@ class Video {
         node.size      = tex.size()
         node.position  = CGPoint(x: x, y: Video.height - y)
         node.alpha     = alpha
-        node.zPosition = zPos; zPos += 1
+        node.zPosition = zPos
+        zPos += 1
     }
 
     /// Draws a sub-region of a surface at a destination position (tile blit).
@@ -141,7 +143,8 @@ class Video {
         node.size      = subTex.size()
         node.position  = CGPoint(x: destX, y: Video.height - destY)
         node.alpha     = sup.currentAlpha
-        node.zPosition = zPos; zPos += 1
+        node.zPosition = zPos
+        zPos += 1
     }
 
     // MARK: - Clip
@@ -149,7 +152,10 @@ class Video {
     func getClip() -> (x: Int, y: Int, w: Int, h: Int) { (clipX, clipY, clipW, clipH) }
 
     func setClip(x: Int, y: Int, w: Int, h: Int) {
-        clipX = x; clipY = y; clipW = w; clipH = h
+        clipX = x
+        clipY = y
+        clipW = w
+        clipH = h
     }
 
     // MARK: - Write text
@@ -194,7 +200,8 @@ class Video {
         label.numberOfLines = 0      // allows line breaks with \n
         label.preferredMaxLayoutWidth = CGFloat(Video.width - 80)  // enables word-wrap and avoids clipping
         label.position = CGPoint(x: px, y: Video.height - py)
-        label.zPosition = zPos; zPos += 1
+        label.zPosition = zPos
+        zPos += 1
         canvasNode.addChild(label)
         ephemeralNodes.append(label)
     }
@@ -214,7 +221,8 @@ class Video {
         node.size      = CGSize(width: w, height: h)
         node.position  = CGPoint(x: px, y: Video.height - py)
         node.alpha     = CGFloat(max(0, min(alpha, 255))) / 255.0
-        node.zPosition = zPos; zPos += 1
+        node.zPosition = zPos
+        zPos += 1
     }
 
     /// Fills a rounded rectangle with the current colour, optional alpha and anchor.
@@ -228,7 +236,8 @@ class Video {
         shape.fillColor   = currentColor
         shape.strokeColor = SKColor.clear
         shape.alpha       = CGFloat(max(0, min(alpha, 255))) / 255.0
-        shape.zPosition   = zPos; zPos += 1
+        shape.zPosition   = zPos
+        zPos += 1
         canvasNode.addChild(shape)
         ephemeralNodes.append(shape)
     }
@@ -260,7 +269,8 @@ class Video {
         shape.strokeColor = currentColor
         shape.fillColor   = .clear
         shape.lineWidth   = 1
-        shape.zPosition   = zPos; zPos += 1
+        shape.zPosition   = zPos
+        zPos += 1
         canvasNode.addChild(shape)
         ephemeralNodes.append(shape)
     }

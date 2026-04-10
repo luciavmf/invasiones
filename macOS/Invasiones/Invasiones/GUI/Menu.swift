@@ -50,9 +50,13 @@ class Menu: GUIBox {
             let padding = 6
             let totalHeight = (buttonHeight + lineSpacing) * itemCount - lineSpacing
             video.setColor(Theme.menus)
-            video.fillRoundedRect(posX - padding, posY - padding,
-                                  buttonWidth + padding * 2, totalHeight + padding * 2,
-                                  10, Theme.alpha)
+            video.fillRoundedRect(
+                posX - padding, posY - padding,
+                buttonWidth + padding * 2,
+                totalHeight + padding * 2,
+                10,
+                Theme.alpha
+            )
         }
 
         var y = posY
@@ -64,10 +68,12 @@ class Menu: GUIBox {
                     video.fillRect(posX, y, buttonWidth, buttonHeight)
                 }
                 video.setFont(font, Theme.text)
-                video.write(items[i] & 0xFF,
-                           posX - (Video.width >> 1) + (buttonWidth >> 1),
-                           y   - (Video.height  >> 1) + (buttonHeight  >> 1),
-                           Surface.centerHorizontal | Surface.centerVertical)
+                video.write(
+                    items[i] & 0xFF,
+                    posX - (Video.width >> 1) + (buttonWidth >> 1),
+                    y   - (Video.height  >> 1) + (buttonHeight  >> 1),
+                    Surface.centerHorizontal | Surface.centerVertical
+                )
                 y += lineSpacing + buttonHeight
             }
         }

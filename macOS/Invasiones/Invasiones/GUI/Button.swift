@@ -27,9 +27,9 @@ class Button: GUIBox {
     init(label: Int, font: GameFont?) {
         super.init()
         self.height = Constants.defaultHeight
-        self.width  = Constants.defaultWidth
-        self.font   = font ?? ResourceManager.shared.fonts[FontConstants.buttonFont]
-        self.label  = label
+        self.width = Constants.defaultWidth
+        self.font = font ?? ResourceManager.shared.fonts[FontConstants.buttonFont]
+        self.label = label
     }
 
     // MARK: - Methods
@@ -60,10 +60,12 @@ class Button: GUIBox {
         video.fillRoundedRect(posX, posY, width, height, 6, alpha)
 
         video.setFont(font, Theme.text)
-        video.write(label,
-                   posX - Video.width / 2 + width / 2,
-                   posY - Video.height  / 2 + height  / 2,
-                   Surface.centerHorizontal | Surface.centerVertical)
+        video.write(
+            label,
+            posX - Video.width / 2 + width / 2,
+            posY - Video.height  / 2 + height  / 2,
+            Surface.centerHorizontal | Surface.centerVertical
+        )
     }
 
 }

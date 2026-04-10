@@ -64,15 +64,24 @@ class Sound {
     func stop(_ id: Int) {
         guard id >= -1, id < Res.SND_COUNT + Res.SFX_COUNT else { return }
         if id == -1 {
-            sfxPlayers.compactMap { $0 }.forEach { $0.stop(); $0.currentTime = 0 }
-            musicPlayer?.stop(); musicPlayer?.currentTime = 0; currentMusic = -1
+            sfxPlayers.compactMap { $0 }.forEach {
+                $0.stop()
+                $0.currentTime = 0
+            }
+            musicPlayer?.stop()
+            musicPlayer?.currentTime = 0
+            currentMusic = -1
             return
         }
+
         if id >= Res.SND_COUNT {
             let p = sfxPlayers[id - Res.SND_COUNT]
-            p?.stop(); p?.currentTime = 0
+            p?.stop()
+            p?.currentTime = 0
         } else {
-            musicPlayer?.stop(); musicPlayer?.currentTime = 0; currentMusic = -1
+            musicPlayer?.stop()
+            musicPlayer?.currentTime = 0
+            currentMusic = -1
         }
     }
 
