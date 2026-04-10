@@ -9,19 +9,21 @@
 
 import Foundation
 
-class Tips: GUIBox {
+class Tips {
 
     // MARK: - Constants
     private enum Constants {
         static let initialTipTime = 250
-        static let maxBlink = 40
-        static let minBlink = 20
-        static let alpha = 100
-        static let defaultWidth = 450
-        static let defaultHeight = 100
+        static let maxBlink       = 40
+        static let minBlink       = 20
+        static let alpha          = 100
+        static let defaultWidth   = 450
+        static let defaultHeight  = 100
     }
 
     // MARK: - Declarations
+    var frame = Frame(width: Constants.defaultWidth, height: Constants.defaultHeight)
+
     private var tipButton: Button
     private var tipText: String = ""
     private var shouldShowTip: Bool = false
@@ -29,35 +31,30 @@ class Tips: GUIBox {
     private var blinkCount: Int = 0
 
     // MARK: - Initializer
-    override init() {
+    init() {
         tipButton = Button(label: Res.STR_TIP_00, font: nil)
-        super.init()
-
         tipButton.setPosition(
-            x: Video.width - tipButton.width - 20,
-            y: Video.height  - 90 - tipButton.height,
-            anchor: 0)
-
-        width = Constants.defaultWidth
-        height = Constants.defaultHeight
+            x: Video.width  - tipButton.frame.width  - 20,
+            y: Video.height - 90 - tipButton.frame.height,
+            anchor: 0
+        )
 
         generateRandomTip()
-
         tipCount = Constants.initialTipTime
         shouldShowTip = false
     }
 
-    // MARK: - GUIBox
+    // MARK: - Methods
 
-    override func setPosition(x: Int, y: Int, anchor: Int) {
-        posX = x
-        posY = y
-        if (anchor & Surface.centerHorizontal) != 0 { posX += (Video.width >> 1) - (width >> 1) }
-        if (anchor & Surface.centerVertical) != 0 { posY += (Video.height >> 1) - (height >> 1) }
+    func setPosition(x: Int, y: Int, anchor: Int) {
+        frame.posX = x
+        frame.posY = y
+        if (anchor & Surface.centerHorizontal) != 0 { frame.posX += (Video.width  >> 1) - (frame.width  >> 1) }
+        if (anchor & Surface.centerVertical)   != 0 { frame.posY += (Video.height >> 1) - (frame.height >> 1) }
     }
 
     @discardableResult
-    override func update() -> Int {
+    func update() -> Int {
         blinkCount += 1
 
         if shouldShowTip {
@@ -77,22 +74,25 @@ class Tips: GUIBox {
         }
 
         tipButton.update()
-        return -1  // SELECCION.NINGUNO
+        return -1
     }
 
-    override func draw(_ video: Video) {
+    func draw(_ video: Video) {
         guard shouldShowTip else { return }
 
         if tipButton.isUnderCursor {
             video.setColor(Theme.menus)
-            video.fillRect(posX, posY, width, height, Constants.alpha)
+            video.fillRect(frame.posX, frame.posY, frame.width, frame.height, Constants.alpha)
             video.setFont(
                 ResourceManager.shared.fonts[FontConstants.objectivesReminderFont],
-                Theme.text)
-            video.write(tipText,
-                       posX - (Video.width >> 1) + (width >> 1),
-                       posY + height / 5,
-                       Surface.centerHorizontal)
+                Theme.text
+            )
+            video.write(
+                tipText,
+                frame.posX - (Video.width >> 1) + (frame.width >> 1),
+                frame.posY + frame.height / 5,
+                Surface.centerHorizontal
+            )
             tipButton.draw(video)
         } else {
             tipCount -= 1

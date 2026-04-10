@@ -48,10 +48,8 @@ class GameState: State {
             stateValue = .playing
 
             button = Button(label: Res.STR_BOTON_MENU_DEL_JUEGO, font: nil)
-            if let b = button {
-                b.setPosition(x: Video.width - b.width - Button.Constants.screenEdgeOffset,
-                              y: Button.Constants.screenEdgeOffset, anchor: 0)
-            }
+            button?.setPosition(x: Video.width - Button.Constants.defaultWidth - Button.Constants.screenEdgeOffset,
+                                y: Button.Constants.screenEdgeOffset, anchor: 0)
 
             confirmMenu = ConfirmationMenu(Res.STR_CONFIRMACION_SALIR,
                                                       Res.STR_NO, Res.STR_SI)

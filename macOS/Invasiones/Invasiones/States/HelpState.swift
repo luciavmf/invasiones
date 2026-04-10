@@ -36,23 +36,27 @@ class HelpState: State {
         let fnt = ResourceManager.shared.fonts[FontIndex.sans18.rawValue]
 
         button = Button(label: Res.STR_BOTON_MENU, font: fnt)
+        let bw = button?.frame.width  ?? 0
+        let bh = button?.frame.height ?? 0
         button?.setPosition(
-            x: Video.width - (button?.width ?? 0) - Button.Constants.screenEdgeOffset,
-            y: Video.height - (button?.height ?? 0) - Button.Constants.screenEdgeOffset,
+            x: Video.width  - bw - Button.Constants.screenEdgeOffset,
+            y: Video.height - bh - Button.Constants.screenEdgeOffset,
             anchor: 0
         )
 
         nextButton = Button(label: Res.STR_SIGUIENTE, font: fnt)
+        let nw = nextButton?.frame.width  ?? 0
+        let nh = nextButton?.frame.height ?? 0
         nextButton?.setPosition(
-            x: Video.width - (nextButton?.width ?? 0) - Button.Constants.screenEdgeOffset,
-            y: Video.height - (nextButton?.height ?? 0) - Button.Constants.screenEdgeOffset,
+            x: Video.width  - nw - Button.Constants.screenEdgeOffset,
+            y: Video.height - nh - Button.Constants.screenEdgeOffset,
             anchor: 0
         )
 
         backButton = Button(label: Res.STR_ATRAS, font: fnt)
         backButton?.setPosition(
-            x: Video.width - (nextButton?.width ?? 0) * 2 - Button.Constants.screenEdgeOffset,
-            y: Video.height - (nextButton?.height ?? 0) - Button.Constants.screenEdgeOffset,
+            x: Video.width  - nw * 2 - Button.Constants.screenEdgeOffset,
+            y: Video.height - nh     - Button.Constants.screenEdgeOffset,
             anchor: 0
         )
 

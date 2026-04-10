@@ -72,8 +72,8 @@ class MainMenuState: State {
 
         if firstBuild {
             firstBuild = false
-            menuTargetY = Video.height - newMenu.height - Constants.mainMenuYOffset
-            posY              = Video.height + newMenu.height + Constants.mainMenuYOffset
+            menuTargetY = Video.height - newMenu.frame.height - Constants.mainMenuYOffset
+            posY = Video.height + newMenu.frame.height + Constants.mainMenuYOffset
             newMenu.setPosition(x: 0, y: Video.height + 15, anchor: Surface.centerHorizontal)
         }
 
