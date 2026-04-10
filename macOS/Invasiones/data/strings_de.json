@@ -82,6 +82,7 @@
   "tip_00": "Tipp!",
   "language": "Deutsch",
   "language_label": "Sprache",
+  "sound_label": "Ton",
   "tips": [
     "Wenn du Lebenspunkte verloren hast, gehe zu den Gebäuden\nmit einem roten Kreuz, um dich zu erholen.",
     "Es gibt mehrere Gebäude, wo du deine Gesundheit wiederherstellen kannst.\nSuche sie auf der gesamten Karte.",

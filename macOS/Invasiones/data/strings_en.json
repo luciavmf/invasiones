@@ -82,6 +82,7 @@
   "tip_00": "Tip!",
   "language": "English",
   "language_label": "Language",
+  "sound_label": "Sound",
   "tips": [
     "If you lost health, head to the buildings marked\nwith a red cross to recover.",
     "There are several buildings where you can restore your health.\nLook for them across the map.",
