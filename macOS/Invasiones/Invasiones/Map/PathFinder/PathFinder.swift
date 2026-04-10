@@ -21,7 +21,7 @@ class PathFinder {
         var i: Int
         var j: Int
 
-                init(_ i: Int = 0, _ j: Int = 0) {
+        init(_ i: Int = 0, _ j: Int = 0) {
             self.i = i
             self.j = j
         }
