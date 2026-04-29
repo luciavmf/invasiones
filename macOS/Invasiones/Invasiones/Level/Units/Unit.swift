@@ -53,6 +53,8 @@ class Unit: MapObject {
     var faction: Episode.Faction = .enemy
     /// The unit currently being evaded after a collision.
     private(set) var unitToEvade: Unit?
+    /// Tiles to treat as blocked on the next pathfinder call (set by evadeUnit, consumed by recalculateNextStep).
+    private var dodgeBlockedTiles: [(i: Int, j: Int)] = []
     /// Current health points.
     private(set) var health: Int = 100
     /// Maximum health points (loaded from CSV).
@@ -280,17 +282,32 @@ class Unit: MapObject {
 
     // MARK: - Collision and evasion
 
-    /// Returns `true` if this unit and `other` occupy overlapping tiles.
+    /// Returns `true` if this unit's next step lands on the same tile as `other`.
+    /// Mirrors C# Unidad.HayColision: collision only when our next tile equals their
+    /// current resting tile (stationary) or their next tile (moving). Proximity alone
+    /// is not a collision — otherwise any nearby unit would trigger evade every frame
+    /// and movement would lock up.
     func hasCollision(_ other: Unit) -> Bool {
-        let dx = abs(physicalTilePos.x - other.physicalTilePos.x)
-        let dy = abs(physicalTilePos.y - other.physicalTilePos.y)
-        return dx < 2 && dy < 2
+        guard other !== self else { return false }
+        if other.isMoving() {
+            return nextTile.x == other.nextTile.x && nextTile.y == other.nextTile.y
+        } else {
+            return nextTile.x == other.physicalTilePos.x && nextTile.y == other.physicalTilePos.y
+        }
     }
 
     /// Triggers the evasion sub-state so the unit recalculates its path around `other`.
+    /// Captures nearby unit tiles so the next A* call routes around them.
     func evadeUnit(other: Unit, visible: [Unit]?) {
         unitToEvade = other
         substate = .dodgeUnit
+
+        var blocked: [(i: Int, j: Int)] = []
+        for u in visible ?? [] {
+            let tile = u.isMoving() ? u.nextTile : u.physicalTilePos
+            blocked.append((tile.x, tile.y))
+        }
+        dodgeBlockedTiles = blocked
     }
 
     // MARK: - Queries
@@ -645,6 +662,9 @@ class Unit: MapObject {
         worldPos = tileToWorld(i: physicalTilePos.x, j: physicalTilePos.y)
         unitToEvade = nil
 
+        let blocked = dodgeBlockedTiles
+        dodgeBlockedTiles = []
+
         guard pathToFollow != nil, !pathToFollow!.isEmpty else {
             setLastPosition()
             return
@@ -655,7 +675,8 @@ class Unit: MapObject {
 
         var newPath = PathFinder.shared.findShortestPath(
             startI: physicalTilePos.x, startJ: physicalTilePos.y,
-            targetI: nextTileIJ.i, targetJ: nextTileIJ.j)
+            targetI: nextTileIJ.i, targetJ: nextTileIJ.j,
+            blockedTiles: blocked)
 
         // If no path, keep popping further waypoints until one is reachable.
         while newPath == nil {
@@ -667,7 +688,8 @@ class Unit: MapObject {
             nextTileIJ = pathToFollow!.removeLast()
             newPath = PathFinder.shared.findShortestPath(
                 startI: physicalTilePos.x, startJ: physicalTilePos.y,
-                targetI: nextTileIJ.i, targetJ: nextTileIJ.j)
+                targetI: nextTileIJ.i, targetJ: nextTileIJ.j,
+                blockedTiles: blocked)
         }
 
         // newPath: [last] = first step toward nextTileIJ, [0] = nextTileIJ.
