@@ -207,13 +207,15 @@ class Unit: MapObject {
         if isSelected {
             let healthFraction = Double(health) / Double(max(resistancePoints, 1))
             let barWidth = Int(Double(Constants.selectionBarWidth) * healthFraction)
+            let spriteHeight = sprite?.frameHeight ?? 0
+            let barY = y - spriteHeight + Constants.selectionBarY
             video.setColor(GameColor.green)
             video.fillRect(x - Constants.selectionBarWidth / 2,
-                               y + Constants.selectionBarY,
+                               barY,
                                barWidth, 3)
             video.setColor(GameColor.red)
             video.fillRect(x - Constants.selectionBarWidth / 2 + barWidth,
-                               y + Constants.selectionBarY,
+                               barY,
                                Constants.selectionBarWidth - barWidth, 3)
         }
         sprite?.draw(video: video, x: x - (sprite?.frameWidth ?? 0) / 2,
