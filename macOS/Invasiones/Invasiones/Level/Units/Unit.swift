@@ -196,6 +196,12 @@ class Unit: MapObject {
         return movedOnMap
     }
 
+    override func updateScreenPos() {
+        guard let cam = MapObject.camera, let map = MapObject.map else { return }
+        x = cam.startX + worldPos.x + cam.x + map.tileWidth / 2
+        y = cam.startY + worldPos.y + cam.y + map.tileHeight / 4
+    }
+
     override func draw(_ video: Video) {
         // Selection (health bar) is drawn here
         if isSelected {
