@@ -9,7 +9,8 @@ As part of the requirements, the entire codebase and documentation had to be wri
 The original project was hosted in an SVN repository on Assembla, so the development history has been lost.
 
 ## Ports
-A macOS port can be found [here](./macOS/README.md)
+- macOS (Swift/SpriteKit): [luciavmf/invasiones-macos](https://github.com/luciavmf/invasiones-macos)
+- Web (TypeScript): [luciavmf/invasiones-web](https://github.com/luciavmf/invasiones-web)
 
 ## Gameplay
 
