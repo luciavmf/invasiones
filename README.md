@@ -46,3 +46,7 @@ Built from scratch in C# (~18,000 lines) without a game engine. Core systems inc
 - **Resource manager** for sprites, fonts, sounds, and animations
 - **XML loader** for levels, objectives, and AI orders
 - **Partial classes** for the main `Episodio` (episode) logic, split across loading, intro, and gameplay states
+
+## License
+
+The source code is released under the [MIT license](LICENSE). Some fonts and sounds come from third parties and keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
